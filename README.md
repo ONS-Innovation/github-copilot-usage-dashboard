@@ -6,7 +6,7 @@ A simple Streamlit app to test and learn Streamlit.
 2. Create a virtual environment using `python3 -m venv venv`
 3. Activate the virtual environment using `source venv/bin/activate`
 4. Install all project dependancies using `poetry install`
-5. Run the project using `streamlit run app.py`
+5. Run the project using `streamlit run src/app.py`
 
 ## Data
 This repository includes 2 sets of example data which mirrors the output of the Github Copilot RESTful API.
