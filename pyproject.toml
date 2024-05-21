@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "streamlit-testing"
 version = "0.1.0"
-description = "A simple python project to test and learn the functionality of Streamlit"
+description = ""
 authors = ["Kieran Pritchard <kieran.pritchard@ons.gov.uk>"]
 readme = "README.md"
 
