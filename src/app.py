@@ -15,27 +15,27 @@ st.set_page_config(layout="wide")
 
 st.title("Github Copilot Dashboard")
 
-with open("./src/example_data/copilot_seats_data.json") as f:
-    seat_data = json.load(f)
+# Usage Data
 
 with open("./src/example_data/copilot_usage_data.json") as f:
     usage_data = json.load(f)
 
-# st.json(usage_data)
-
-data = pd.read_json("./src/example_data/copilot_usage_data.json").drop(columns="breakdown")
+df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json").drop(columns="breakdown")
 
 # Convert date column from str to datetime
-data["day"] = data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
+df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
 # Create a short version of the day
-data["display_day"] = data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
+df_usage_data["display_day"] = df_usage_data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
 
 # Add a column for number of ignore results
-data["total_decline_count"] = data.total_suggestions_count - data.total_acceptances_count
+df_usage_data["total_decline_count"] = df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
 
 # Add an acceptance rate column
-data["acceptance_rate"] = round(data.total_acceptances_count / data.total_suggestions_count * 100, 2)
+df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
+
+
+# Breakdown Data
 
 # breakdown = pd.DataFrame()
 
@@ -49,6 +49,16 @@ data["acceptance_rate"] = round(data.total_acceptances_count / data.total_sugges
 # st.dataframe(breakdown)
 
 
+# Seat Data
+
+with open("./src/example_data/copilot_seats_data.json") as f:
+    seat_data = json.load(f)
+
+df_seat_data = pd.DataFrame()
+
+for row in seat_data["seats"]:
+    df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)])
+
 min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
 max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
 
@@ -61,20 +71,23 @@ date_range = st.slider(
 )
 
 # Create a subset of data based on slider selection
-data_subset = data.loc[(data["day"] >= date_range[0]) & (data["day"] <= date_range[1])]
+data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
 
 # Metrics
 col1, col2, col3, col4 = st.columns(4)
 
-total_shown = data_subset["total_suggestions_count"].sum()
-total_accepts = data_subset["total_acceptances_count"].sum()
-acceptance_rate = round(total_accepts / total_shown * 100, 2)
-total_lines_accepted = data_subset["total_lines_accepted"].sum()
-
-col1.metric("Total Shown", total_shown)
-col2.metric("Total Accepts", total_accepts)
-col3.metric("Acceptance Rate", str(acceptance_rate)+"%")
-col4.metric("Lines of Code Accepted", total_lines_accepted)
+with col1:
+    total_shown = data_subset["total_suggestions_count"].sum()
+    st.metric("Total Shown", total_shown)
+with col2:
+    total_accepts = data_subset["total_acceptances_count"].sum()
+    st.metric("Total Accepts", total_accepts)
+with col3:
+    acceptance_rate = round(total_accepts / total_shown * 100, 2)
+    st.metric("Acceptance Rate", str(acceptance_rate)+"%")
+with col4:
+    total_lines_accepted = data_subset["total_lines_accepted"].sum()
+    st.metric("Lines of Code Accepted", total_lines_accepted)
 
 # Acceptance Graph
 
@@ -146,3 +159,12 @@ fig.update_layout(
 fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
 
 st.plotly_chart(fig, use_container_width=True)
+
+
+col1, col2 = st.columns([0.7, 0.3])
+
+with col1:
+    st.dataframe(df_seat_data)
+
+with col2:
+    st.write("WOOOOO!")
