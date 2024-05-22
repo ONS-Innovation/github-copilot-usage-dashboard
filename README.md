@@ -16,3 +16,12 @@ The 2 datasets are:
 - copilot_seats_data.json (from [this enpoint](https://docs.github.com/en/rest/copilot/copilot-user-management?apiVersion=2022-11-28#list-all-copilot-seat-assignments-for-an-organization))
 
 These endpoints are both in beta (as of 21/05/24) and may change in the future.
+
+## Graphing Libraries
+Streamlit supports a range of different graphing libraries. Within the project I test different ones to decide which is best for my use case.
+
+- [Streamlit (native)](https://docs.streamlit.io/develop/api-reference/charts)
+- [Matplotlib](https://matplotlib.org/stable/gallery/index)
+- [Plotly](https://plotly.com/python/)
+
+Matplotlib is the most basic and most powerful. However, it lacks any interactivity which is offered in Plotly (which is something I find very valuable).
