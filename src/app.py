@@ -40,10 +40,19 @@ df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count /
 
 breakdown = pd.DataFrame()
 
-for row in df_usage_data.breakdown:
-    breakdown = pd.concat([breakdown, pd.json_normalize(row)], ignore_index=True)
+# for row in df_usage_data.breakdown:
+#     breakdown = pd.concat([breakdown, pd.json_normalize(row)], ignore_index=True)
 
-grouped_breakdown = breakdown.groupby(["language"]).sum().drop(columns=["editor", "active_users"])
+for i in range(0, len(df_usage_data.day)):
+    for d in df_usage_data.breakdown[i]:
+        d["day"] = df_usage_data.day[i]
+
+    breakdown = pd.concat([breakdown, pd.json_normalize(df_usage_data.breakdown[i])], ignore_index=True)
+
+st.dataframe(breakdown)
+
+breakdown_subset = breakdown.drop(columns=["editor", "active_users", "day"])
+grouped_breakdown = breakdown_subset.groupby(["language"]).sum()
 
 # Add acceptance_rate to grouped_breakdown
 grouped_breakdown["acceptance_rate"] = round((grouped_breakdown["acceptances_count"] / grouped_breakdown["suggestions_count"]), 2)
@@ -176,7 +185,6 @@ col1, col2 = st.columns([0.6, 0.4])
 with col1:
     st.header("User Breakdown")
 
-
     st.subheader("Active Users")
 
     st.dataframe(
@@ -261,6 +269,9 @@ with col2:
             st.metric("Lines Suggested", selected_row["lines_suggested"])
         with col5:
             st.metric("Lines Accepted", selected_row["lines_accepted"])
+
+        fig = px.bar(breakdown.loc[breakdown["language"] == selected_row.index.values[0]], breakdown["day"], breakdown["suggestions_count"])
+        st.plotly_chart(fig)
 
     except IndexError:
         st.write("Please select a row for more information.")
