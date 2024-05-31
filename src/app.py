@@ -17,11 +17,12 @@ st.title("Github Copilot Dashboard")
 
 # Usage Data
 
+# Get a JSON version of usage data
 with open("./src/example_data/copilot_usage_data.json") as f:
     usage_data = json.load(f)
 
+# Converts copilot_usage_data.json into a dataframe
 df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json")
-# df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json").drop(columns="breakdown")
 
 # Convert date column from str to datetime
 df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
@@ -40,17 +41,14 @@ df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count /
 
 breakdown = pd.DataFrame()
 
-# for row in df_usage_data.breakdown:
-#     breakdown = pd.concat([breakdown, pd.json_normalize(row)], ignore_index=True)
-
+# Puts df_usage_data.breakdown into a dataframe
 for i in range(0, len(df_usage_data.day)):
     for d in df_usage_data.breakdown[i]:
         d["day"] = df_usage_data.day[i]
 
     breakdown = pd.concat([breakdown, pd.json_normalize(df_usage_data.breakdown[i])], ignore_index=True)
 
-st.dataframe(breakdown)
-
+# Group the breakdown data by language
 breakdown_subset = breakdown.drop(columns=["editor", "active_users", "day"])
 grouped_breakdown = breakdown_subset.groupby(["language"]).sum()
 
@@ -60,15 +58,20 @@ grouped_breakdown["acceptance_rate"] = round((grouped_breakdown["acceptances_cou
 
 # Seat Data
 
+# GEt a JSON version of Seat Data
 with open("./src/example_data/copilot_seats_data.json") as f:
     seat_data = json.load(f)
 
 df_seat_data = pd.DataFrame()
 
+# Puts the seat information from copilot_seats_data.json into a dataframe
 for row in seat_data["seats"]:
     df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
-def last_activity_to_datetime(x: str | None) -> datetime | None:
+def last_activity_to_datetime(x: str | None) -> str | None:
+    """
+        A function used to convert the last_activity column of df_seat_data into a formatted datetime string
+    """
     if x not in (None, ""):
         sections = x.split(":")
 
@@ -78,12 +81,14 @@ def last_activity_to_datetime(x: str | None) -> datetime | None:
     else:
         return None
 
+# Converts last_activity_at to a formatted string
 df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(x))
 
-
+# Get the maximum and minimum date which we have data for from copilot_usage_data.json
 min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
 max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
 
+# Create a date slider
 date_range = st.slider(
     "Date Range",
     min_value=min_date,
@@ -95,7 +100,7 @@ date_range = st.slider(
 # Create a subset of data based on slider selection
 data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
 
-# Metrics
+# Metrics for total shown, total accepts, acceptance rate and total lines accepted
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -180,59 +185,13 @@ fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
 st.plotly_chart(fig, use_container_width=True)
 
 
+# Language breakdown
+
+st.header("Language Breakdown")
+
 col1, col2 = st.columns([0.6, 0.4])
 
 with col1:
-    st.header("User Breakdown")
-
-    st.subheader("Active Users")
-
-    st.dataframe(
-        df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][["assignee.login", "last_activity_at", "assignee.html_url"]], 
-        hide_index=True, 
-        use_container_width=True, 
-        column_config={
-            "assignee.login": st.column_config.Column(
-                "User"
-            ),
-            "last_activity_at": st.column_config.DatetimeColumn(
-                "Last Activity At",
-                format="YYYY-MM-DD HH:mm"
-            ),
-            "assignee.html_url": st.column_config.LinkColumn(
-                "Github Profile",
-                help="A link to this user's profile",
-                display_text="Go to Profile"
-            )
-        }
-    )
-
-    st.subheader("Inactive Users")
-
-    st.dataframe(
-        df_seat_data.loc[df_seat_data["last_activity_at"].isnull()][["assignee.login", "last_activity_at", "assignee.html_url"]], 
-        hide_index=True, 
-        use_container_width=True, 
-        column_config={
-            "assignee.login": st.column_config.Column(
-                "User"
-            ),
-            "last_activity_at": st.column_config.DatetimeColumn(
-                "Last Activity At",
-                format="YYYY-MM-DD HH:mm"
-            ),
-            "assignee.html_url": st.column_config.LinkColumn(
-                "Github Profile",
-                help="A link to this user's profile",
-                display_text="Go to Profile"
-            )
-        }
-    )
-
-
-with col2:
-    st.header("Language Breakdown")
-
     language_drill = st.dataframe(
         grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]], 
         use_container_width=True,
@@ -254,6 +213,8 @@ with col2:
         }
     )
 
+with col2:
+    # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
     try:
         selected_row = grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
 
@@ -270,11 +231,103 @@ with col2:
         with col5:
             st.metric("Lines Accepted", selected_row["lines_accepted"])
 
-        fig = px.bar(breakdown.loc[breakdown["language"] == selected_row.index.values[0]], breakdown["day"], breakdown["suggestions_count"])
+        # Creates a subset of breakdown dataframe to only hold information for the selected language
+        df_breakdown_by_day = breakdown.loc[breakdown["language"] == selected_row.index.values[0]].groupby(["day", "language", "editor"]).sum()
+        df_breakdown_by_day = df_breakdown_by_day.reset_index()
+
+        # Calculates the total copilot suggestion for the date
+        df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
+        df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
+        df_date_totals = df_date_totals.reset_index()
+
+        # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
+        df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
+
+        # Create a graph showing number of suggestions by day, split by IDE.
+        fig = make_subplots()
+
+        list_of_editors = df_breakdown_by_day["editor"].unique()
+
+        for editor in list_of_editors:
+            df = df_breakdown_by_day.loc[df_breakdown_by_day["editor"] == editor]
+
+            fig.add_trace(
+                go.Bar(
+                    name=editor,
+                    x=df["day"],
+                    y=df["suggestions_count"],
+                    customdata=df["total_suggestions"],
+                    hovertemplate="<br>" +
+                        "Number of Suggestions: %{y} <br>" +
+                        "Total Suggestions for Day: %{customdata} <br>"
+                ))
+
+        fig.update_layout(
+            barmode="stack",
+            title="Suggestions by Day Per Editor",
+            xaxis_title="Day",
+            yaxis_title="Number of Suggestions",
+            hovermode="x unified"
+        )
+
         st.plotly_chart(fig)
 
     except IndexError:
         st.write("Please select a row for more information.")
+
+# User Breakdown
+
+st.header("User Breakdown")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Active Users")
+
+    # Dataframe showing only active users (this with a latest activity)
+    st.dataframe(
+        df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][["assignee.login", "last_activity_at", "assignee.html_url"]], 
+        hide_index=True, 
+        use_container_width=True, 
+        column_config={
+            "assignee.login": st.column_config.Column(
+                "User"
+            ),
+            "last_activity_at": st.column_config.DatetimeColumn(
+                "Last Activity At",
+                format="YYYY-MM-DD HH:mm"
+            ),
+            "assignee.html_url": st.column_config.LinkColumn(
+                "Github Profile",
+                help="A link to this user's profile",
+                display_text="Go to Profile"
+            )
+        }
+    )
+
+with col2:
+    st.subheader("Inactive Users")
+
+    # Dataframe showing only inactive users (those where last_activity_at is None)
+    st.dataframe(
+        df_seat_data.loc[df_seat_data["last_activity_at"].isnull()][["assignee.login", "last_activity_at", "assignee.html_url"]], 
+        hide_index=True, 
+        use_container_width=True, 
+        column_config={
+            "assignee.login": st.column_config.Column(
+                "User"
+            ),
+            "last_activity_at": st.column_config.DatetimeColumn(
+                "Last Activity At",
+                format="YYYY-MM-DD HH:mm"
+            ),
+            "assignee.html_url": st.column_config.LinkColumn(
+                "Github Profile",
+                help="A link to this user's profile",
+                display_text="Go to Profile"
+            )
+        }
+    )
 
 col1, col2, col3 = st.columns([0.2, 0.4, 0.4])
 
@@ -290,7 +343,7 @@ with col1:
     st.metric("Number of Engaged Users", number_of_engaged_users)
 
 with col2:
-    st.write("yippee")
+    st.write("Engaged Users by Day")
 
 with col3:
-    st.write("yippee")
+    st.write("Engaged Users IDE Split")
