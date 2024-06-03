@@ -25,3 +25,5 @@ Streamlit supports a range of different graphing libraries. Within the project I
 - [Plotly](https://plotly.com/python/)
 
 Matplotlib is the most basic and most powerful. However, it lacks any interactivity which is offered in Plotly (which is something I find very valuable).
+
+After Testing, I decided to go with Plotly, due to it having the right balance between interactivity and simplicity while still being powerful enough to produce a range of charts.
