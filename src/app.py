@@ -34,83 +34,93 @@ date_range = st.slider(
     format="YYYY-MM-DD"
 )
 
-
-# Converts copilot_usage_data.json into a dataframe
-df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json")
-
-# Convert date column from str to datetime
-df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
-
-# Create a short version of the day
-df_usage_data["display_day"] = df_usage_data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
-
-# Add a column for number of ignore results
-df_usage_data["total_decline_count"] = df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
-
-# Add an acceptance rate column
-df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
-
-# Create a subset of data based on slider selection
-df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
-
-
-# Breakdown Data
-
-breakdown = pd.DataFrame()
-
-# Puts df_usage_data.breakdown into a dataframe
-for i in range(0, len(df_usage_data_subset.day)):
-    for d in df_usage_data_subset.breakdown[i]:
-        d["day"] = df_usage_data_subset.day[i]
-
-    breakdown = pd.concat([breakdown, pd.json_normalize(df_usage_data_subset.breakdown[i])], ignore_index=True)
-
-# Group the breakdown data by language
-breakdown_subset = breakdown.drop(columns=["editor", "active_users", "day"])
-language_grouped_breakdown = breakdown_subset.groupby(["language"]).sum()
-
-# Add acceptance_rate to language_grouped_breakdown
-language_grouped_breakdown["acceptance_rate"] = round((language_grouped_breakdown["acceptances_count"] / language_grouped_breakdown["suggestions_count"]), 2)
-
-# Group breakdown data by editor (IDE)
-breakdown_subset = breakdown.drop(columns=["language"])
-
-# Gets the average of the columns for mean active users by IDE
-editor_grouped_breakdown_avg = breakdown_subset.groupby(["editor", "day"]).mean()
-editor_grouped_breakdown_avg = editor_grouped_breakdown_avg.reset_index()
-
-# Gets the sum of the columns for total active users by IDE
-editor_grouped_breakdown_sum = breakdown_subset.groupby(["editor", "day"]).sum()
-editor_grouped_breakdown_sum = editor_grouped_breakdown_sum.reset_index()
-
-
-# Seat Data
-
-# Get a JSON version of Seat Data
-with open("./src/example_data/copilot_seats_data.json") as f:
-    seat_data = json.load(f)
-
-df_seat_data = pd.DataFrame()
-
-# Puts the seat information from copilot_seats_data.json into a dataframe
-for row in seat_data["seats"]:
-    df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
-
-def last_activity_to_datetime(x: str | None) -> str | None:
+@st.cache_data
+def generate_datasets(date_range: tuple):
     """
-        A function used to convert the last_activity column of df_seat_data into a formatted datetime string
+        Converts the 2 JSON responses from the Github API into Pandas Dataframes
     """
-    if x not in (None, ""):
-        sections = x.split(":")
 
-        corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
+    # Converts copilot_usage_data.json into a dataframe
+    df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json")
 
-        return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
-    else:
-        return None
+    # Convert date column from str to datetime
+    df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
-# Converts last_activity_at to a formatted string
-df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(x))
+    # Create a short version of the day
+    df_usage_data["display_day"] = df_usage_data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
+
+    # Add a column for number of ignore results
+    df_usage_data["total_decline_count"] = df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
+
+    # Add an acceptance rate column
+    df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
+
+    # Create a subset of data based on slider selection
+    df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
+
+
+    # Breakdown Data
+
+    breakdown = pd.DataFrame()
+
+    # Puts df_usage_data.breakdown into a dataframe
+    for i in range(0, len(df_usage_data_subset.day)):
+        for d in df_usage_data_subset.breakdown[i]:
+            d["day"] = df_usage_data_subset.day[i]
+
+        breakdown = pd.concat([breakdown, pd.json_normalize(df_usage_data_subset.breakdown[i])], ignore_index=True)
+
+    # Group the breakdown data by language
+    breakdown_subset = breakdown.drop(columns=["editor", "active_users", "day"])
+    language_grouped_breakdown = breakdown_subset.groupby(["language"]).sum()
+
+    # Add acceptance_rate to language_grouped_breakdown
+    language_grouped_breakdown["acceptance_rate"] = round((language_grouped_breakdown["acceptances_count"] / language_grouped_breakdown["suggestions_count"]), 2)
+
+    # Group breakdown data by editor (IDE)
+    breakdown_subset = breakdown.drop(columns=["language"])
+
+    # Gets the average of the columns for mean active users by IDE
+    editor_grouped_breakdown_avg = breakdown_subset.groupby(["editor", "day"]).mean()
+    editor_grouped_breakdown_avg = editor_grouped_breakdown_avg.reset_index()
+
+    # Gets the sum of the columns for total active users by IDE
+    editor_grouped_breakdown_sum = breakdown_subset.groupby(["editor", "day"]).sum()
+    editor_grouped_breakdown_sum = editor_grouped_breakdown_sum.reset_index()
+
+
+    # Seat Data
+
+    # Get a JSON version of Seat Data
+    with open("./src/example_data/copilot_seats_data.json") as f:
+        seat_data = json.load(f)
+
+    df_seat_data = pd.DataFrame()
+
+    # Puts the seat information from copilot_seats_data.json into a dataframe
+    for row in seat_data["seats"]:
+        df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
+
+    def last_activity_to_datetime(x: str | None) -> str | None:
+        """
+            A function used to convert the last_activity column of df_seat_data into a formatted datetime string
+        """
+        if x not in (None, ""):
+            sections = x.split(":")
+
+            corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
+
+            return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
+        else:
+            return None
+
+    # Converts last_activity_at to a formatted string
+    df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(x))
+
+    return df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum, df_seat_data, seat_data
+
+
+df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum, df_seat_data, seat_data = generate_datasets(date_range)
 
 
 # Metrics for total shown, total accepts, acceptance rate and total lines accepted
