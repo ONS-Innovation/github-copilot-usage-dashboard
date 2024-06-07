@@ -4,9 +4,6 @@ from datetime import datetime
 
 import pandas as pd
 
-# import matplotlib.pyplot as plt
-# import matplotlib.ticker as ticker
-
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
