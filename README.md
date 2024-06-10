@@ -14,7 +14,61 @@ This project uses poetry for package management.
 5. Run the project using `streamlit run src/app.py`
 
 ## Setup - Running in a container
-TODO
+1. Build a Docker Image
+
+```
+    docker build -t copilot-usage-dashboard .
+```
+
+2. Check the image exists
+
+```
+    docker images
+```
+
+Example Output:
+
+```
+REPOSITORY                                                      TAG         IMAGE ID       CREATED          SIZE
+copilot-usage-dashboard                                         latest      afa0494f35a5   7 minutes ago    1.02GB
+```
+
+3. Run the image locally mapping local port 5801 to container port 5801 and passing in AWS credentials to download a .pem file from AWS Secrets Manager to the running container.
+
+```
+docker run -p 8501:8501 \
+-e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
+-e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
+-e AWS_DEFAULT_REGION=eu-west-2 \
+copilot-usage-dashboard
+```
+
+4. Check the container is running
+
+```
+docker ps
+```
+
+Example Output:
+
+```
+CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
+ae4aaf1daee6   copilot-usage-dashboard   "/app/start_dashboar…"   7 seconds ago   Up 6 seconds   0.0.0.0:8501->8501/tcp, :::8501->8501/tcp   quirky_faraday
+```
+
+5. To view the running in a browser app navigate to
+
+```
+You can now view your Streamlit app in your browser.
+
+URL: http://0.0.0.0:8501
+```
+
+6. To stop the container, use the container ID
+
+```
+docker stop ae4aaf1daee6
+```
 
 ## Data
 ### Example Data
