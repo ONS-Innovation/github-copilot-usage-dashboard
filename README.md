@@ -83,6 +83,9 @@ These endpoints are both in beta (as of 21/05/24) and may change in the future.
 ### Live Data
 To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file.
 
+### Data Model Diagram (Live Data)
+![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
+
 #### Getting a .pem file for the Github App
 
 A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
