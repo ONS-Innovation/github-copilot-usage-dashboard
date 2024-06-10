@@ -1,4 +1,4 @@
-# Streamlit Testing
+# GitHub Copilot Usage Dashboard
 A Streamlit dashboard to display information from the Github Copilot Usage API endpoints.
 
 ## Prerequisites
