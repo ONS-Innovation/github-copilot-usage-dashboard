@@ -1,22 +1,22 @@
-<mxfile host="app.diagrams.net" modified="2024-06-10T15:07:34.920Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="RSWowGSgwlft-Ni9D1c_" version="24.4.14" type="device">
+<mxfile host="app.diagrams.net" modified="2024-06-10T15:13:42.385Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="GjT8YIaDb9nsNVVxNvXh" version="24.5.2" type="device">
   <diagram name="Page-1" id="UuaVYHqYEeruNvDf7hTw">
-    <mxGraphModel dx="3191" dy="1648" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
+    <mxGraphModel dx="2074" dy="1071" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-3" value="Get request with JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-1" target="JAojj6oCfwSo5Z4DhQhG-2">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-3" value="Get request with JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-1" target="JAojj6oCfwSo5Z4DhQhG-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-1" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-1" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-4" value="Returns Github App&lt;div&gt;&amp;nbsp;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-2" target="JAojj6oCfwSo5Z4DhQhG-1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-4" value="Returns Github App&lt;div&gt;&amp;nbsp;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-2" target="JAojj6oCfwSo5Z4DhQhG-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-2" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-2" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="280" y="920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-5" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-6" target="JAojj6oCfwSo5Z4DhQhG-8">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-5" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-6" target="JAojj6oCfwSo5Z4DhQhG-8" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="150" y="1140" />
@@ -24,103 +24,103 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-6" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-6" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1120" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-7" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-8" target="JAojj6oCfwSo5Z4DhQhG-6">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-7" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-8" target="JAojj6oCfwSo5Z4DhQhG-6" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-8" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-8" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="280" y="1120" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-9" value="1. Get the installation ID of the Github App by sending a GET request to /orgs/{org}/installation&amp;nbsp;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-9" value="1. Get the installation ID of the Github App by sending a GET request to /orgs/{org}/installation&amp;nbsp;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="840" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-10" value="2. Get an Access Token by sending a GET request to /app/installations/{installation_id}/access_tokens" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-10" value="2. Get an Access Token by sending a GET request to /app/installations/{installation_id}/access_tokens" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1040" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-11" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-12" target="JAojj6oCfwSo5Z4DhQhG-14">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-11" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-12" target="JAojj6oCfwSo5Z4DhQhG-14" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-12" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-12" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-13" value="Returns Usage and&lt;div&gt;Seat Information for&lt;/div&gt;&lt;div&gt;last 28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-14" target="JAojj6oCfwSo5Z4DhQhG-12">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-13" value="Returns Usage and&lt;div&gt;Seat Information for&lt;/div&gt;&lt;div&gt;last 28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-14" target="JAojj6oCfwSo5Z4DhQhG-12" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-14" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-14" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="680" y="920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-15" value="1. Send GET Requests to /orgs/{org}/copilot/usage and /orgs/{org}/copilot/billing/seats to get Copilot Usage and Seat information" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-15" value="1. Send GET Requests to /orgs/{org}/copilot/usage and /orgs/{org}/copilot/billing/seats to get Copilot Usage and Seat information" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="840" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-19" value="Access Token&lt;div&gt;Request&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;align=center;fontColor=#FF0000;exitX=0;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-16" target="JAojj6oCfwSo5Z4DhQhG-18">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-19" value="Access Token&lt;div&gt;Request&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;align=center;fontColor=#FF0000;exitX=0;exitY=0.75;exitDx=0;exitDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-16" target="JAojj6oCfwSo5Z4DhQhG-18" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="480" y="790" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-21" value="API Request with&lt;div&gt;Token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-16" target="JAojj6oCfwSo5Z4DhQhG-17">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-21" value="API Request with&lt;div&gt;Token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-16" target="JAojj6oCfwSo5Z4DhQhG-17" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-16" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-16" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="320" y="680" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-22" value="28 Days of Seat&lt;div&gt;and Usage Data&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-17" target="JAojj6oCfwSo5Z4DhQhG-16">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-22" value="28 Days of Seat&lt;div&gt;and Usage Data&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-17" target="JAojj6oCfwSo5Z4DhQhG-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-17" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-17" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="640" y="680" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-20" value="Access&lt;div&gt;Token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;align=center;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-18" target="JAojj6oCfwSo5Z4DhQhG-16">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-20" value="Access&lt;div&gt;Token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;align=center;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-18" target="JAojj6oCfwSo5Z4DhQhG-16" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-18" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-18" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="680" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-23" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;1. Authentication&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-23" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;1. Authentication&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="800" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-24" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;2. Live Data&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-24" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;2. Live Data&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="800" width="180" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-25" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Live Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-25" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Live Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="600" width="720" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-28" value="AWS Lambda" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#CC6600;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-28" value="AWS Lambda" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#CC6600;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="320" y="1320" width="120" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-46" value="Historic Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-30" target="JAojj6oCfwSo5Z4DhQhG-37">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-46" value="Historic Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-30" target="JAojj6oCfwSo5Z4DhQhG-37" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-30" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-30" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="600" y="1480" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-32" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-32" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1320" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-33" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Historic Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-33" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Historic Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1240" width="720" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-34" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-34" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1480" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-37" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-37" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="600" y="1320" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-38" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-38" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="160" y="1380" as="sourcePoint" />
             <mxPoint x="320" y="1380" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-39" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-39" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="320" y="1340" as="sourcePoint" />
             <mxPoint x="160" y="1340" as="targetPoint" />
@@ -130,14 +130,14 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-42" value="Updated Usage&amp;nbsp;&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#0066CC;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-42" value="Updated Usage&amp;nbsp;&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="440" y="1539.5" as="sourcePoint" />
             <mxPoint x="600" y="1539.5" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-43" value="Old Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#0066CC;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-43" value="Old Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="600" y="1499.5" as="sourcePoint" />
             <mxPoint x="440" y="1499.5" as="targetPoint" />
@@ -148,33 +148,33 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-44" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-44" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="320" y="1499.5" as="sourcePoint" />
             <mxPoint x="160" y="1499.5" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-45" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-45" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
             <mxPoint x="160" y="1539.5" as="sourcePoint" />
             <mxPoint x="320" y="1539.5" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-47" value="Get request with JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-48" target="JAojj6oCfwSo5Z4DhQhG-50">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-47" value="Get request with JWT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-48" target="JAojj6oCfwSo5Z4DhQhG-50" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-48" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-48" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1720" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-49" value="Returns Github App&lt;div&gt;&amp;nbsp;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-50" target="JAojj6oCfwSo5Z4DhQhG-48">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-49" value="Returns Github App&lt;div&gt;&amp;nbsp;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-50" target="JAojj6oCfwSo5Z4DhQhG-48" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-50" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-50" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="280" y="1720" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-51" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-52" target="JAojj6oCfwSo5Z4DhQhG-54">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-51" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-52" target="JAojj6oCfwSo5Z4DhQhG-54" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="150" y="1940" />
@@ -182,128 +182,128 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-52" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-52" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-53" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-54" target="JAojj6oCfwSo5Z4DhQhG-52">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-53" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-54" target="JAojj6oCfwSo5Z4DhQhG-52" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-54" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-54" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="280" y="1920" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-55" value="1. Get the installation ID of the Github App by sending a GET request to /orgs/{org}/installation&amp;nbsp;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-55" value="1. Get the installation ID of the Github App by sending a GET request to /orgs/{org}/installation&amp;nbsp;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1640" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-56" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;1. Authentication&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-56" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;1. Authentication&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1600" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-57" value="2. Get an Access Token by sending a GET request to /app/installations/{installation_id}/access_tokens" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-57" value="2. Get an Access Token by sending a GET request to /app/installations/{installation_id}/access_tokens" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="1840" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-58" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#009900;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-59" target="JAojj6oCfwSo5Z4DhQhG-61">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-58" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-59" target="JAojj6oCfwSo5Z4DhQhG-61" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-59" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-59" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="2160" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-60" value="Returns Usage and&lt;div&gt;Seat Information for&lt;/div&gt;&lt;div&gt;last 28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#009900;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-61" target="JAojj6oCfwSo5Z4DhQhG-59">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-60" value="Returns Usage and&lt;div&gt;Seat Information for&lt;/div&gt;&lt;div&gt;last 28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-61" target="JAojj6oCfwSo5Z4DhQhG-59" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-61" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-61" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#009900;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="280" y="2160" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-62" value="1. Send GET Requests to /orgs/{org}/copilot/usage to get Copilot Usage information" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#009900;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-62" value="1. Send GET Requests to /orgs/{org}/copilot/usage to get Copilot Usage information" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="2080" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-63" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;2. Live Data&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-63" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;2. Live Data&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="2040" width="180" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-64" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;3. AWS Lambda and S3&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-64" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;3. AWS Lambda and S3&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1600" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-65" value="1. Get old Usage Information from S3 Bucket" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-65" value="1. Get old Usage Information from S3 Bucket" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1640" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-66" value="2. Get live data from Live Data process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#009900;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-66" value="2. Get live data from Live Data process" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#009900;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1840" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-67" value="3. Append live data to old data" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#CC6600;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-67" value="3. Append live data to old data" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#CC6600;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1880" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-68" value="4. Push updated usage information back to S3" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-68" value="4. Push updated usage information back to S3" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1920" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-69" value="AWS&amp;nbsp;&lt;div&gt;Lambda&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-69" value="AWS&amp;nbsp;&lt;div&gt;Lambda&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="1720" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-79" value="Old Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontColor=#0066CC;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-70" target="JAojj6oCfwSo5Z4DhQhG-69">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-79" value="Old Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-70" target="JAojj6oCfwSo5Z4DhQhG-69" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-70" value="S3&lt;div&gt;Bucket&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-70" value="S3&lt;div&gt;Bucket&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="680" y="1720" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-80" value="AWS&amp;nbsp;&lt;div&gt;Lambda&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-80" value="AWS&amp;nbsp;&lt;div&gt;Lambda&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="2000" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-81" value="Updated Usage&amp;nbsp;&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontColor=#0066CC;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-80" target="JAojj6oCfwSo5Z4DhQhG-82">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-81" value="Updated Usage&amp;nbsp;&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-80" target="JAojj6oCfwSo5Z4DhQhG-82" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-82" value="S3&lt;div&gt;Bucket&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-82" value="S3&lt;div&gt;Bucket&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#0066CC;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="680" y="2000" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-84" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=default;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-84" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=default;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="2240" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-89" value="Historic Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-86" target="JAojj6oCfwSo5Z4DhQhG-84">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-89" value="Historic Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-86" target="JAojj6oCfwSo5Z4DhQhG-84" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-86" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=default;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-86" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=default;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="680" y="2240" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-87" value="1. Download Historic Usage Data from S3 Bucket" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=default;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-87" value="1. Download Historic Usage Data from S3 Bucket" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=default;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="2160" width="320" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-88" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;4. Return Data to Dashboard&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontColor=default;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-88" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;4. Return Data to Dashboard&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fontColor=default;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="440" y="2120" width="360" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-90" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Combined Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-90" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Combined Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="40" y="40" width="720" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-120" value="Updated Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;align=right;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-91" target="JAojj6oCfwSo5Z4DhQhG-93">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-120" value="Updated Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;align=right;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-91" target="JAojj6oCfwSo5Z4DhQhG-93" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-91" value="AWS Lambda" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-91" value="AWS Lambda" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="620" y="160" width="120" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-119" value="Old Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;align=left;fontColor=#FF0000;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-93" target="JAojj6oCfwSo5Z4DhQhG-91">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-119" value="Old Usage&lt;div&gt;Information&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;align=left;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-93" target="JAojj6oCfwSo5Z4DhQhG-91" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-121" value="Historic Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="JAojj6oCfwSo5Z4DhQhG-93" target="JAojj6oCfwSo5Z4DhQhG-96">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-121" value="Historic Usage Information" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;labelBackgroundColor=none;" parent="1" source="JAojj6oCfwSo5Z4DhQhG-93" target="JAojj6oCfwSo5Z4DhQhG-96" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-93" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-93" value="S3 Bucket" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="620" y="480" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-95" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#000000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-95" value="GitHub RESTful API" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#000000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="340" y="160" width="120" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-96" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#000000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-96" value="Copilot Usage Dashboard" style="rounded=1;whiteSpace=wrap;html=1;fontColor=#000000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="60" y="160" width="120" height="240" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-97" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-97" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="460" y="220" as="sourcePoint" />
             <mxPoint x="620" y="220" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-98" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-98" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="620" y="180" as="sourcePoint" />
             <mxPoint x="460" y="180" as="targetPoint" />
@@ -313,28 +313,28 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-101" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-101" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="620" y="339.5" as="sourcePoint" />
             <mxPoint x="460" y="339.5" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-102" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-102" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
             <mxPoint x="460" y="379.5" as="sourcePoint" />
             <mxPoint x="620" y="379.5" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-115" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#000000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-115" value="Returns Access Token&lt;div&gt;for future requests&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#000000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="340" y="219.75" as="sourcePoint" />
             <mxPoint x="180" y="219.75" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-116" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#000000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-116" value="Get request with&lt;div&gt;Installation ID&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#000000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="180" y="179.75" as="sourcePoint" />
             <mxPoint x="340" y="179.75" as="targetPoint" />
@@ -344,30 +344,30 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-117" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#000000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-117" value="Get request with access&lt;div&gt;token&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontColor=#000000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="180" y="339.25" as="sourcePoint" />
             <mxPoint x="340" y="339.25" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-118" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#000000;" edge="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-118" value="Returns Usage&lt;div&gt;Information for last&lt;/div&gt;&lt;div&gt;28 days&lt;/div&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontColor=#000000;labelBackgroundColor=none;" parent="1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint as="offset" />
             <mxPoint x="340" y="379.25" as="sourcePoint" />
             <mxPoint x="180" y="379.25" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-122" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Live Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-122" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Live Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="60" y="80" width="340" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-123" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Historic Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-123" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Historic Data Process&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;align=center;fontStyle=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="400" y="80" width="340" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-124" value="Runs on page request&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; text-wrap: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20value%3D%22%26lt%3Bh1%20style%3D%26quot%3Bmargin-top%3A%200px%3B%26quot%3B%26gt%3BLive%20Data%26lt%3B%2Fh1%26gt%3B%22%20style%3D%22text%3Bhtml%3D1%3BwhiteSpace%3Dwrap%3Boverflow%3Dhidden%3Brounded%3D0%3Balign%3Dcenter%3BfontStyle%3D0%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%221840%22%20width%3D%22340%22%20height%3D%2240%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-124" value="Runs on page request&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; text-wrap: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20value%3D%22%26lt%3Bh1%20style%3D%26quot%3Bmargin-top%3A%200px%3B%26quot%3B%26gt%3BLive%20Data%26lt%3B%2Fh1%26gt%3B%22%20style%3D%22text%3Bhtml%3D1%3BwhiteSpace%3Dwrap%3Boverflow%3Dhidden%3Brounded%3D0%3Balign%3Dcenter%3BfontStyle%3D0%22%20vertex%3D%221%22%20parent%3D%221%22%3E%3CmxGeometry%20x%3D%2240%22%20y%3D%221840%22%20width%3D%22340%22%20height%3D%2240%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="60" y="120" width="340" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="JAojj6oCfwSo5Z4DhQhG-125" value="Runs every 28 days using AWS Event Bridge" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#FF0000;" vertex="1" parent="1">
+        <mxCell id="JAojj6oCfwSo5Z4DhQhG-125" value="Runs every 28 days using AWS Event Bridge" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontColor=#FF0000;labelBackgroundColor=none;" parent="1" vertex="1">
           <mxGeometry x="400" y="120" width="340" height="40" as="geometry" />
         </mxCell>
       </root>
