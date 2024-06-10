@@ -8,15 +8,40 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import api_interface as at
+
+org = "ONSdigital"
+
 st.set_page_config(layout="wide")
 
 st.title("Github Copilot Usage Dashboard")
 
+# Get the access token
+access_token = at.get_access_token(org, "./copilot-usage-dashboard.pem")
+
+use_example_data = False
+
+# Check if the access token is a string. If it is, then an error occurred.
+if type(access_token) == str:
+    st.error("An error occurred while trying to get the access token. Please check the error message below.")
+    st.error(access_token)
+    st.error("Using the example dataset instead.")
+
+    use_example_data = True
+
+use_example_data = st.toggle("Use Example Data", use_example_data)
+
 # Usage Data
 
 # Get a JSON version of usage data
-with open("./src/example_data/copilot_usage_data.json") as f:
-    usage_data = json.load(f)
+if use_example_data:
+    with open("./src/example_data/copilot_usage_data.json") as f:
+        usage_data = json.load(f)
+else:
+    gh = at.api_controller(access_token[0])
+
+    usage_data = gh.get(f"/orgs/{org}/copilot/usage", params={})
+    usage_data = usage_data.json()
 
 # Get the maximum and minimum date which we have data for from copilot_usage_data.json
 min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
@@ -38,7 +63,7 @@ def generate_datasets(date_range: tuple):
     """
 
     # Converts copilot_usage_data.json into a dataframe
-    df_usage_data = pd.read_json("./src/example_data/copilot_usage_data.json")
+    df_usage_data = pd.json_normalize(usage_data)
 
     # Convert date column from str to datetime
     df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
@@ -89,8 +114,15 @@ def generate_datasets(date_range: tuple):
     # Seat Data
 
     # Get a JSON version of Seat Data
-    with open("./src/example_data/copilot_seats_data.json") as f:
-        seat_data = json.load(f)
+    if use_example_data:
+        with open("./src/example_data/copilot_seats_data.json") as f:
+            seat_data = json.load(f)
+    else:
+        gh = at.api_controller(access_token[0])
+
+        seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={})
+        seat_data = seat_data.json()
+    
 
     df_seat_data = pd.DataFrame()
 
@@ -98,21 +130,28 @@ def generate_datasets(date_range: tuple):
     for row in seat_data["seats"]:
         df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
-    def last_activity_to_datetime(x: str | None) -> str | None:
+
+    def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
         """
             A function used to convert the last_activity column of df_seat_data into a formatted datetime string
         """
-        if x not in (None, ""):
-            sections = x.split(":")
+        if use_example_data:
+            if x not in (None, ""):
+                sections = x.split(":")
 
-            corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
+                corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
 
-            return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
+                return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
+            else:
+                return None
         else:
-            return None
+            if x not in (None, ""):
+                return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")            
+            else:
+                return None
 
     # Converts last_activity_at to a formatted string
-    df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(x))
+    df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(use_example_data, x))
 
     return df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum, df_seat_data, seat_data
 
@@ -278,7 +317,7 @@ with col2:
     number_of_engaged_users = 0
 
     for index, row in df_seat_data.iterrows():
-        if row.last_activity_at not in (None, ""):
+        if pd.isnull(row.last_activity_at) == False:
             number_of_engaged_users += 1
     
     st.metric("Number of Engaged Users", number_of_engaged_users)
