@@ -71,6 +71,8 @@ docker stop ae4aaf1daee6
 ```
 
 ## Data
+When running the dashboard, you can toggle between using Live and Example Data.
+
 ### Example Data
 This repository includes 2 sets of example data which mirrors the output of the Github Copilot RESTful API.
 These have been sourced from [this repository](https://github.com/octodemo/Copilot-Usage-Dashboard/tree/main).
@@ -82,9 +84,6 @@ These endpoints are both in beta (as of 21/05/24) and may change in the future.
 
 ### Live Data
 To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file.
-
-### Data Model Diagram (Live Data)
-![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
 
 #### Getting a .pem file for the Github App
 
@@ -98,6 +97,9 @@ Once created and installed, you need to generate a Private Key for that Github A
 This file needs to be renamed **copilot-usage-dashboard.pem** ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps)).
 
 If you do not have access to organisation settings, you need to request a .pem file for the app.
+
+### Data Model Diagram (Live Data)
+![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
 
 ## Streamlit and Supporting Libraries
 This project uses [Streamlit](https://streamlit.io/) to build a quick and easy web app. Streamlit can generate front ends without the need for any HTML, CSS or JS. This means that the dashboard can be more quickly than alternative frameworks such as [Dash](https://dash.plotly.com/) which is similar to a [Flask](https://flask.palletsprojects.com/en/3.0.x/) app. Streamlit also supports the use of many other libraries. For example, Streamlit can render many graphing libraries, such as Matplotlib, Altair and Plotly. 
