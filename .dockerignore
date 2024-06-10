@@ -1,0 +1,5 @@
+# Virtual Environment
+venv/
+
+# .pem file
+copilot-usage-dashboard.pem
