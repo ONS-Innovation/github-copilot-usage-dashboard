@@ -1,2 +1,9 @@
+# Virtual Environment
 venv
 .venv
+
+# Pycache
+__pycache__/
+
+# .pem file for GitHub API Token
+copilot-usage-dashboard.pem
