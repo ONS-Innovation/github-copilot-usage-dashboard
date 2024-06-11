@@ -51,9 +51,16 @@ if file_exists:
 else:
     historic_usage = []
 
+dates_added = []
+
 # Append the new usage data to the historic_usage_data.json
 for day in usage_data:
-    historic_usage.append(day)
+    if not any(d["day"] == day["day"] for d in historic_usage):
+        historic_usage.append(day)
+
+        dates_added.append(day["day"])
+
+print(f"Added {len(dates_added)} new days to historic_usage_data.json: {dates_added}")
 
 # Write the updated historic_usage to historic_usage_data.json
 with open(file_name, "w") as f:
