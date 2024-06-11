@@ -34,6 +34,7 @@ copilot-usage-dashboard                                         latest      afa0
 ```
 
 3. Run the image locally mapping local port 5801 to container port 5801 and passing in AWS credentials to download a .pem file from AWS Secrets Manager to the running container.
+These credentials should also allow access to S3 for historic reporting.
 
 ```
 docker run -p 8501:8501 \
@@ -82,8 +83,10 @@ The 2 datasets are:
 
 These endpoints are both in beta (as of 21/05/24) and may change in the future.
 
-### Live Data
-To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file.
+### Real Data
+To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file. If running locally, you will need to supply this. If running out of a container, the project will get a copilot-usage-dashboard.pem file from AWS secret manager using the provided credentials.
+
+This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](./aws_lambda_scripts/README.md).
 
 #### Getting a .pem file for the Github App
 
@@ -99,6 +102,8 @@ This file needs to be renamed **copilot-usage-dashboard.pem** ([documentation](h
 If you do not have access to organisation settings, you need to request a .pem file for the app.
 
 ### Data Model Diagram (Live Data)
+The diagram below shows the dataflow for the live data
+
 ![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
 
 ## Streamlit and Supporting Libraries
