@@ -12,7 +12,7 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Make start_repo_tool.sh executable
+# Make start_dashboard.sh executable
 RUN chmod +x /app/start_dashboard.sh
 
 # Install AWS CLI
@@ -24,6 +24,6 @@ RUN poetry install --no-root
 # Expose the port the app runs on
 EXPOSE 8501
 
-# Run the start_repo_tool.sh script
+# Run the start_dashboard.sh script
 # Note: ENTRYPOINT cannot be overriden by docker run command
 ENTRYPOINT ["/app/start_dashboard.sh"]

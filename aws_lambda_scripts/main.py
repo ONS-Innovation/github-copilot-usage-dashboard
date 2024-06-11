@@ -22,7 +22,7 @@ client_id = "Iv23liRzPdnPeplrQ4x2"
 file_exists = True
 
 # Create an S3 client
-session = boto3.Session(profile_name="ons_sdp_sandbox")
+session = boto3.Session()
 s3 = session.client('s3')
 
 # Get historic_usage_data.json from S3
