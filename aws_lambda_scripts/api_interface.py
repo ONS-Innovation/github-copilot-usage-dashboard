@@ -20,7 +20,6 @@ def get_access_token(org: str, pem: str, client_id: str) -> tuple | str:
     """
 
     # Generate JSON Web Token
-    client_id = "Iv23liRzPdnPeplrQ4x2"
     issue_time = time.time()
     expiration_time = issue_time + 600
 

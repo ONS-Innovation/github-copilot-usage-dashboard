@@ -8,7 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-import api_interface as at
+import api_interface
 
 org = "ONSdigital"
 
@@ -17,7 +17,7 @@ st.set_page_config(layout="wide")
 st.title("Github Copilot Usage Dashboard")
 
 # Get the access token
-access_token = at.get_access_token(org, "./copilot-usage-dashboard.pem")
+access_token = api_interface.get_access_token(org, "./copilot-usage-dashboard.pem", "Iv23liRzPdnPeplrQ4x2")
 
 use_example_data = False
 
@@ -38,7 +38,7 @@ if use_example_data:
     with open("./src/example_data/copilot_usage_data.json") as f:
         usage_data = json.load(f)
 else:
-    gh = at.api_controller(access_token[0])
+    gh = api_interface.api_controller(access_token[0])
 
     usage_data = gh.get(f"/orgs/{org}/copilot/usage", params={})
     usage_data = usage_data.json()
@@ -118,7 +118,7 @@ def generate_datasets(date_range: tuple):
         with open("./src/example_data/copilot_seats_data.json") as f:
             seat_data = json.load(f)
     else:
-        gh = at.api_controller(access_token[0])
+        gh = api_interface.api_controller(access_token[0])
 
         seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={})
         seat_data = seat_data.json()
