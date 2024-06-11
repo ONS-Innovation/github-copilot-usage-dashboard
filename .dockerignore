@@ -6,3 +6,6 @@ copilot-usage-dashboard.pem
 
 # aws_lambda_scripts
 aws_lambda_scripts
+
+# historic_usage_data file
+historic_usage_data.json

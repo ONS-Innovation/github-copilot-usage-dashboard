@@ -8,9 +8,24 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import boto3
+from botocore.exceptions import ClientError
+
 import api_interface
 
+# AWS Bucket Path
+bucket_name = "copilot-usage-dashboard"
+object_name = "historic_usage_data.json"
+file_name = "historic_usage_data.json"
+
+# GitHub Organisation
 org = "ONSdigital"
+
+# Path to .pem file
+pem = "copilot-usage-dashboard.pem"
+
+# GitHub App Client IDß
+client_id = "Iv23liRzPdnPeplrQ4x2"
 
 st.set_page_config(layout="wide")
 
@@ -22,7 +37,7 @@ with live_tab:
     st.header("Live Data")
 
     # Get the access token
-    access_token = api_interface.get_access_token(org, "./copilot-usage-dashboard.pem", "Iv23liRzPdnPeplrQ4x2")
+    access_token = api_interface.get_access_token(org, pem, client_id)
 
     use_example_data = False
 
@@ -434,4 +449,91 @@ with live_tab:
 
 with historic_tab:
     st.header("Historic Data")
-    st.write("Coming Soon...")
+
+    date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
+
+    # Create an S3 client
+    session = boto3.Session(profile_name="ons_sdp_sandbox")
+    s3 = session.client('s3')
+
+    # Get historic_usage_data.json from S3
+    try:
+        s3.download_file(bucket_name, object_name, file_name)
+    except ClientError as e:
+        st.error("An error occurred while trying to get the historic data from S3. Please check the error message below.")
+        st.error(e)
+        st.stop()
+
+    # Load the historic data
+    with open(file_name) as f:
+        historic_data = json.load(f)
+
+    # Convert the historic data into a dataframe
+    df_historic_data = pd.json_normalize(historic_data)
+
+    # Convert date column from str to datetime
+    df_historic_data["day"] = df_historic_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
+
+    # Drop the breakdown column as it is unused
+    df_historic_data = df_historic_data.drop(columns=["breakdown"])
+
+    # Group the data by the date as selected by the user
+    if date_grouping == "Day":
+        # Format into a year-month-day format (i.e 2022-01-01)
+        df_historic_data["day"] = df_historic_data["day"].dt.strftime("%Y-%m-%d")
+    elif date_grouping == "Week":
+        # Format into a year-week format (i.e 2022-01)
+        df_historic_data["day"] = df_historic_data["day"].dt.strftime("%Y-%U")
+    elif date_grouping == "Month":
+        # Format into a year-month format (i.e 2022-01)
+        df_historic_data["day"] = df_historic_data["day"].dt.strftime("%Y-%m")
+    elif date_grouping == "Year":
+        # Format into a year format (i.e 2022)
+        df_historic_data["day"] = df_historic_data["day"].dt.strftime("%Y")
+
+    # Group the data by the date
+    df_historic_data = df_historic_data.groupby(["day"]).sum()
+    df_historic_data = df_historic_data.reset_index()
+
+    # st.dataframe(df_historic_data, use_container_width=True)
+
+    # Add a column for the acceptance rate
+    df_historic_data["acceptance_rate"] = round(df_historic_data["total_acceptances_count"] / df_historic_data["total_suggestions_count"] * 100, 2)
+
+    # Acceptance Graph
+
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig.add_trace(
+        go.Scatter(
+            mode="lines+markers+text",
+            x=df_historic_data["day"],
+            y=df_historic_data["acceptance_rate"],
+            name="Acceptance Rate (%)",
+            text=df_historic_data["acceptance_rate"],
+            textposition="top center"
+        ),
+        secondary_y=True
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=df_historic_data["day"],
+            y=df_historic_data["total_acceptances_count"],
+            name="Total Acceptances",
+            hovertext=df_historic_data["total_acceptances_count"]
+        )
+    )
+
+    fig.update_layout(
+        title="Accepts and Acceptance Rate",
+        xaxis_title="Date",
+        yaxis_title="Acceptances",
+        legend_title="Legend",
+        hovermode="x unified"
+    )
+
+    fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
+    fig.update_xaxes(type="category")
+
+    st.plotly_chart(fig, use_container_width=True)

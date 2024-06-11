@@ -11,7 +11,25 @@ This project uses poetry for package management.
 2. Activate the virtual environment using `source venv/bin/activate`
 3. Install all project dependancies using `poetry install`
 4. Get the copilot-usage-dashboard.pem and copy to the source code root directory (see "Getting a .pem file" below).
-5. Run the project using `streamlit run src/app.py`
+5. When running the project locally, you need to edit `app.py`.
+
+When creating an instance of `boto3.Session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
+
+When running locally:
+
+```
+session = boto3.Session(profile_name="<profile_name>")
+s3 = session.client("s3")
+```
+
+When running from a container:
+
+```
+session = boto3.Session()
+s3 = session.client("s3")
+```
+
+6. Run the project using `streamlit run src/app.py`
 
 ## Setup - Running in a container
 1. Build a Docker Image
