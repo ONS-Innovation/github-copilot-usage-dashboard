@@ -9,3 +9,9 @@ aws_lambda_scripts
 
 # historic_usage_data file
 historic_usage_data.json
+
+# diagrams
+diagrams/
+
+# __pycache__
+__pycache__/
