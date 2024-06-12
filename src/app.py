@@ -453,7 +453,7 @@ with historic_tab:
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
     # Create an S3 client
-    session = boto3.Session()
+    session = boto3.Session(profile_name="ons_sdp_sandbox")
     s3 = session.client('s3')
 
     # Get historic_usage_data.json from S3
@@ -537,3 +537,25 @@ with historic_tab:
     fig.update_xaxes(type="category")
 
     st.plotly_chart(fig, use_container_width=True)
+
+    # Engaged Users By Day
+
+    fig = make_subplots()
+
+    fig.add_trace(
+        go.Bar(
+            x=df_historic_data["day"],
+            y=df_historic_data["total_active_users"]
+        )
+    )
+
+    fig.update_layout(
+        title="Engaged Users By Day (All Editors)",
+        xaxis_title="Day",
+        yaxis_title="Number of Users",
+        hovermode="x unified"
+    )
+
+    fig.update_xaxes(type="category")
+
+    st.plotly_chart(fig)
