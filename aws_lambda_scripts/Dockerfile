@@ -1,21 +1,14 @@
-# Get a base image with a slim version of Python 3.10
-FROM python:3.12-slim
+FROM public.ecr.aws/lambda/python:3.12
 
-# Set the working directory
-WORKDIR /app
+# Copy requirements.txt
+COPY requirements.txt ${LAMBDA_TASK_ROOT}
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Make run_script.sh executable
-RUN chmod +x /app/run_script.sh
-
-# Install AWS CLI
-RUN pip install awscli
-
-# Install the required packages
+# Install the specified packages
 RUN pip install -r requirements.txt
 
-# Run the run_script.sh script
-# Note: ENTRYPOINT cannot be overriden by docker run command
-ENTRYPOINT ["/app/run_script.sh"]
+# Copy function code
+COPY main.py ${LAMBDA_TASK_ROOT}
+COPY api_interface.py ${LAMBDA_TASK_ROOT}
+
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "main.handler" ]

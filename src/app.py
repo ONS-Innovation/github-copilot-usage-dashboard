@@ -453,7 +453,7 @@ with historic_tab:
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
     # Create an S3 client
-    session = boto3.Session(profile_name="ons_sdp_sandbox")
+    session = boto3.Session()
     s3 = session.client('s3')
 
     # Get historic_usage_data.json from S3
