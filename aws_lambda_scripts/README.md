@@ -97,5 +97,31 @@ You can find the AWS repo push commands under your repository in ECR by selectin
     docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
     ```
 
+## AWS Lambda Setup
+
+Once the container is pushed to ECR, we can run it as a Lambda function.
+
+1. Create a Lambda Function, selecting the Container Image option.
+2. Once the option is selected, we then need to name the function and select the ECR image which we want the Lambda function to use.
+3. Once created, we then need to add some extra permissions to the IAM role which Lambda created for the function.
+
+    1. Navigate to Configuration > Permissions
+    2. Click on the **Role Name** to be redirected to IAM.
+    3. Once redirected to IAM > Role > <role_name>, we need to add 2 permissions. Click on Add permissions > Create inline policy.
+    4. Here we can select which permissions we want to give for which services. For this script, we need to have the following permissions:
+        
+        Secret Manager
+        - GetSecretValue
+
+        S3 
+        - GetObject
+        - PutObject
+
+    5. Once these have been added, our Lambda function now has all the necessary permissions to execute the container on ECR.
+
+4. Now that the Lambda function has the correct permissions, we can test it.
+
+5. Once a Lambda function has been created, we can schedule it to run periodically using Amazon [EventBridge](https://aws.amazon.com/eventbridge/). The function should be run at a minimum of every 28 days.
+
 ## Data Model Diagram (Historic Data)
 ![Data Model Diagram](./diagrams/aws-lambda-script-data-model.svg)
