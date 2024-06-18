@@ -1,2 +1,12 @@
+# Virtual Environment
 venv
 .venv
+
+# Pycache
+__pycache__/
+
+# .pem file for GitHub API Token
+copilot-usage-dashboard.pem
+
+# File storage for aws_lambda_scripts functions
+historic_usage_data.json
