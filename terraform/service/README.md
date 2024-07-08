@@ -2,11 +2,9 @@
 
 This terraform must be run to provision the ECS Fargate service and task definition used to run the Copilot Usage Dashboard.
 
-The IaC is separated from the storage terraform so that the file store can persist if the service is destroyed.  This gives greater flexibility, e.g allowing the service to be destroyed to save costs without losing the data that has been output by the tool.
-
 ## Prerequisites
 
-The service terraform is bootstrapped with a separate terraform state key so that both S3 and Service terraform state files are separated.
+The service terraform is bootstrapped with a separate terraform state key so that terraform state files are separated.
 
 ## Apply the Terraform
 
@@ -38,35 +36,7 @@ terraform apply -var-file=env/dev/dev.tfvars
 
 ### Provision Service from Scratch
 
-Apply the S3 bucket storage terraform first
-
-```bash
-cd terraform/storage 
-
-terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
-
-terraform validate
-
-terraform plan -var-file=env/dev/dev.tfvars
-
-terraform apply -var-file=env/dev/dev.tfvars
-```
-
-Apply the Authentication terraform second
-
-```bash
-cd terraform/authentication 
-
-terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
-
-terraform refresh -var-file=env/dev/dev.tfvars
-
-terraform validate
-
-terraform plan -var-file=env/dev/dev.tfvars
-
-terraform apply -var-file=env/dev/dev.tfvars
-```
+Ensure that IAM roles and a terraform backend using S3 and dynamoDB are provisioned.
 
 Apply the terraform for this service
 
