@@ -10,6 +10,11 @@ The service terraform is bootstrapped with a separate terraform state key so tha
 
 ## Apply the Terraform
 
+Depending upon which environment you are deploying to you will want to run your terraform by pointing at an appropriate environment tfvars file.  
+
+Example service tfvars file:
+[service/env/sandbox/example_tfvars.txt](https://github.com/ONS-Innovation/code-github-copilot-usage-audit/terraform/service/env/sandbox/example_tfvars.txt)
+
 ### Update Existing Service
 
 If you are just upgrading the application logic then only the service terraform needs to be run.
@@ -22,13 +27,13 @@ When upgrading:
 - Ensure the terraform plan and apply select the appropriate environment variable file
 
 ```bash
-terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
 terraform validate
 
-terraform plan -var-file=env/prod/prod.tfvars
+terraform plan -var-file=env/dev/dev.tfvars
 
-terraform apply -var-file=env/prod/prod.tfvars
+terraform apply -var-file=env/dev/dev.tfvars
 ```
 
 ### Provision Service from Scratch
@@ -38,13 +43,13 @@ Apply the S3 bucket storage terraform first
 ```bash
 cd terraform/storage 
 
-terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
 terraform validate
 
-terraform plan -var-file=env/prod/prod.tfvars
+terraform plan -var-file=env/dev/dev.tfvars
 
-terraform apply -var-file=env/prod/prod.tfvars
+terraform apply -var-file=env/dev/dev.tfvars
 ```
 
 Apply the Authentication terraform second
@@ -52,15 +57,15 @@ Apply the Authentication terraform second
 ```bash
 cd terraform/authentication 
 
-terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
-terraform refresh -var-file=env/prod/prod.tfvars
+terraform refresh -var-file=env/dev/dev.tfvars
 
 terraform validate
 
-terraform plan -var-file=env/prod/prod.tfvars
+terraform plan -var-file=env/dev/dev.tfvars
 
-terraform apply -var-file=env/prod/prod.tfvars
+terraform apply -var-file=env/dev/dev.tfvars
 ```
 
 Apply the terraform for this service
@@ -68,13 +73,13 @@ Apply the terraform for this service
 ```bash
 cd terraform/service 
 
-terraform init -backend-config=env/prod/backend-prod.tfbackend -reconfigure
+terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
 terraform validate
 
-terraform plan -var-file=env/prod/prod.tfvars
+terraform plan -var-file=env/dev/dev.tfvars
 
-terraform apply -var-file=env/prod/prod.tfvars
+terraform apply -var-file=env/dev/dev.tfvars
 ```
 
 ## Resources
