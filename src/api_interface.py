@@ -12,7 +12,7 @@ def get_access_token(org: str, pem: str, client_id: str) -> tuple | str:
         Args:
             org (str):  the name of the organisation to be accessed. This should match the .pem file.
                         This variable is dealt with in code.
-            pem (str):  the path to the .pem file used to sign the JWT.
+            pem (str):  the contents of the .pem file used to sign the JWT.
         Returns:
             tuple: contains the token and its expiration time
             or
@@ -20,12 +20,10 @@ def get_access_token(org: str, pem: str, client_id: str) -> tuple | str:
     """
 
     # Generate JSON Web Token
-    client_id = "Iv23liRzPdnPeplrQ4x2"
     issue_time = time.time()
-    expiration_time = issue_time + 600
+    expiration_time = issue_time + 300
 
-    with open(pem, "rb") as pem:
-        signing_key = jwt.jwk_from_pem(pem.read())
+    signing_key = jwt.jwk_from_pem(pem.encode())
 
     payload = {
         # Issued at time

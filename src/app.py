@@ -27,6 +27,15 @@ pem = "copilot-usage-dashboard.pem"
 # GitHub App Client IDß
 client_id = "Iv23liRzPdnPeplrQ4x2"
 
+# AWS Secret Manager Secret Name for the .pem file
+secret_name = "/sdp/tools/copilot-usage/copilot-usage-dashboard.pem"
+secret_reigon = "eu-west-2"
+
+
+# Initialise a boto3 session
+session = boto3.Session(profile_name="ons_sdp_sandbox")
+
+
 st.set_page_config(layout="wide")
 
 st.title("Github Copilot Usage Dashboard")
@@ -36,8 +45,13 @@ live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 with live_tab:
     st.header("Live Data")
 
+    # Get the .pem file from AWS Secrets Manager
+    secret_manager = session.client("secretsmanager", region_name=secret_reigon)
+
+    secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+
     # Get the access token
-    access_token = api_interface.get_access_token(org, pem, client_id)
+    access_token = api_interface.get_access_token(org, secret, client_id)
 
     use_example_data = False
 
@@ -453,7 +467,6 @@ with historic_tab:
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
     # Create an S3 client
-    session = boto3.Session()
     s3 = session.client('s3')
 
     # Get historic_usage_data.json from S3
