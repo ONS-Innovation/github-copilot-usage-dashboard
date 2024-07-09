@@ -21,14 +21,12 @@ This project uses poetry for package management.
 
     ```python
     session = boto3.Session(profile_name="<profile_name>")
-    s3 = session.client("s3")
     ```
 
     When running from a container:
 
     ```python
     session = boto3.Session()
-    s3 = session.client("s3")
     ```
 
 5. Run the project using `streamlit run src/app.py`
