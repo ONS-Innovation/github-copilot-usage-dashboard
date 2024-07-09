@@ -31,14 +31,27 @@ client_id = "Iv23liRzPdnPeplrQ4x2"
 secret_name = "/sdp/tools/copilot-usage/copilot-usage-dashboard.pem"
 secret_reigon = "eu-west-2"
 
+@st.cache_data
+def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
+    """
+    Gets the .pem file contents from AWS Secret Manager
+
+    Args:
+        session (boto3.Session): A boto3 session (Led with an underscore so st.cahce_data doesn't hash it)
+        secret_name (str): The name of the secret in AWS Secret Manager
+        region_name (str): The region where the secret is stored
+    Returns:
+        str: The contents of the .pem file
+    """
+    secret_manager = session.client("secretsmanager", region_name=region_name)
+    return secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+
 
 # Initialise a boto3 session
-session = boto3.Session()
-
+session = boto3.Session(profile_name="ons_sdp_sandbox")
 
 st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
 
-# st.logo("./src/branding/ONS-symbol_digital.svg")
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
 
 col1, col2 = st.columns([0.8, 0.2])
@@ -52,10 +65,7 @@ live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 with live_tab:
     st.header(":blue-background[Live Data]")
 
-    # Get the .pem file from AWS Secrets Manager
-    secret_manager = session.client("secretsmanager", region_name=secret_reigon)
-
-    secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+    secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
 
     # Get the access token
     access_token = api_interface.get_access_token(org, secret, client_id)
