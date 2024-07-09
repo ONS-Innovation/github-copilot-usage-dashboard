@@ -36,14 +36,21 @@ secret_reigon = "eu-west-2"
 session = boto3.Session(profile_name="ons_sdp_sandbox")
 
 
-st.set_page_config(layout="wide")
+st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
 
-st.title("Github Copilot Usage Dashboard")
+# st.logo("./src/branding/ONS-symbol_digital.svg")
+st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
+
+col1, col2 = st.columns([0.8, 0.2])
+
+col1.title(":blue-background[Github Copilot Usage Dashboard]")
+
+col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 
 live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 
 with live_tab:
-    st.header("Live Data")
+    st.header(":blue-background[Live Data]")
 
     # Get the .pem file from AWS Secrets Manager
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
@@ -112,7 +119,7 @@ with live_tab:
         df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
 
         # Create a subset of data based on slider selection
-        df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
+        df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])].reset_index(drop=True)
 
 
         # Breakdown Data
@@ -249,7 +256,7 @@ with live_tab:
 
     # Language breakdown
 
-    st.header("Language Breakdown")
+    st.header(":blue-background[Language Breakdown]")
 
     col1, col2 = st.columns([0.6, 0.4])
 
@@ -340,7 +347,7 @@ with live_tab:
 
     # User Breakdown
 
-    st.header("User Breakdown")
+    st.header(":blue-background[User Breakdown]")
 
     col1, col2, col3 = st.columns(3)
 
@@ -462,7 +469,7 @@ with live_tab:
     st.plotly_chart(fig)
 
 with historic_tab:
-    st.header("Historic Data")
+    st.header(":blue-background[Historic Data]")
 
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
