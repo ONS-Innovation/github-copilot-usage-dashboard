@@ -1,0 +1,11 @@
+# Do NOT commit the real tfvars file to Github
+aws_account_id        = "999999999"
+aws_access_key_id     = "AWSACCCESSKEYID"
+aws_secret_access_key = "AWSSECRETASSOCIATEDWITHACCESSKEY"
+domain                = "sdp-sandbox"
+service_subdomain     = "copilot-usage"
+container_image       = "sdp-sandbox-copilot-usage"
+container_ver         = "v0.0.1"
+force_deployment      = "true"
+container_port        = "8501"
+from_port             = "8501"
