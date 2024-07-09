@@ -27,17 +27,48 @@ pem = "copilot-usage-dashboard.pem"
 # GitHub App Client IDß
 client_id = "Iv23liRzPdnPeplrQ4x2"
 
-st.set_page_config(layout="wide")
+# AWS Secret Manager Secret Name for the .pem file
+secret_name = "/sdp/tools/copilot-usage/copilot-usage-dashboard.pem"
+secret_reigon = "eu-west-2"
 
-st.title("Github Copilot Usage Dashboard")
+@st.cache_data
+def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
+    """
+    Gets the .pem file contents from AWS Secret Manager
+
+    Args:
+        session (boto3.Session): A boto3 session (Led with an underscore so st.cahce_data doesn't hash it)
+        secret_name (str): The name of the secret in AWS Secret Manager
+        region_name (str): The region where the secret is stored
+    Returns:
+        str: The contents of the .pem file
+    """
+    secret_manager = session.client("secretsmanager", region_name=region_name)
+    return secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+
+
+# Initialise a boto3 session
+session = boto3.Session()
+
+st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
+
+st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
+
+col1, col2 = st.columns([0.8, 0.2])
+
+col1.title(":blue-background[Github Copilot Usage Dashboard]")
+
+col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 
 live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 
 with live_tab:
-    st.header("Live Data")
+    st.header(":blue-background[Live Data]")
+
+    secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
 
     # Get the access token
-    access_token = api_interface.get_access_token(org, pem, client_id)
+    access_token = api_interface.get_access_token(org, secret, client_id)
 
     use_example_data = False
 
@@ -98,7 +129,7 @@ with live_tab:
         df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
 
         # Create a subset of data based on slider selection
-        df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])]
+        df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])].reset_index(drop=True)
 
 
         # Breakdown Data
@@ -235,7 +266,7 @@ with live_tab:
 
     # Language breakdown
 
-    st.header("Language Breakdown")
+    st.header(":blue-background[Language Breakdown]")
 
     col1, col2 = st.columns([0.6, 0.4])
 
@@ -326,7 +357,7 @@ with live_tab:
 
     # User Breakdown
 
-    st.header("User Breakdown")
+    st.header(":blue-background[User Breakdown]")
 
     col1, col2, col3 = st.columns(3)
 
@@ -448,12 +479,11 @@ with live_tab:
     st.plotly_chart(fig)
 
 with historic_tab:
-    st.header("Historic Data")
+    st.header(":blue-background[Historic Data]")
 
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
     # Create an S3 client
-    session = boto3.Session()
     s3 = session.client('s3')
 
     # Get historic_usage_data.json from S3

@@ -13,8 +13,7 @@ This project uses poetry for package management.
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
 2. Activate the virtual environment using `source venv/bin/activate`
 3. Install all project dependancies using `poetry install`
-4. Get the copilot-usage-dashboard.pem and copy to the source code root directory (see "Getting a .pem file" below).
-5. When running the project locally, you need to edit `app.py`.
+4. When running the project locally, you need to edit `app.py`.
 
     When creating an instance of `boto3.Session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
 
@@ -22,17 +21,15 @@ This project uses poetry for package management.
 
     ```python
     session = boto3.Session(profile_name="<profile_name>")
-    s3 = session.client("s3")
     ```
 
     When running from a container:
 
     ```python
     session = boto3.Session()
-    s3 = session.client("s3")
     ```
 
-6. Run the project using `streamlit run src/app.py`
+5. Run the project using `streamlit run src/app.py`
 
 ## Setup - Running in a container
 
@@ -114,7 +111,7 @@ To use real data from the Github API, the project must be supplied with a copilo
 
 This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](./aws_lambda_scripts/README.md).
 
-#### Getting a .pem file for the Github App
+#### Github App Permissions
 
 A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
 The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
@@ -122,10 +119,7 @@ The project uses authentication as a Github App installation ([documentation](ht
 In order to get a .pem file, a Github App must be created an installed into the organisation of which the app will be managing.
 This app should have **Read and Write Administration** organisation permission and **Read-only GitHub Copilot Business** organisation permission.
 
-Once created and installed, you need to generate a Private Key for that Github App. This will download a .pem file to your pc.
-This file needs to be renamed **copilot-usage-dashboard.pem** ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/managing-private-keys-for-github-apps)).
-
-If you do not have access to organisation settings, you need to request a .pem file for the app.
+This file should be uploaded to AWS Secret Manager as below.
 
 ### Data Model Diagram (Live Data)
 
