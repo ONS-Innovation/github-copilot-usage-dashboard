@@ -33,7 +33,7 @@ secret_reigon = "eu-west-2"
 
 
 # Initialise a boto3 session
-session = boto3.Session(profile_name="ons_sdp_sandbox")
+session = boto3.Session()
 
 
 st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
