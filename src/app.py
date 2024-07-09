@@ -48,7 +48,7 @@ def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, regio
 
 
 # Initialise a boto3 session
-session = boto3.Session(profile_name="ons_sdp_sandbox")
+session = boto3.Session()
 
 st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
 
