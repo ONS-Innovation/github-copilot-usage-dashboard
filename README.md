@@ -36,13 +36,13 @@ This project uses poetry for package management.
 1. Build a Docker Image
 
     ```bash
-        docker build -t copilot-usage-dashboard .
+    docker build -t copilot-usage-dashboard .
     ```
 
 2. Check the image exists
 
     ```bash
-        docker images
+    docker images
     ```
 
     Example Output:
@@ -261,6 +261,14 @@ If the application has been modified then the following can be performed to upda
   ```
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
+
+  **Please Note:** This step requires an AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to be loaded into the environment if not already in place.
+  This can be done using:
+
+  ```bash
+  export AWS_ACCESS_KEY_ID="<aws_access_key_id>"
+  export AWS_SECRET_ACCESS_KEY="<aws_secret_access_key>"
+  ```
 
 - Refresh the local state to ensure it is in sync with the backend
 
