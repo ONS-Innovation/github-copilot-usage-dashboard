@@ -90,6 +90,37 @@ These credentials should also allow access to S3 for historic reporting.
     docker stop ae4aaf1daee6
     ```
 
+## Storing the container on AWS Elastic Container Registry (ECR)
+
+When you make changes to the application a new container image must be pushed to ECR.
+
+These instructions assume:
+
+1. You have a repository set up in your AWS account named copilot-usage-dashboard.
+2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in ~/.aws/credentials and can be used by accessing --profile <aws-credentials-profile\>, if these are the only credentials in your file then the profile name is _default_
+
+You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace <aws-credentials-profile\>, <aws-account-id\> and <version\> accordingly):
+
+1. Get an authentication token and authenticate your docker client for pushing images to ECR:
+
+    ```bash
+    aws ecr --profile <aws-credentials-profile> get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com
+    ```
+
+2. Tag your latest built docker image for ECR (assumes you have run _docker build -t sdp-repo-archive ._ locally first)
+
+    ```bash
+    docker tag copilot-usage-dashboard:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-dashboard:<version>
+    ```
+
+    **Note:** To find the <version\> to build look at the latest tagged version in ECR and increment appropriately
+
+3. Push the version up to ECR
+
+    ```bash
+    docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-dashboard:<version>
+    ```
+
 ## Data
 
 When running the dashboard, you can toggle between using Live and Example Data.
