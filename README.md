@@ -262,7 +262,7 @@ If the application has been modified then the following can be performed to upda
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
 
-  **Please Note:** This step requires an AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY to be loaded into the environment if not already in place.
+  **_Please Note:_** This step requires an **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** to be loaded into the environment if not already in place.
   This can be done using:
 
   ```bash
