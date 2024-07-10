@@ -96,7 +96,7 @@ When you make changes to the application a new container image must be pushed to
 
 These instructions assume:
 
-1. You have a repository set up in your AWS account named sdp-repo-archive.
+1. You have a repository set up in your AWS account named copilot-usage-dashboard.
 2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in ~/.aws/credentials and can be used by accessing --profile <aws-credentials-profile\>, if these are the only credentials in your file then the profile name is _default_
 
 You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace <aws-credentials-profile\>, <aws-account-id\> and <version\> accordingly):
