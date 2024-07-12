@@ -530,6 +530,22 @@ with historic_tab:
     # Add a column for the acceptance rate
     df_historic_data["acceptance_rate"] = round(df_historic_data["total_acceptances_count"] / df_historic_data["total_suggestions_count"] * 100, 2)
 
+
+    # Overall Metrics
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Suggestions", df_historic_data["total_suggestions_count"].sum())
+        st.metric(f"Average Suggestions Per {date_grouping}", round(df_historic_data["total_suggestions_count"].mean(), 2))
+
+    with col2:
+        st.metric("Total Accepts", df_historic_data["total_acceptances_count"].sum())
+        st.metric(f"Average Accepts Per {date_grouping}", round(df_historic_data["total_acceptances_count"].mean(), 2))
+    with col3:
+        st.metric("Total Lines Accepted", df_historic_data["total_lines_accepted"].sum())
+        st.metric("Acceptance Rate", str(round(df_historic_data["total_acceptances_count"].sum() / df_historic_data["total_suggestions_count"].sum() * 100, 2))+"%")
+
+
     # Acceptance Graph
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
