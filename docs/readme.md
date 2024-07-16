@@ -8,6 +8,12 @@ This project uses poetry for package management.
 
 [Instructions to install Poetry](https://python-poetry.org/docs/)
 
+## Documentation
+
+This project uses MkDocs for documentation.
+
+[Getting started with MkDocs](https://www.mkdocs.org/getting-started/)
+
 ## Setup - Run outside of Docker
 
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
