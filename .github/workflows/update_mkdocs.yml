@@ -1,4 +1,4 @@
-name: ci 
+name: update_mkdocs
 on:
   push:
     branches:
