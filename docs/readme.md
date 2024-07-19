@@ -8,6 +8,12 @@ This project uses poetry for package management.
 
 [Instructions to install Poetry](https://python-poetry.org/docs/)
 
+## Documentation
+
+This project uses MkDocs for documentation.
+
+[Getting started with MkDocs](https://www.mkdocs.org/getting-started/)
+
 ## Setup - Run outside of Docker
 
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
@@ -138,9 +144,9 @@ These endpoints are both in beta (as of 21/05/24) and may change in the future.
 
 ### Real Data
 
-To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file. If running locally, you will need to supply this. If running out of a container, the project will get a copilot-usage-dashboard.pem file from AWS secret manager using the provided credentials.
+To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)). 
 
-This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](./aws_lambda_scripts/README.md).
+This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](../aws_lambda_scripts/README.md).
 
 #### Github App Permissions
 
@@ -157,12 +163,6 @@ This file should be uploaded to AWS Secret Manager as below.
 The diagram below shows the dataflow for the live data
 
 ![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
-
-## Streamlit and Supporting Libraries
-
-This project uses [Streamlit](https://streamlit.io/) to build a quick and easy web app. Streamlit can generate front ends without the need for any HTML, CSS or JS. This means that the dashboard can be more quickly than alternative frameworks such as [Dash](https://dash.plotly.com/) which is similar to a [Flask](https://flask.palletsprojects.com/en/3.0.x/) app. Streamlit also supports the use of many other libraries. For example, Streamlit can render many graphing libraries, such as Matplotlib, Altair and Plotly. 
-
-In this project, [Plotly](https://plotly.com/python/) is used alongside [Pandas](https://pandas.pydata.org/docs/index.html) to create visualisations from the API data. Plotly was chosen because of its interactivity while still allowing for a range of technical visualisations.
 
 ## Deployment to AWS
 
