@@ -268,92 +268,88 @@ with live_tab:
 
     st.header(":blue-background[Language Breakdown]")
 
-    col1, col2 = st.columns([0.6, 0.4])
+    language_drill = st.dataframe(
+        language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]], 
+        use_container_width=True,
+        on_select="rerun",
+        selection_mode=["single-row"],
+        column_config={
+            "acceptances_count": st.column_config.Column(
+                "Total Accepts"
+            ),
+            "acceptance_rate": st.column_config.ProgressColumn(
+                "Acceptance Rate",
+                help="The percentage of which Copilot suggestions are accepted",
+                min_value=0,
+                max_value=1
+            ),
+            "lines_accepted": st.column_config.Column(
+                "Lines of Code Accepted"
+            )
+        }
+    )
 
-    with col1:
-        language_drill = st.dataframe(
-            language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]], 
-            use_container_width=True,
-            on_select="rerun",
-            selection_mode=["single-row"],
-            column_config={
-                "acceptances_count": st.column_config.Column(
-                    "Total Accepts"
-                ),
-                "acceptance_rate": st.column_config.ProgressColumn(
-                    "Acceptance Rate",
-                    help="The percentage of which Copilot suggestions are accepted",
-                    min_value=0,
-                    max_value=1
-                ),
-                "lines_accepted": st.column_config.Column(
-                    "Lines of Code Accepted"
-                )
-            }
+    # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
+    try:
+        selected_row = language_grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
+
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col1:
+            st.metric("Language", selected_row.index.values[0])
+        with col2:
+            st.metric("Total Suggestions", selected_row["suggestions_count"])
+        with col3:
+            st.metric("Total Accepts", selected_row["acceptances_count"])
+        with col4:
+            st.metric("Lines Suggested", selected_row["lines_suggested"])
+        with col5:
+            st.metric("Lines Accepted", selected_row["lines_accepted"])
+
+        # Creates a subset of breakdown dataframe to only hold information for the selected language
+        df_breakdown_by_day = breakdown.loc[breakdown["language"] == selected_row.index.values[0]].groupby(["day", "language", "editor"]).sum()
+        df_breakdown_by_day = df_breakdown_by_day.reset_index()
+
+        # Calculates the total copilot suggestion for the date
+        df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
+        df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
+        df_date_totals = df_date_totals.reset_index()
+
+        # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
+        df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
+
+        # Create a graph showing number of suggestions by day, split by IDE.
+        fig = make_subplots()
+
+        list_of_editors = df_breakdown_by_day["editor"].unique()
+
+        for editor in list_of_editors:
+            df = df_breakdown_by_day.loc[df_breakdown_by_day["editor"] == editor]
+
+            fig.add_trace(
+                go.Bar(
+                    name=editor,
+                    x=df["day"],
+                    y=df["suggestions_count"],
+                    customdata=df["total_suggestions"],
+                    hovertemplate="<br>" +
+                        "Number of Suggestions: %{y} <br>" +
+                        "Total Suggestions for Day: %{customdata} <br>"
+                ))
+
+        fig.update_layout(
+            barmode="stack",
+            title="Suggestions by Day Per Editor",
+            xaxis_title="Day",
+            yaxis_title="Number of Suggestions",
+            hovermode="x unified",
+            legend_orientation="h"
         )
 
-    with col2:
-        # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
-        try:
-            selected_row = language_grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
+        st.plotly_chart(fig)
 
-            col1, col2, col3, col4, col5 = st.columns(5)
-
-            with col1:
-                st.metric("Language", selected_row.index.values[0])
-            with col2:
-                st.metric("Total Suggestions", selected_row["suggestions_count"])
-            with col3:
-                st.metric("Total Accepts", selected_row["acceptances_count"])
-            with col4:
-                st.metric("Lines Suggested", selected_row["lines_suggested"])
-            with col5:
-                st.metric("Lines Accepted", selected_row["lines_accepted"])
-
-            # Creates a subset of breakdown dataframe to only hold information for the selected language
-            df_breakdown_by_day = breakdown.loc[breakdown["language"] == selected_row.index.values[0]].groupby(["day", "language", "editor"]).sum()
-            df_breakdown_by_day = df_breakdown_by_day.reset_index()
-
-            # Calculates the total copilot suggestion for the date
-            df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
-            df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
-            df_date_totals = df_date_totals.reset_index()
-
-            # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
-            df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
-
-            # Create a graph showing number of suggestions by day, split by IDE.
-            fig = make_subplots()
-
-            list_of_editors = df_breakdown_by_day["editor"].unique()
-
-            for editor in list_of_editors:
-                df = df_breakdown_by_day.loc[df_breakdown_by_day["editor"] == editor]
-
-                fig.add_trace(
-                    go.Bar(
-                        name=editor,
-                        x=df["day"],
-                        y=df["suggestions_count"],
-                        customdata=df["total_suggestions"],
-                        hovertemplate="<br>" +
-                            "Number of Suggestions: %{y} <br>" +
-                            "Total Suggestions for Day: %{customdata} <br>"
-                    ))
-
-            fig.update_layout(
-                barmode="stack",
-                title="Suggestions by Day Per Editor",
-                xaxis_title="Day",
-                yaxis_title="Number of Suggestions",
-                hovermode="x unified",
-                legend_orientation="h"
-            )
-
-            st.plotly_chart(fig)
-
-        except IndexError:
-            st.write("Please select a row for more information.")
+    except IndexError:
+        st.caption("Please select a row for more information.")
 
     # User Breakdown
 
@@ -595,8 +591,10 @@ with historic_tab:
         )
     )
 
+    title = "Engaged Users By Day (All Editors)" if date_grouping == "Day" else f"Unique Daily User Instances By {date_grouping} (All Editors)"
+
     fig.update_layout(
-        title="Engaged Users By Day (All Editors)",
+        title=title,
         xaxis_title="Day",
         yaxis_title="Number of Users",
         hovermode="x unified"
@@ -605,3 +603,5 @@ with historic_tab:
     fig.update_xaxes(type="category")
 
     st.plotly_chart(fig)
+
+    st.caption("**Note:** If grouping by day, the graph above will show the number of unique users per day. If grouping by week, month or year, the graph above will show the sum of those unique users for the period.")
