@@ -545,6 +545,21 @@ files = [
 smmap = ">=3.0.1,<6"
 
 [[package]]
+name = "github_api_toolkit"
+version = "0.1.0"
+description = "A toolkit for interacting with the GitHub API"
+optional = false
+python-versions = "*"
+files = []
+develop = false
+
+[package.source]
+type = "git"
+url = "https://github.com/ONS-Innovation/code-github-api-package.git"
+reference = "HEAD"
+resolved_reference = "e40547e490790c241c8b2d518c2a91c5fabba327"
+
+[[package]]
 name = "gitpython"
 version = "3.1.43"
 description = "GitPython is a Python library used to interact with Git repositories"
@@ -2012,4 +2027,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "55b54ad372d7757cb7d5431de1033e9cd431dade8d4ac17533bd51258b65865e"
+content-hash = "77a58bbc58f0dbc5d60ceee4c50ab3463feb7fa337be71429b725cb302bd87b7"
