@@ -34,6 +34,10 @@ docker run --platform linux/amd64 -p 9000:8080 \
 -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
 -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
 -e AWS_DEFAULT_REGION=eu-west-2 \
+-e AWS_SECRET_NAME=<aws_secret_name> \
+-e GITHUB_ORG=ONSDigital \
+-e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
+-e AWS_ACCOUNT_NAME=sdp-sandbox
 copilot-usage-lambda-script
 ```
 
