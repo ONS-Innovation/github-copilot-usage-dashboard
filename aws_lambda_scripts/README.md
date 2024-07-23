@@ -8,19 +8,19 @@ This script is run as a containered lambda function in AWS which is executed per
 ## Setup - Running in a container
 1. Build a Docker Image
 
-```
+```bash
     docker build -t copilot-usage-lambda-script .
 ```
 
 2. Check the image exists
 
-```
+```bash
     docker images
 ```
 
 Example Output:
 
-```
+```bash
 REPOSITORY                                                      TAG         IMAGE ID       CREATED          SIZE
 copilot-usage-lambda-script                                     latest      0bbe73d9256f   11 seconds ago   224MB
 ```
@@ -29,7 +29,7 @@ copilot-usage-lambda-script                                     latest      0bbe
 
 The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager and upload and download files from AWS S3.
 
-```
+```bash
 docker run --platform linux/amd64 -p 9000:8080 \
 -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
 -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
@@ -45,7 +45,7 @@ Once the container is running, a local endpoint is created at `localhost:9000/20
 
 4. Post to the endpoint to trigger the function
 
-```
+```bash
 curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
 ```
 
@@ -53,20 +53,20 @@ curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
 
 To check the container is running
 
-```
+```bash
 docker ps
 ```
 
 Example output
 
-```
+```bash
 CONTAINER ID   IMAGE                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
 3f7d64676b1a   copilot-usage-lambda-script   "/lambda-entrypoint.…"   44 seconds ago   Up 44 seconds   0.0.0.0:9000->8080/tcp, :::9000->8080/tcp   nice_ritchie
 ```
 
 Stop the container
 
-```
+```bash
 docker stop 3f7d64676b1a
 ```
 

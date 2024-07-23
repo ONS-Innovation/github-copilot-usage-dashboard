@@ -73,7 +73,7 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
 3. Run the image locally mapping local port 5801 to container port 5801 and passing in AWS credentials to download a .pem file from AWS Secrets Manager to the running container.
 These credentials should also allow access to S3 for historic reporting.
 
-    ```
+    ```bash
     docker run -p 8501:8501 \
     -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
     -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
