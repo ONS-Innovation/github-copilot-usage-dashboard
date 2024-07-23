@@ -9,13 +9,13 @@ This script is run as a containered lambda function in AWS which is executed per
 1. Build a Docker Image
 
 ```bash
-    docker build -t copilot-usage-lambda-script .
+docker build -t copilot-usage-lambda-script .
 ```
 
 2. Check the image exists
 
 ```bash
-    docker images
+docker images
 ```
 
 Example Output:
