@@ -557,7 +557,7 @@ develop = false
 type = "git"
 url = "https://github.com/ONS-Innovation/github-api-package.git"
 reference = "HEAD"
-resolved_reference = "b0ff9b8221adda14865e0387520999be04f8f2f0"
+resolved_reference = "d9d1cf493add9b3093d947385da4d6a6c0e2365e"
 
 [[package]]
 name = "gitpython"
