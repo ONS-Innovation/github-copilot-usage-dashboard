@@ -13,6 +13,11 @@ variable "aws_secret_access_key" {
   type        = string
 }
 
+variable "aws_secret_name" {
+  description = "The path to the AWS Secret Manager resource which contains the Github App .pem file"
+  type        = string
+}
+
 variable "container_image" {
   description = "Container image"
   type        = string
@@ -90,6 +95,11 @@ variable "github_org" {
   description = "Github Organisation"
   type        = string
   default     = "ONS-Innovation"
+}
+
+variable "github_app_client_id" {
+  description = "Github App Client ID"
+  type        = string
 }
 
 variable "project_tag" {

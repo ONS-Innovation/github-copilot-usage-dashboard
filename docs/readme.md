@@ -16,6 +16,18 @@ This project uses MkDocs for documentation.
 
 ## Setup - Run outside of Docker
 
+Prior to running outside of Docker ensure you have the necessary environment variables setup locally where you are running the application. E.g in linux or OSX you can run the following, providing appropriate values for the variables:
+
+```bash
+export AWS_ACCESS_KEY_ID=<aws_access_key_id> 
+export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> 
+export AWS_DEFAULT_REGION=eu-west-2 
+export AWS_SECRET_NAME=<aws_secret_name> 
+export GITHUB_ORG=ONSDigital 
+export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+export AWS_ACCOUNT_NAME=sdp-sandbox
+```
+
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
 2. Activate the virtual environment using `source venv/bin/activate`
 3. Install all project dependancies using `poetry install`
@@ -61,11 +73,15 @@ This project uses MkDocs for documentation.
 3. Run the image locally mapping local port 5801 to container port 5801 and passing in AWS credentials to download a .pem file from AWS Secrets Manager to the running container.
 These credentials should also allow access to S3 for historic reporting.
 
-    ```
+    ```bash
     docker run -p 8501:8501 \
     -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
     -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
     -e AWS_DEFAULT_REGION=eu-west-2 \
+    -e AWS_SECRET_NAME=<aws_secret_name> \
+    -e GITHUB_ORG=ONSDigital \
+    -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
+    -e AWS_ACCOUNT_NAME=sdp-sandbox
     copilot-usage-dashboard
     ```
 
