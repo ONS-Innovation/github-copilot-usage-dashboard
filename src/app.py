@@ -11,25 +11,26 @@ from plotly.subplots import make_subplots
 import boto3
 from botocore.exceptions import ClientError
 
-import api_interface
+import os
 
-# AWS Bucket Path
-bucket_name = "copilot-usage-dashboard"
-object_name = "historic_usage_data.json"
-file_name = "historic_usage_data.json"
+import github_api_toolkit
 
 # GitHub Organisation
-org = "ONSdigital"
+org = os.getenv("GITHUB_ORG")
 
-# Path to .pem file
-pem = "copilot-usage-dashboard.pem"
-
-# GitHub App Client IDß
-client_id = "Iv23liRzPdnPeplrQ4x2"
+# GitHub App Client ID
+client_id = os.getenv("GITHUB_APP_CLIENT_ID")
 
 # AWS Secret Manager Secret Name for the .pem file
-secret_name = "/sdp/tools/copilot-usage/copilot-usage-dashboard.pem"
-secret_reigon = "eu-west-2"
+secret_name = os.getenv("AWS_SECRET_NAME")
+secret_reigon = os.getenv("AWS_DEFAULT_REGION")
+
+account = os.getenv("AWS_ACCOUNT_NAME")
+
+# AWS Bucket Path
+bucket_name = f"{account}-copilot-usage-dashboard"
+object_name = "historic_usage_data.json"
+file_name = "historic_usage_data.json"
 
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
@@ -68,12 +69,12 @@ with live_tab:
     secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
 
     # Get the access token
-    access_token = api_interface.get_access_token(org, secret, client_id)
+    access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 
     use_example_data = False
 
-    # Check if the access token is a string. If it is, then an error occurred.
-    if type(access_token) == str:
+    # If the access token isn't a tuple an error occurred.
+    if type(access_token) != tuple:
         st.error("An error occurred while trying to get the access token. Please check the error message below.")
         st.error(access_token)
         st.error("Using the example dataset instead.")
@@ -89,7 +90,7 @@ with live_tab:
         with open("./src/example_data/copilot_usage_data.json") as f:
             usage_data = json.load(f)
     else:
-        gh = api_interface.api_controller(access_token[0])
+        gh = github_api_toolkit.github_interface(access_token[0])
 
         usage_data = gh.get(f"/orgs/{org}/copilot/usage", params={})
         usage_data = usage_data.json()
@@ -169,7 +170,7 @@ with live_tab:
             with open("./src/example_data/copilot_seats_data.json") as f:
                 seat_data = json.load(f)
         else:
-            gh = api_interface.api_controller(access_token[0])
+            gh = github_api_toolkit.github_interface(access_token[0])
 
             seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={})
             seat_data = seat_data.json()

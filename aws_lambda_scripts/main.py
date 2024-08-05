@@ -1,26 +1,26 @@
 import boto3
 from botocore.exceptions import ClientError
 import json
+import os
 
-import api_interface
-
-# AWS Bucket Path
-bucket_name = "copilot-usage-dashboard"
-object_name = "historic_usage_data.json"
-file_name = "/tmp/historic_usage_data.json"
+import github_api_toolkit
 
 # GitHub Organisation
-org = "ONSdigital"
+org = os.getenv("GITHUB_ORG")
 
-# Path to .pem file
-pem = "/tmp/copilot-usage-dashboard.pem"
-
-# GitHub App Client IDß
-client_id = "Iv23liRzPdnPeplrQ4x2"
+# GitHub App Client ID
+client_id = os.getenv("GITHUB_APP_CLIENT_ID")
 
 # AWS Secret Manager Secret Name for the .pem file
-secret_name = "/sdp/tools/copilot-usage/copilot-usage-dashboard.pem"
-secret_reigon = "eu-west-2"
+secret_name = os.getenv("AWS_SECRET_NAME")
+secret_reigon = os.getenv("AWS_DEFAULT_REGION")
+
+account = os.getenv("AWS_ACCOUNT_NAME")
+
+# AWS Bucket Path
+bucket_name = f"{account}-copilot-usage-dashboard"
+object_name = "historic_usage_data.json"
+file_name = "/tmp/historic_usage_data.json"
 
 
 def handler(event, context):
@@ -51,7 +51,7 @@ def handler(event, context):
     print("Secret retrieved")
 
     # Get updated copilot usage data from GitHub API
-    access_token = api_interface.get_access_token(org, secret, client_id)
+    access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 
     if type(access_token) == str:
         return(f"Error getting access token: {access_token}")
@@ -59,12 +59,12 @@ def handler(event, context):
         print("Access token retrieved")
 
     # Create an instance of the api_controller class
-    gh = api_interface.api_controller(access_token[0])
+    gh = github_api_toolkit.github_interface(access_token[0])
 
     print("API Controller created")
 
     # Get the usage data
-    usage_data = gh.get(f"/orgs/{org}/copilot/usage", params={})
+    usage_data = gh.get(f"/orgs/{org}/copilot/usage")
     usage_data = usage_data.json()
 
     print("Usage data retrieved")
