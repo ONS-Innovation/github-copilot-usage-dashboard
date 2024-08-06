@@ -147,24 +147,11 @@ You can find the AWS repo push commands under your repository in ECR by selectin
 
 When running the dashboard, you can toggle between using Live and Example Data.
 
-### Example Data
-
-This repository includes 2 sets of example data which mirrors the output of the Github Copilot RESTful API.
-These have been sourced from [this repository](https://github.com/octodemo/Copilot-Usage-Dashboard/tree/main).
-The 2 datasets are:
-
-- copilot_usage_data.json (from [this endpoint](https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28#get-a-summary-of-copilot-usage-for-organization-members))
-- copilot_seats_data.json (from [this enpoint](https://docs.github.com/en/rest/copilot/copilot-user-management?apiVersion=2022-11-28#list-all-copilot-seat-assignments-for-an-organization))
-
-These endpoints are both in beta (as of 21/05/24) and may change in the future.
-
-### Real Data
-
 To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)). 
 
 This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](../aws_lambda_scripts/README.md).
 
-#### Github App Permissions
+## Github App Permissions
 
 A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
 The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
@@ -173,12 +160,6 @@ In order to get a .pem file, a Github App must be created an installed into the 
 This app should have **Read and Write Administration** organisation permission and **Read-only GitHub Copilot Business** organisation permission.
 
 This file should be uploaded to AWS Secret Manager as below.
-
-### Data Model Diagram (Live Data)
-
-The diagram below shows the dataflow for the live data
-
-![Data Model Diagram](./diagrams/copilot-usage-dashboard-data-model.svg)
 
 ## Deployment to AWS
 
@@ -323,4 +304,3 @@ Delete the service resources by running the following ensuring your reference th
 
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
-  

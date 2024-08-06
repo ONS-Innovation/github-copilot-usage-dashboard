@@ -1,4 +1,5 @@
 # AWS Lambda Scripts
+
 This script is used to gather data from the /orgs/{org}/copilot/usage endpoint in the Github API.
 The script then appends the collected data to the old data in an S3 bucket.
 This creates a record of historical copilot usage data which is used to show trends over time.
@@ -126,6 +127,3 @@ Once the container is pushed to ECR, we can run it as a Lambda function.
 4. Now that the Lambda function has the correct permissions, we can test it.
 
 5. Once a Lambda function has been created, we can schedule it to run periodically using Amazon [EventBridge](https://aws.amazon.com/eventbridge/). The function should be run at a minimum of every 28 days.
-
-## Data Model Diagram (Historic Data)
-![Data Model Diagram](./diagrams/aws-lambda-script-data-model.svg)

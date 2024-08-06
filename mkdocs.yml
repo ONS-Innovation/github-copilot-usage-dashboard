@@ -1,14 +1,22 @@
 site_name: GitHub Copilot Usage Dashboard
+
+repo_url: https://github.com/ONS-Innovation/github-copilot-usage-dashboard
+repo_name: GitHub Copilot Usage Dashboard
+
 nav:
   - Home: 'index.md'
-  - Getting Started: 'readme.md'
-  - Technical Documentation: 'technical.md'
 theme:
   name: material
   palette:
     scheme: slate
   features:
     - content.code.copy
+
+  logo: ./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png
+  favicon: ./src/branding/ONS-symbol_digital.svg
+
+  icon:
+    repo: fontawesome/brands/github
 
 markdown_extensions:
   - pymdownx.highlight:
