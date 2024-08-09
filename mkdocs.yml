@@ -8,13 +8,43 @@ nav:
   - Documentation: 'documentation.md'
 theme:
   name: material
+  language: en
+
   palette:
-    scheme: slate
+    # toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to system preference
+
   features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+
+    - search.suggest
+
+    - header.autohide
     - content.code.copy
 
-  logo: ./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png
-  favicon: ./src/branding/ONS-symbol_digital.svg
+  
+
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
 
   icon:
     repo: fontawesome/brands/github
