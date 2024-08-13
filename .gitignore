@@ -13,6 +13,9 @@ historic_usage_data.json
 
 copilot-usage/
 
+# MkDocs Build
+site/
+
 # Local .terraform directories
 **/.terraform/*
 

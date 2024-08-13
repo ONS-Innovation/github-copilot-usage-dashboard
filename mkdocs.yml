@@ -1,14 +1,53 @@
 site_name: GitHub Copilot Usage Dashboard
+
+repo_url: https://github.com/ONS-Innovation/github-copilot-usage-dashboard
+repo_name: GitHub Copilot Usage Dashboard
+
 nav:
   - Home: 'index.md'
-  - Getting Started: 'readme.md'
-  - Technical Documentation: 'technical.md'
+  - Documentation: 'documentation.md'
 theme:
   name: material
+  language: en
+
   palette:
-    scheme: slate
+    # toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: white
+      accent: deep purple
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to system preference
+
   features:
+    - navigation.tracking
+    - navigation.sections
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+
+    - search.suggest
+
+    - header.autohide
     - content.code.copy
+
+  
+
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+
+  icon:
+    repo: fontawesome/brands/github
 
 markdown_extensions:
   - pymdownx.highlight:
