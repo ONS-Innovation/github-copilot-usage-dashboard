@@ -2,6 +2,19 @@
 
 A Streamlit dashboard to display information from the Github Copilot Usage API endpoints.
 
+## Disclaimer
+### Early Stage Disclaimer
+
+Please note that the code available in this repository for creating a Dashboard to track GitHub Copilot usage within your organisation is in its {*}early stages of development{*}. It may not fully comply with all Civil Service / ONS best practices for software development. Currently, it is being used by a *limited number of individuals* within ONS.
+
+### Purpose of Early Sharing
+
+We are sharing this piece of code at this stage to enable other Civil Service entities to utilise it as soon as possible.
+
+### Collaboration and Contribution
+
+Feel free to *fork this repository* and use it as you see fit. If you wish to contribute to this work, please make a pull request, and we will consider adding you as an external collaborator.
+
 ## Prerequisites
 
 This project uses poetry for package management.
