@@ -30,7 +30,6 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 # AWS Bucket Path
 bucket_name = f"{account}-copilot-usage-dashboard"
 object_name = "historic_usage_data.json"
-file_name = "historic_usage_data.json"
 
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
@@ -485,15 +484,14 @@ with historic_tab:
 
     # Get historic_usage_data.json from S3
     try:
-        s3.download_file(bucket_name, object_name, file_name)
+        response = s3.get_object(Bucket=bucket_name, Key=object_name)
+
     except ClientError as e:
         st.error("An error occurred while trying to get the historic data from S3. Please check the error message below.")
         st.error(e)
         st.stop()
-
-    # Load the historic data
-    with open(file_name) as f:
-        historic_data = json.load(f)
+    else:
+        historic_data = json.loads(response["Body"].read().decode("utf-8"))
 
     # Convert the historic data into a dataframe
     df_historic_data = pd.json_normalize(historic_data)

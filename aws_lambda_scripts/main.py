@@ -1,4 +1,5 @@
 import boto3
+import boto3.exceptions
 from botocore.exceptions import ClientError
 import json
 import os
@@ -21,13 +22,10 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 # AWS Bucket Path
 bucket_name = f"{account}-copilot-usage-dashboard"
 object_name = "historic_usage_data.json"
-file_name = "/tmp/historic_usage_data.json"
 
 logger = logging.getLogger()
 
 def handler(event, context):
-    file_exists = True
-
     logger.info("Starting process")
 
     logger.info("Creating S3 client")
@@ -37,17 +35,6 @@ def handler(event, context):
     s3 = session.client('s3')
 
     logger.info("S3 client created")
-
-    logger.info("Getting historic_usage_data.json from S3")
-
-    # Get historic_usage_data.json from S3
-    try:
-        s3.download_file(bucket_name, object_name, file_name)
-    except ClientError as e:
-        logger.exception("Error getting historic_usage_data.json from S3")
-        file_exists = False
-    else:
-        logger.info("Downloaded historic_usage_data.json from S3")
 
     logger.info("Creating Secret Manager client")
 
@@ -90,14 +77,17 @@ def handler(event, context):
 
     logger.info("Processing usage data")
 
-    # If historic_usage_data.json exists, load it, else create an empty list
-    if file_exists:
-        with open(file_name, "r") as f:
-            historic_usage = json.load(f)
-            logger.info("Loaded historic_usage_data.json")
-    else:
-        logger.info("No historic_usage_data.json found, creating empty list")
+    logger.info("Loading historic_usage_data.json")
+
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key=object_name)
+    except ClientError as e:
+        logger.error(f"Error getting historic_usage_data.json: {e}")
+
+        logger.info("Using empty list for historic_usage_data.json")
         historic_usage = []
+    else:
+        historic_usage = json.loads(response["Body"].read().decode("utf-8"))
 
     dates_added = []
 
@@ -118,13 +108,7 @@ def handler(event, context):
         }
     )
 
-    # Write the updated historic_usage to historic_usage_data.json
-    with open(file_name, "w") as f:
-        f.write(json.dumps(historic_usage, indent=4))
-        logger.info("Written changes to historic_usage_data.json")
-
-    # Upload the updated historic_usage_data.json to S3
-    s3.upload_file(file_name, bucket_name, object_name)
+    s3.put_object(Bucket=bucket_name, Key=object_name, Body=json.dumps(historic_usage, indent=4).encode("utf-8"))
 
     logger.info("Uploaded updated historic_usage_data.json to S3")
 
