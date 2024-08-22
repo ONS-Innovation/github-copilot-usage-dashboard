@@ -556,8 +556,8 @@ develop = false
 [package.source]
 type = "git"
 url = "https://github.com/ONS-Innovation/github-api-package.git"
-reference = "HEAD"
-resolved_reference = "d9d1cf493add9b3093d947385da4d6a6c0e2365e"
+reference = "v1.0.0"
+resolved_reference = "3336b0cc5f8589e08853e1398dc925b0e6157207"
 
 [[package]]
 name = "gitpython"
@@ -2027,4 +2027,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "8e876fc98302161590d27e0e81d2b727443db3384f8626503340686f5a3e36e2"
+content-hash = "a0f95a0a5a563e99a654c81d67eb24bc566f05dcc05571e30af6368412b538e1"
