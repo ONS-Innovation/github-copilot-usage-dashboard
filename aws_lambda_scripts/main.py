@@ -59,10 +59,10 @@ def handler(event, context):
     try:
         s3.download_file(bucket_name, object_name, file_name)
     except ClientError as e:
-        logger.exception("Error getting historic_usage_data.json from S3")
+        logger.exception(f"Error getting {object_name} from S3")
         file_exists = False
     else:
-        logger.info("Downloaded historic_usage_data.json from S3")
+        logger.info(f"Downloaded {object_name} from S3")
 
     # Get the .pem file from AWS Secrets Manager
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
@@ -100,9 +100,9 @@ def handler(event, context):
     if file_exists:
         with open(file_name, "r") as f:
             historic_usage = json.load(f)
-            logger.info("Loaded historic_usage_data.json")
+            logger.info(f"Loaded {object_name}")
     else:
-        logger.info("No historic_usage_data.json found, creating empty list")
+        logger.info(f"No {object_name} found, creating empty list")
         historic_usage = []
 
     dates_added = []
@@ -115,7 +115,7 @@ def handler(event, context):
             dates_added.append(day["day"])
     
     logger.info(
-        "New usage data added to historic_usage_data.json",
+        f"New usage data added to {object_name}",
         extra={
             "no_days_added": len(dates_added),
             "dates_added": dates_added
@@ -125,12 +125,12 @@ def handler(event, context):
     # Write the updated historic_usage to historic_usage_data.json
     with open(file_name, "w") as f:
         f.write(json.dumps(historic_usage, indent=4))
-        logger.info("Written changes to historic_usage_data.json")
+        logger.info(f"Written changes to {object_name}")
 
     # Upload the updated historic_usage_data.json to S3
     s3.upload_file(file_name, bucket_name, object_name)
 
-    logger.info("Uploaded updated historic_usage_data.json to S3")
+    logger.info(f"Uploaded updated {object_name} to S3")
 
     logger.info(
         "Process complete",
