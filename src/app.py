@@ -485,13 +485,12 @@ with historic_tab:
     # Get historic_usage_data.json from S3
     try:
         response = s3.get_object(Bucket=bucket_name, Key=object_name)
+        historic_data = json.loads(response["Body"].read().decode("utf-8"))
 
     except ClientError as e:
-        st.error("An error occurred while trying to get the historic data from S3. Please check the error message below.")
+        st.error(f"An error occurred while trying to get the historic data from S3 ({object_name}). Please check the error message below.")
         st.error(e)
-        st.stop()
-    else:
-        historic_data = json.loads(response["Body"].read().decode("utf-8"))
+        st.stop()        
 
     # Convert the historic data into a dataframe
     df_historic_data = pd.json_normalize(historic_data)
