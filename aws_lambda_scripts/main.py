@@ -25,10 +25,28 @@ object_name = "historic_usage_data.json"
 
 logger = logging.getLogger()
 
-def handler(event, context):
-    logger.info("Starting process")
+# Example Log Output:
+#
+# Standard output:
+# {
+#     "timestamp":"2023-10-27T19:17:45.586Z",
+#     "level":"INFO",
+#     "message":"Inside the handler function",
+#     "logger": "root",
+#     "requestId":"79b4f56e-95b1-4643-9700-2807f4e68189"
+# }
+#
+# Output with extra fields:
+# {
+#     "timestamp":"2023-10-27T19:17:45.586Z",
+#     "level":"INFO",
+#     "message":"Inside the handler function",
+#     "logger": "root",
+#     "requestId":"79b4f56e-95b1-4643-9700-2807f4e68189",
+#     "records_added": 10
+# }
 
-    logger.info("Creating S3 client")
+def handler(event, context):
 
     # Create an S3 client
     session = boto3.Session()
@@ -36,20 +54,12 @@ def handler(event, context):
 
     logger.info("S3 client created")
 
-    logger.info("Creating Secret Manager client")
-
     # Get the .pem file from AWS Secrets Manager
     secret_manager = session.client("secretsmanager", region_name=secret_reigon)
 
     logger.info("Secret Manager client created")
 
-    logger.info("Getting secret from Secret Manager")
-
     secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
-
-    logger.info("Secret retrieved")
-
-    logger.info("Getting access token")
 
     # Get updated copilot usage data from GitHub API
     access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
@@ -58,16 +68,17 @@ def handler(event, context):
         logger.error(f"Error getting access token: {access_token}")
         return(f"Error getting access token: {access_token}")
     else:
-        logger.info("Access token retrieved")
-
-    logger.info("Creating API Controller")
+        logger.info(
+            "Access token retrieved using AWS Secret",
+            extra = {
+                "secret_address": secret_name
+            }
+        )
 
     # Create an instance of the api_controller class
     gh = github_api_toolkit.github_interface(access_token[0])
 
     logger.info("API Controller created")
-
-    logger.info("Getting usage data from GitHub")
 
     # Get the usage data
     usage_data = gh.get(f"/orgs/{org}/copilot/usage")
@@ -75,23 +86,16 @@ def handler(event, context):
 
     logger.info("Usage data retrieved")
 
-    logger.info("Processing usage data")
-
-    logger.info("Loading historic_usage_data.json")
-
     try:
         response = s3.get_object(Bucket=bucket_name, Key=object_name)
-    except ClientError as e:
-        logger.error(f"Error getting historic_usage_data.json: {e}")
-
-        logger.info("Using empty list for historic_usage_data.json")
-        historic_usage = []
-    else:
         historic_usage = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        logger.error(f"Error getting {object_name}: {e}")
+
+        logger.info(f"Using empty list for {object_name}")
+        historic_usage = []
 
     dates_added = []
-
-    logger.info("Adding new usage data to historic_usage_data.json")
 
     # Append the new usage data to the historic_usage_data.json
     for day in usage_data:
@@ -101,16 +105,25 @@ def handler(event, context):
             dates_added.append(day["day"])
     
     logger.info(
-        "New usage data added to historic_usage_data.json",
+        f"New usage data added to {object_name}",
         extra={
             "no_days_added": len(dates_added),
             "dates_added": dates_added
         }
     )
 
+    # Write the updated historic_usage to historic_usage_data.json
     s3.put_object(Bucket=bucket_name, Key=object_name, Body=json.dumps(historic_usage, indent=4).encode("utf-8"))
 
-    logger.info("Uploaded updated historic_usage_data.json to S3")
+    logger.info(f"Uploaded updated {object_name} to S3")
 
-    logger.info("Process complete")
-    return("Process complete")
+    logger.info(
+        "Process complete",
+        extra = {
+            "bucket": bucket_name,
+            "no_days_added": len(dates_added),
+            "dates_added": dates_added,
+            "no_dates_before": len(historic_usage) - len(dates_added),
+            "no_dates_after": len(historic_usage)
+        }
+    )
