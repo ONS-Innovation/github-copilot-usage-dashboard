@@ -46,11 +46,12 @@ logger = logging.getLogger()
 #     "records_added": 10
 # }
 
+
 def handler(event, context):
 
     # Create an S3 client
     session = boto3.Session()
-    s3 = session.client('s3')
+    s3 = session.client("s3")
 
     logger.info("S3 client created")
 
@@ -66,13 +67,11 @@ def handler(event, context):
 
     if type(access_token) == str:
         logger.error(f"Error getting access token: {access_token}")
-        return(f"Error getting access token: {access_token}")
+        return f"Error getting access token: {access_token}"
     else:
         logger.info(
             "Access token retrieved using AWS Secret",
-            extra = {
-                "secret_address": secret_name
-            }
+            extra={"secret_address": secret_name},
         )
 
     # Create an instance of the api_controller class
@@ -103,27 +102,28 @@ def handler(event, context):
             historic_usage.append(day)
 
             dates_added.append(day["day"])
-    
+
     logger.info(
         f"New usage data added to {object_name}",
-        extra={
-            "no_days_added": len(dates_added),
-            "dates_added": dates_added
-        }
+        extra={"no_days_added": len(dates_added), "dates_added": dates_added},
     )
 
     # Write the updated historic_usage to historic_usage_data.json
-    s3.put_object(Bucket=bucket_name, Key=object_name, Body=json.dumps(historic_usage, indent=4).encode("utf-8"))
+    s3.put_object(
+        Bucket=bucket_name,
+        Key=object_name,
+        Body=json.dumps(historic_usage, indent=4).encode("utf-8"),
+    )
 
     logger.info(f"Uploaded updated {object_name} to S3")
 
     logger.info(
         "Process complete",
-        extra = {
+        extra={
             "bucket": bucket_name,
             "no_days_added": len(dates_added),
             "dates_added": dates_added,
             "no_dates_before": len(historic_usage) - len(dates_added),
-            "no_dates_after": len(historic_usage)
-        }
+            "no_dates_after": len(historic_usage),
+        },
     )
