@@ -317,3 +317,39 @@ Delete the service resources by running the following ensuring your reference th
 
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
+
+  ## Linting and Formatting
+To view all commands
+```bash
+make all
+```
+
+To clean residue files
+```bash
+make clean
+```
+
+To format your code
+```bash
+make format
+```
+
+To run all linting tools
+```bash
+make lint
+```
+
+To run a specific linter (black, ruff, pylint)
+```bash
+make black
+make ruff
+make pylint
+```
+
+To run mypy (static type checking)
+```bash
+make mypy
+```
+
+
+
