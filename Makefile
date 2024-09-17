@@ -21,14 +21,18 @@ format:  ## Format the code.
 .PHONY: black
 black:
 	poetry run black src
+	poetry run black aws_lambda_scripts
+
 
 .PHONY: ruff
 ruff:
 	poetry run ruff check src --fix
+	poetry run ruff check aws_lambda_scripts --fix
 
 .PHONY: pylint
 pylint:
 	poetry run pylint src
+	poetry run pylint aws_lambda_scripts
 
 .PHONY: lint
 lint:  ## Run Python linter
@@ -39,6 +43,7 @@ lint:  ## Run Python linter
 .PHONY: mypy
 mypy:  ## Run mypy.
 	poetry run mypy src
+	poetry run mypy aws_lambda_scripts
 
 .PHONY: install
 install:  ## Install the dependencies excluding dev.
