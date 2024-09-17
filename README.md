@@ -324,6 +324,11 @@ To view all commands
 make all
 ```
 
+Linting tools must first be installed before they can be used
+```bash
+make install-dev
+```
+
 To clean residue files
 ```bash
 make clean
