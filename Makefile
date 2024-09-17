@@ -10,11 +10,8 @@ all: ## Show the available make targets.
 
 .PHONY: clean
 clean: ## Clean the temporary files.
-	rm -rf .pytest_cache
 	rm -rf .mypy_cache
-	rm -rf .coverage
 	rm -rf .ruff_cache
-	rm -rf megalinter-reports
 
 .PHONY: format
 format:  ## Format the code.
