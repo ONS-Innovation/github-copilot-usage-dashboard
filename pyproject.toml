@@ -17,7 +17,7 @@ mkdocs = "^1.6.0"
 mkdocs-material = "^9.5.29"
 github-api-toolkit = {git = "https://github.com/ONS-Innovation/github-api-package.git", rev = "v1.0.0"}
 
-[tool.poetry.dev.dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 ruff = "^0.6.5"
 pylint = "^3.2.7"
