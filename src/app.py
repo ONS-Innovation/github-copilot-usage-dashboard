@@ -1,18 +1,14 @@
-import streamlit as st
 import json
+import os
 from datetime import datetime
 
-import pandas as pd
-
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-
 import boto3
-from botocore.exceptions import ClientError
-
-import os
-
 import github_api_toolkit
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from botocore.exceptions import ClientError
+from plotly.subplots import make_subplots
 
 # GitHub Organisation
 org = os.getenv("GITHUB_ORG")
@@ -32,11 +28,8 @@ object_name = "historic_usage_data.json"
 
 
 @st.cache_data
-def get_pem_from_secret_manager(
-    _session: boto3.Session, secret_name: str, region_name: str
-) -> str:
-    """
-    Gets the .pem file contents from AWS Secret Manager
+def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
+    """Gets the .pem file contents from AWS Secret Manager
 
     Args:
         session (boto3.Session): A boto3 session (Led with an underscore so st.cahce_data doesn't hash it)
@@ -80,9 +73,7 @@ with live_tab:
 
     # If the access token isn't a tuple an error occurred.
     if type(access_token) != tuple:
-        st.error(
-            "An error occurred while trying to get the access token. Please check the error message below."
-        )
+        st.error("An error occurred while trying to get the access token. Please check the error message below.")
         st.error(access_token)
         st.error("Using the example dataset instead.")
 
@@ -117,41 +108,31 @@ with live_tab:
 
     @st.cache_data
     def generate_datasets(date_range: tuple):
+        """Converts the 2 JSON responses from the Github API into Pandas Dataframes
         """
-        Converts the 2 JSON responses from the Github API into Pandas Dataframes
-        """
-
         # Converts copilot_usage_data.json into a dataframe
         df_usage_data = pd.json_normalize(usage_data)
 
         # Convert date column from str to datetime
-        df_usage_data["day"] = df_usage_data["day"].apply(
-            lambda x: datetime.strptime(x, "%Y-%m-%d")
-        )
+        df_usage_data["day"] = df_usage_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
         # Create a short version of the day
-        df_usage_data["display_day"] = df_usage_data["day"].apply(
-            lambda x: datetime.strftime(x, "%d %b")
-        )
+        df_usage_data["display_day"] = df_usage_data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
 
         # Add a column for number of ignore results
         df_usage_data["total_decline_count"] = (
-            df_usage_data.total_suggestions_count
-            - df_usage_data.total_acceptances_count
+            df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
         )
 
         # Add an acceptance rate column
         df_usage_data["acceptance_rate"] = round(
-            df_usage_data.total_acceptances_count
-            / df_usage_data.total_suggestions_count
-            * 100,
+            df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100,
             2,
         )
 
         # Create a subset of data based on slider selection
         df_usage_data_subset = df_usage_data.loc[
-            (df_usage_data["day"] >= date_range[0])
-            & (df_usage_data["day"] <= date_range[1])
+            (df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])
         ].reset_index(drop=True)
 
         # Breakdown Data
@@ -174,10 +155,7 @@ with live_tab:
 
         # Add acceptance_rate to language_grouped_breakdown
         language_grouped_breakdown["acceptance_rate"] = round(
-            (
-                language_grouped_breakdown["acceptances_count"]
-                / language_grouped_breakdown["suggestions_count"]
-            ),
+            (language_grouped_breakdown["acceptances_count"] / language_grouped_breakdown["suggestions_count"]),
             2,
         )
 
@@ -185,9 +163,7 @@ with live_tab:
         breakdown_subset = breakdown.drop(columns=["language"])
 
         # Gets the average of the columns for mean active users by IDE
-        editor_grouped_breakdown_avg = breakdown_subset.groupby(
-            ["editor", "day"]
-        ).mean()
+        editor_grouped_breakdown_avg = breakdown_subset.groupby(["editor", "day"]).mean()
         editor_grouped_breakdown_avg = editor_grouped_breakdown_avg.reset_index()
 
         # Gets the sum of the columns for total active users by IDE
@@ -210,39 +186,24 @@ with live_tab:
 
         # Puts the seat information from copilot_seats_data.json into a dataframe
         for row in seat_data["seats"]:
-            df_seat_data = pd.concat(
-                [df_seat_data, pd.json_normalize(row)], ignore_index=True
-            )
+            df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
-        def last_activity_to_datetime(
-            use_example_data: bool, x: str | None
-        ) -> str | None:
-            """
-            A function used to convert the last_activity column of df_seat_data into a formatted datetime string
+        def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
+            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string
             """
             if use_example_data:
                 if x not in (None, ""):
                     sections = x.split(":")
 
-                    corrected_string = (
-                        sections[0]
-                        + ":"
-                        + sections[1]
-                        + ":"
-                        + sections[2]
-                        + sections[3]
-                    )
+                    corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
 
-                    return datetime.strptime(
-                        corrected_string, "%Y-%m-%dT%H:%M:%S%z"
-                    ).strftime("%Y-%m-%d %H:%M")
+                    return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
                 else:
                     return None
+            elif x not in (None, ""):
+                return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
             else:
-                if x not in (None, ""):
-                    return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
-                else:
-                    return None
+                return None
 
         # Converts last_activity_at to a formatted string
         df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(
@@ -327,9 +288,7 @@ with live_tab:
     st.header(":blue-background[Language Breakdown]")
 
     language_drill = st.dataframe(
-        language_grouped_breakdown[
-            ["acceptances_count", "acceptance_rate", "lines_accepted"]
-        ],
+        language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]],
         use_container_width=True,
         on_select="rerun",
         selection_mode=["single-row"],
@@ -347,9 +306,7 @@ with live_tab:
 
     # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
     try:
-        selected_row = language_grouped_breakdown.iloc[
-            [language_drill.selection["rows"][0]]
-        ]
+        selected_row = language_grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
 
         col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -373,18 +330,12 @@ with live_tab:
         df_breakdown_by_day = df_breakdown_by_day.reset_index()
 
         # Calculates the total copilot suggestion for the date
-        df_date_totals = (
-            df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
-        )
-        df_date_totals = df_date_totals.rename(
-            columns={"suggestions_count": "total_suggestions"}
-        )
+        df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
+        df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
         df_date_totals = df_date_totals.reset_index()
 
         # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
-        df_breakdown_by_day = df_breakdown_by_day.merge(
-            df_date_totals, on="day", how="left"
-        )
+        df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
 
         # Create a graph showing number of suggestions by day, split by IDE.
         fig = make_subplots()
@@ -457,9 +408,7 @@ with live_tab:
             use_container_width=True,
             column_config={
                 "assignee.login": st.column_config.Column("User"),
-                "last_activity_at": st.column_config.DatetimeColumn(
-                    "Last Activity At", format="YYYY-MM-DD HH:mm"
-                ),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
                     "Github Profile",
                     help="A link to this user's profile",
@@ -480,9 +429,7 @@ with live_tab:
             use_container_width=True,
             column_config={
                 "assignee.login": st.column_config.Column("User"),
-                "last_activity_at": st.column_config.DatetimeColumn(
-                    "Last Activity At", format="YYYY-MM-DD HH:mm"
-                ),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
                     "Github Profile",
                     help="A link to this user's profile",
@@ -495,11 +442,7 @@ with live_tab:
 
     fig = make_subplots()
 
-    fig.add_trace(
-        go.Bar(
-            x=df_usage_data_subset["day"], y=df_usage_data_subset["total_active_users"]
-        )
-    )
+    fig.add_trace(go.Bar(x=df_usage_data_subset["day"], y=df_usage_data_subset["total_active_users"]))
 
     fig.update_layout(
         title="Engaged Users By Day (All Editors)",
@@ -566,9 +509,7 @@ with historic_tab:
     df_historic_data = pd.json_normalize(historic_data)
 
     # Convert date column from str to datetime
-    df_historic_data["day"] = df_historic_data["day"].apply(
-        lambda x: datetime.strptime(x, "%Y-%m-%d")
-    )
+    df_historic_data["day"] = df_historic_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
     # Drop the breakdown column as it is unused
     df_historic_data = df_historic_data.drop(columns=["breakdown"])
@@ -595,9 +536,7 @@ with historic_tab:
 
     # Add a column for the acceptance rate
     df_historic_data["acceptance_rate"] = round(
-        df_historic_data["total_acceptances_count"]
-        / df_historic_data["total_suggestions_count"]
-        * 100,
+        df_historic_data["total_acceptances_count"] / df_historic_data["total_suggestions_count"] * 100,
         2,
     )
 
@@ -605,9 +544,7 @@ with historic_tab:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(
-            "Total Suggestions", df_historic_data["total_suggestions_count"].sum()
-        )
+        st.metric("Total Suggestions", df_historic_data["total_suggestions_count"].sum())
         st.metric(
             f"Average Suggestions Per {date_grouping}",
             round(df_historic_data["total_suggestions_count"].mean(), 2),
@@ -620,9 +557,7 @@ with historic_tab:
             round(df_historic_data["total_acceptances_count"].mean(), 2),
         )
     with col3:
-        st.metric(
-            "Total Lines Accepted", df_historic_data["total_lines_accepted"].sum()
-        )
+        st.metric("Total Lines Accepted", df_historic_data["total_lines_accepted"].sum())
         st.metric(
             "Acceptance Rate",
             str(
@@ -678,9 +613,7 @@ with historic_tab:
 
     fig = make_subplots()
 
-    fig.add_trace(
-        go.Bar(x=df_historic_data["day"], y=df_historic_data["total_active_users"])
-    )
+    fig.add_trace(go.Bar(x=df_historic_data["day"], y=df_historic_data["total_active_users"]))
 
     title = (
         "Engaged Users By Day (All Editors)"
