@@ -43,7 +43,7 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
 
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
 2. Activate the virtual environment using `source venv/bin/activate`
-3. Install all project dependancies using `poetry install`
+3. Install all project dependancies using `make install`
 4. When running the project locally, you need to edit `app.py`.
 
     When creating an instance of `boto3.Session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
@@ -317,3 +317,44 @@ Delete the service resources by running the following ensuring your reference th
 
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
+
+  ## Linting and Formatting
+To view all commands
+```bash
+make all
+```
+
+Linting tools must first be installed before they can be used
+```bash
+make install-dev
+```
+
+To clean residue files
+```bash
+make clean
+```
+
+To format your code
+```bash
+make format
+```
+
+To run all linting tools
+```bash
+make lint
+```
+
+To run a specific linter (black, ruff, pylint)
+```bash
+make black
+make ruff
+make pylint
+```
+
+To run mypy (static type checking)
+```bash
+make mypy
+```
+
+
+
