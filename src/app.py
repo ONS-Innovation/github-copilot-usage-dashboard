@@ -1,19 +1,14 @@
-import streamlit as st
 import json
+import os
 from datetime import datetime
 
-import pandas as pd
-
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-
 import boto3
-from botocore.exceptions import ClientError
-
-import os
-
 import github_api_toolkit
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
+from botocore.exceptions import ClientError
+from plotly.subplots import make_subplots
 
 # GitHub Organisation
 org = os.getenv("GITHUB_ORG")
@@ -31,10 +26,10 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 bucket_name = f"{account}-copilot-usage-dashboard"
 object_name = "historic_usage_data.json"
 
+
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
-    """
-    Gets the .pem file contents from AWS Secret Manager
+    """Gets the .pem file contents from AWS Secret Manager
 
     Args:
         session (boto3.Session): A boto3 session (Led with an underscore so st.cahce_data doesn't hash it)
@@ -50,7 +45,11 @@ def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, regio
 # Initialise a boto3 session
 session = boto3.Session()
 
-st.set_page_config(page_title="CoPilot Usage Dashboard", page_icon="./src/branding/ONS-symbol_digital.svg", layout="wide")
+st.set_page_config(
+    page_title="CoPilot Usage Dashboard",
+    page_icon="./src/branding/ONS-symbol_digital.svg",
+    layout="wide",
+)
 
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
 
@@ -104,15 +103,13 @@ with live_tab:
         min_value=min_date,
         max_value=max_date,
         value=(min_date, max_date),
-        format="YYYY-MM-DD"
+        format="YYYY-MM-DD",
     )
 
     @st.cache_data
     def generate_datasets(date_range: tuple):
+        """Converts the 2 JSON responses from the Github API into Pandas Dataframes
         """
-            Converts the 2 JSON responses from the Github API into Pandas Dataframes
-        """
-
         # Converts copilot_usage_data.json into a dataframe
         df_usage_data = pd.json_normalize(usage_data)
 
@@ -123,14 +120,20 @@ with live_tab:
         df_usage_data["display_day"] = df_usage_data["day"].apply(lambda x: datetime.strftime(x, "%d %b"))
 
         # Add a column for number of ignore results
-        df_usage_data["total_decline_count"] = df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
+        df_usage_data["total_decline_count"] = (
+            df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
+        )
 
         # Add an acceptance rate column
-        df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
+        df_usage_data["acceptance_rate"] = round(
+            df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100,
+            2,
+        )
 
         # Create a subset of data based on slider selection
-        df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])].reset_index(drop=True)
-
+        df_usage_data_subset = df_usage_data.loc[
+            (df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])
+        ].reset_index(drop=True)
 
         # Breakdown Data
 
@@ -141,14 +144,20 @@ with live_tab:
             for d in df_usage_data_subset.breakdown[i]:
                 d["day"] = df_usage_data_subset.day[i]
 
-            breakdown = pd.concat([breakdown, pd.json_normalize(df_usage_data_subset.breakdown[i])], ignore_index=True)
+            breakdown = pd.concat(
+                [breakdown, pd.json_normalize(df_usage_data_subset.breakdown[i])],
+                ignore_index=True,
+            )
 
         # Group the breakdown data by language
         breakdown_subset = breakdown.drop(columns=["editor", "active_users", "day"])
         language_grouped_breakdown = breakdown_subset.groupby(["language"]).sum()
 
         # Add acceptance_rate to language_grouped_breakdown
-        language_grouped_breakdown["acceptance_rate"] = round((language_grouped_breakdown["acceptances_count"] / language_grouped_breakdown["suggestions_count"]), 2)
+        language_grouped_breakdown["acceptance_rate"] = round(
+            (language_grouped_breakdown["acceptances_count"] / language_grouped_breakdown["suggestions_count"]),
+            2,
+        )
 
         # Group breakdown data by editor (IDE)
         breakdown_subset = breakdown.drop(columns=["language"])
@@ -161,7 +170,6 @@ with live_tab:
         editor_grouped_breakdown_sum = breakdown_subset.groupby(["editor", "day"]).sum()
         editor_grouped_breakdown_sum = editor_grouped_breakdown_sum.reset_index()
 
-
         # Seat Data
 
         # Get a JSON version of Seat Data
@@ -173,7 +181,6 @@ with live_tab:
 
             seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={})
             seat_data = seat_data.json()
-        
 
         df_seat_data = pd.DataFrame()
 
@@ -181,10 +188,8 @@ with live_tab:
         for row in seat_data["seats"]:
             df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
-
         def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
-            """
-                A function used to convert the last_activity column of df_seat_data into a formatted datetime string
+            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string
             """
             if use_example_data:
                 if x not in (None, ""):
@@ -195,20 +200,35 @@ with live_tab:
                     return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
                 else:
                     return None
+            elif x not in (None, ""):
+                return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
             else:
-                if x not in (None, ""):
-                    return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")            
-                else:
-                    return None
+                return None
 
         # Converts last_activity_at to a formatted string
-        df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(lambda x: last_activity_to_datetime(use_example_data, x))
+        df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(
+            lambda x: last_activity_to_datetime(use_example_data, x)
+        )
 
-        return df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum, df_seat_data, seat_data
+        return (
+            df_usage_data_subset,
+            breakdown,
+            language_grouped_breakdown,
+            editor_grouped_breakdown_avg,
+            editor_grouped_breakdown_sum,
+            df_seat_data,
+            seat_data,
+        )
 
-
-    df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum, df_seat_data, seat_data = generate_datasets(date_range)
-
+    (
+        df_usage_data_subset,
+        breakdown,
+        language_grouped_breakdown,
+        editor_grouped_breakdown_avg,
+        editor_grouped_breakdown_sum,
+        df_seat_data,
+        seat_data,
+    ) = generate_datasets(date_range)
 
     # Metrics for total shown, total accepts, acceptance rate and total lines accepted
     col1, col2, col3, col4 = st.columns(4)
@@ -221,7 +241,7 @@ with live_tab:
         st.metric("Total Accepts", total_accepts)
     with col3:
         acceptance_rate = round(total_accepts / total_shown * 100, 2)
-        st.metric("Acceptance Rate", str(acceptance_rate)+"%")
+        st.metric("Acceptance Rate", str(acceptance_rate) + "%")
     with col4:
         total_lines_accepted = df_usage_data_subset["total_lines_accepted"].sum()
         st.metric("Lines of Code Accepted", total_lines_accepted)
@@ -237,9 +257,9 @@ with live_tab:
             y=df_usage_data_subset["acceptance_rate"],
             name="Acceptance Rate (%)",
             text=df_usage_data_subset["acceptance_rate"],
-            textposition="top center"
+            textposition="top center",
         ),
-        secondary_y=True
+        secondary_y=True,
     )
 
     fig.add_trace(
@@ -247,7 +267,7 @@ with live_tab:
             x=df_usage_data_subset["display_day"],
             y=df_usage_data_subset["total_acceptances_count"],
             name="Total Acceptances",
-            hovertext=df_usage_data_subset["total_acceptances_count"]
+            hovertext=df_usage_data_subset["total_acceptances_count"],
         )
     )
 
@@ -256,37 +276,32 @@ with live_tab:
         xaxis_title="Date",
         yaxis_title="Acceptances",
         legend_title="Legend",
-        hovermode="x unified"
+        hovermode="x unified",
     )
 
     fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
 
     st.plotly_chart(fig, use_container_width=True)
 
-
     # Language breakdown
 
     st.header(":blue-background[Language Breakdown]")
 
     language_drill = st.dataframe(
-        language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]], 
+        language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]],
         use_container_width=True,
         on_select="rerun",
         selection_mode=["single-row"],
         column_config={
-            "acceptances_count": st.column_config.Column(
-                "Total Accepts"
-            ),
+            "acceptances_count": st.column_config.Column("Total Accepts"),
             "acceptance_rate": st.column_config.ProgressColumn(
                 "Acceptance Rate",
                 help="The percentage of which Copilot suggestions are accepted",
                 min_value=0,
-                max_value=1
+                max_value=1,
             ),
-            "lines_accepted": st.column_config.Column(
-                "Lines of Code Accepted"
-            )
-        }
+            "lines_accepted": st.column_config.Column("Lines of Code Accepted"),
+        },
     )
 
     # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
@@ -307,7 +322,11 @@ with live_tab:
             st.metric("Lines Accepted", selected_row["lines_accepted"])
 
         # Creates a subset of breakdown dataframe to only hold information for the selected language
-        df_breakdown_by_day = breakdown.loc[breakdown["language"] == selected_row.index.values[0]].groupby(["day", "language", "editor"]).sum()
+        df_breakdown_by_day = (
+            breakdown.loc[breakdown["language"] == selected_row.index.values[0]]
+            .groupby(["day", "language", "editor"])
+            .sum()
+        )
         df_breakdown_by_day = df_breakdown_by_day.reset_index()
 
         # Calculates the total copilot suggestion for the date
@@ -332,10 +351,11 @@ with live_tab:
                     x=df["day"],
                     y=df["suggestions_count"],
                     customdata=df["total_suggestions"],
-                    hovertemplate="<br>" +
-                        "Number of Suggestions: %{y} <br>" +
-                        "Total Suggestions for Day: %{customdata} <br>"
-                ))
+                    hovertemplate="<br>"
+                    + "Number of Suggestions: %{y} <br>"
+                    + "Total Suggestions for Day: %{customdata} <br>",
+                )
+            )
 
         fig.update_layout(
             barmode="stack",
@@ -343,7 +363,7 @@ with live_tab:
             xaxis_title="Day",
             yaxis_title="Number of Suggestions",
             hovermode="x unified",
-            legend_orientation="h"
+            legend_orientation="h",
         )
 
         st.plotly_chart(fig)
@@ -366,14 +386,13 @@ with live_tab:
         for index, row in df_seat_data.iterrows():
             if pd.isnull(row.last_activity_at) == False:
                 number_of_engaged_users += 1
-        
+
         st.metric("Number of Engaged Users", number_of_engaged_users)
 
     with col3:
         number_of_inactive_users = seat_data["total_seats"] - number_of_engaged_users
 
         st.metric("Number of Inactive Users", number_of_inactive_users)
-
 
     col1, col2 = st.columns(2)
 
@@ -382,23 +401,20 @@ with live_tab:
 
         # Dataframe showing only active users (this with a latest activity)
         st.dataframe(
-            df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][["assignee.login", "last_activity_at", "assignee.html_url"]], 
-            hide_index=True, 
-            use_container_width=True, 
+            df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
+                ["assignee.login", "last_activity_at", "assignee.html_url"]
+            ],
+            hide_index=True,
+            use_container_width=True,
             column_config={
-                "assignee.login": st.column_config.Column(
-                    "User"
-                ),
-                "last_activity_at": st.column_config.DatetimeColumn(
-                    "Last Activity At",
-                    format="YYYY-MM-DD HH:mm"
-                ),
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
                     "Github Profile",
                     help="A link to this user's profile",
-                    display_text="Go to Profile"
-                )
-            }
+                    display_text="Go to Profile",
+                ),
+            },
         )
 
     with col2:
@@ -406,41 +422,33 @@ with live_tab:
 
         # Dataframe showing only inactive users (those where last_activity_at is None)
         st.dataframe(
-            df_seat_data.loc[df_seat_data["last_activity_at"].isnull()][["assignee.login", "last_activity_at", "assignee.html_url"]], 
-            hide_index=True, 
-            use_container_width=True, 
+            df_seat_data.loc[df_seat_data["last_activity_at"].isnull()][
+                ["assignee.login", "last_activity_at", "assignee.html_url"]
+            ],
+            hide_index=True,
+            use_container_width=True,
             column_config={
-                "assignee.login": st.column_config.Column(
-                    "User"
-                ),
-                "last_activity_at": st.column_config.DatetimeColumn(
-                    "Last Activity At",
-                    format="YYYY-MM-DD HH:mm"
-                ),
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
                     "Github Profile",
                     help="A link to this user's profile",
-                    display_text="Go to Profile"
-                )
-            }
+                    display_text="Go to Profile",
+                ),
+            },
         )
 
     # Engaged Users By Day
 
     fig = make_subplots()
 
-    fig.add_trace(
-        go.Bar(
-            x=df_usage_data_subset["day"],
-            y=df_usage_data_subset["total_active_users"]
-        )
-    )
+    fig.add_trace(go.Bar(x=df_usage_data_subset["day"], y=df_usage_data_subset["total_active_users"]))
 
     fig.update_layout(
         title="Engaged Users By Day (All Editors)",
         xaxis_title="Day",
         yaxis_title="Number of Users",
-        hovermode="x unified"
+        hovermode="x unified",
     )
 
     st.plotly_chart(fig)
@@ -448,28 +456,31 @@ with live_tab:
     # Engaged Users By IDE
 
     fig = make_subplots(
-        rows=1, 
-        cols=2, 
-        specs=[[{"type":"pie"}, {"type":"pie"}]], 
-        subplot_titles=("Average Engaged User by IDE Per Day", "Total Engaged Users by IDE")
+        rows=1,
+        cols=2,
+        specs=[[{"type": "pie"}, {"type": "pie"}]],
+        subplot_titles=(
+            "Average Engaged User by IDE Per Day",
+            "Total Engaged Users by IDE",
+        ),
     )
 
     fig.add_trace(
         go.Pie(
             values=editor_grouped_breakdown_avg["active_users"],
-            labels=editor_grouped_breakdown_avg["editor"]
+            labels=editor_grouped_breakdown_avg["editor"],
         ),
         row=1,
-        col=1
+        col=1,
     )
 
     fig.add_trace(
         go.Pie(
             values=editor_grouped_breakdown_sum["active_users"],
-            labels=editor_grouped_breakdown_sum["editor"]
+            labels=editor_grouped_breakdown_sum["editor"],
         ),
         row=1,
-        col=2
+        col=2,
     )
 
     st.plotly_chart(fig)
@@ -480,7 +491,7 @@ with historic_tab:
     date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
 
     # Create an S3 client
-    s3 = session.client('s3')
+    s3 = session.client("s3")
 
     # Get historic_usage_data.json from S3
     try:
@@ -488,9 +499,11 @@ with historic_tab:
         historic_data = json.loads(response["Body"].read().decode("utf-8"))
 
     except ClientError as e:
-        st.error(f"An error occurred while trying to get the historic data from S3 ({object_name}). Please check the error message below.")
+        st.error(
+            f"An error occurred while trying to get the historic data from S3 ({object_name}). Please check the error message below."
+        )
         st.error(e)
-        st.stop()        
+        st.stop()
 
     # Convert the historic data into a dataframe
     df_historic_data = pd.json_normalize(historic_data)
@@ -522,23 +535,41 @@ with historic_tab:
     # st.dataframe(df_historic_data, use_container_width=True)
 
     # Add a column for the acceptance rate
-    df_historic_data["acceptance_rate"] = round(df_historic_data["total_acceptances_count"] / df_historic_data["total_suggestions_count"] * 100, 2)
-
+    df_historic_data["acceptance_rate"] = round(
+        df_historic_data["total_acceptances_count"] / df_historic_data["total_suggestions_count"] * 100,
+        2,
+    )
 
     # Overall Metrics
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.metric("Total Suggestions", df_historic_data["total_suggestions_count"].sum())
-        st.metric(f"Average Suggestions Per {date_grouping}", round(df_historic_data["total_suggestions_count"].mean(), 2))
+        st.metric(
+            f"Average Suggestions Per {date_grouping}",
+            round(df_historic_data["total_suggestions_count"].mean(), 2),
+        )
 
     with col2:
         st.metric("Total Accepts", df_historic_data["total_acceptances_count"].sum())
-        st.metric(f"Average Accepts Per {date_grouping}", round(df_historic_data["total_acceptances_count"].mean(), 2))
+        st.metric(
+            f"Average Accepts Per {date_grouping}",
+            round(df_historic_data["total_acceptances_count"].mean(), 2),
+        )
     with col3:
         st.metric("Total Lines Accepted", df_historic_data["total_lines_accepted"].sum())
-        st.metric("Acceptance Rate", str(round(df_historic_data["total_acceptances_count"].sum() / df_historic_data["total_suggestions_count"].sum() * 100, 2))+"%")
-
+        st.metric(
+            "Acceptance Rate",
+            str(
+                round(
+                    df_historic_data["total_acceptances_count"].sum()
+                    / df_historic_data["total_suggestions_count"].sum()
+                    * 100,
+                    2,
+                )
+            )
+            + "%",
+        )
 
     # Acceptance Graph
 
@@ -551,9 +582,9 @@ with historic_tab:
             y=df_historic_data["acceptance_rate"],
             name="Acceptance Rate (%)",
             text=df_historic_data["acceptance_rate"],
-            textposition="top center"
+            textposition="top center",
         ),
-        secondary_y=True
+        secondary_y=True,
     )
 
     fig.add_trace(
@@ -561,7 +592,7 @@ with historic_tab:
             x=df_historic_data["day"],
             y=df_historic_data["total_acceptances_count"],
             name="Total Acceptances",
-            hovertext=df_historic_data["total_acceptances_count"]
+            hovertext=df_historic_data["total_acceptances_count"],
         )
     )
 
@@ -570,7 +601,7 @@ with historic_tab:
         xaxis_title="Date",
         yaxis_title="Acceptances",
         legend_title="Legend",
-        hovermode="x unified"
+        hovermode="x unified",
     )
 
     fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
@@ -582,24 +613,25 @@ with historic_tab:
 
     fig = make_subplots()
 
-    fig.add_trace(
-        go.Bar(
-            x=df_historic_data["day"],
-            y=df_historic_data["total_active_users"]
-        )
-    )
+    fig.add_trace(go.Bar(x=df_historic_data["day"], y=df_historic_data["total_active_users"]))
 
-    title = "Engaged Users By Day (All Editors)" if date_grouping == "Day" else f"Unique Daily User Instances By {date_grouping} (All Editors)"
+    title = (
+        "Engaged Users By Day (All Editors)"
+        if date_grouping == "Day"
+        else f"Unique Daily User Instances By {date_grouping} (All Editors)"
+    )
 
     fig.update_layout(
         title=title,
         xaxis_title="Day",
         yaxis_title="Number of Users",
-        hovermode="x unified"
+        hovermode="x unified",
     )
 
     fig.update_xaxes(type="category")
 
     st.plotly_chart(fig)
 
-    st.caption("**Note:** If grouping by day, the graph above will show the number of unique users per day. If grouping by week, month or year, the graph above will show the sum of those unique users for the period.")
+    st.caption(
+        "**Note:** If grouping by day, the graph above will show the number of unique users per day. If grouping by week, month or year, the graph above will show the sum of those unique users for the period."
+    )
