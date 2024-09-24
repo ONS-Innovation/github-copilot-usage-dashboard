@@ -108,8 +108,7 @@ with live_tab:
 
     @st.cache_data
     def generate_datasets(date_range: tuple):
-        """Converts the 2 JSON responses from the Github API into Pandas Dataframes
-        """
+        """Converts the 2 JSON responses from the Github API into Pandas Dataframes"""
         # Converts copilot_usage_data.json into a dataframe
         df_usage_data = pd.json_normalize(usage_data)
 
@@ -189,8 +188,7 @@ with live_tab:
             df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
         def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
-            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string
-            """
+            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string"""
             if use_example_data:
                 if x not in (None, ""):
                     sections = x.split(":")
@@ -511,8 +509,17 @@ with historic_tab:
     # Convert date column from str to datetime
     df_historic_data["day"] = df_historic_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
+    # Create a date picker for the user to select the date range
+    starting_date = st.date_input("Enter starting date")
+    ending_date = st.date_input("Enter ending date")
+
     # Drop the breakdown column as it is unused
     df_historic_data = df_historic_data.drop(columns=["breakdown"])
+
+    # Filter the data based on the date range selected by the user
+    df_historic_data = df_historic_data[
+        (df_historic_data["day"] <= str(ending_date)) & (df_historic_data["day"] >= str(starting_date))
+    ]
 
     # Group the data by the date as selected by the user
     if date_grouping == "Day":
