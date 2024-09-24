@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 import boto3
 import github_api_toolkit
@@ -510,8 +510,8 @@ with historic_tab:
     df_historic_data["day"] = df_historic_data["day"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
 
     # Create a date picker for the user to select the date range
-    starting_date = st.date_input("Enter starting date")
-    ending_date = st.date_input("Enter ending date")
+    starting_date = st.date_input("Enter starting date", date.today() - timedelta(30))
+    ending_date = st.date_input("Enter ending date", date.today())
 
     # Drop the breakdown column as it is unused
     df_historic_data = df_historic_data.drop(columns=["breakdown"])
