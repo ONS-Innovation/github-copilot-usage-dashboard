@@ -40,13 +40,13 @@ usage_data = gh.get(
 usage_data = usage_data.json()
 print(org, usage_data)
 # Define the path to the output JSON file
-output_path = os.path.join(os.path.dirname(__file__), '../src/data.json')
+output_path = os.path.join(os.path.dirname(__file__), "../src/data.json")
 
 # Ensure the directory exists
 os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
 # Write the usage data to the JSON file
-with open(output_path, 'w') as json_file:
+with open(output_path, "w") as json_file:
     json.dump(usage_data, json_file, indent=4)
 
 print(f"Usage data has been written to {output_path}")

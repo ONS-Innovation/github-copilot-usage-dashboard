@@ -1,15 +1,14 @@
-import streamlit as st
-import requests
-from urllib.parse import urlencode
 import os
-import github_api_toolkit
-import boto3
-import pandas as pd
-import json
 from datetime import datetime
-from plotly.subplots import make_subplots
+from urllib.parse import urlencode
+
+import boto3
+import github_api_toolkit
+import pandas as pd
 import plotly.graph_objects as go
-from botocore.exceptions import ClientError
+import requests
+import streamlit as st
+from plotly.subplots import make_subplots
 
 org = os.getenv("GITHUB_ORG")
 
@@ -23,12 +22,12 @@ secret_reigon = os.getenv("AWS_DEFAULT_REGION")
 account = os.getenv("AWS_ACCOUNT_NAME")
 
 
-client_id = 'Ov23liJPFTZTiHwrQiEq'
-client_secret = 'SECRET_REMOVED'
-authorize_url = 'https://github.com/login/oauth/authorize'
-access_token_url = 'https://github.com/login/oauth/access_token'
-user_api_url = 'https://api.github.com/user'
-redirect_uri = 'http://localhost:8502/team_usage'
+client_id = "Ov23liJPFTZTiHwrQiEq"
+client_secret = "SECRET_REMOVED"
+authorize_url = "https://github.com/login/oauth/authorize"
+access_token_url = "https://github.com/login/oauth/access_token"
+user_api_url = "https://api.github.com/user"
+redirect_uri = "http://localhost:8502/team_usage"
 
 session = boto3.Session()
 s3 = session.client("s3")
@@ -41,32 +40,34 @@ secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
 gh = github_api_toolkit.github_interface(access_token[0])
 
+
 def get_access_token(code):
     """Exchange code for access token"""
     data = {
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'code': code,
-        'redirect_uri': redirect_uri,
-        'scope': 'user:email,read:org'
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "scope": "user:email,read:org",
     }
-    headers = {'Accept': 'application/json'}
+    headers = {"Accept": "application/json"}
     response = requests.post(access_token_url, data=data, headers=headers)
     response.raise_for_status()
-    access_token = response.json().get('access_token')
+    access_token = response.json().get("access_token")
     st.session_state.access_token = access_token
     return access_token
 
 
 def get_user_profile(access_token):
     """Fetch authenticated user's GitHub profile"""
-    headers = {'Authorization': f'token {access_token}'}
+    headers = {"Authorization": f"token {access_token}"}
     response = requests.get(user_api_url, headers=headers)
     response.raise_for_status()
     return response.json()
 
+
 def is_user_in_org(username, org):
-    orgs = gh.get(f'/orgs/{org}/members/{username}')
+    orgs = gh.get(f"/orgs/{org}/members/{username}")
 
     return orgs.status_code == 204
 
@@ -93,10 +94,14 @@ def generate_datasets(date_range: tuple, usage_data):
     df_usage_data["total_decline_count"] = df_usage_data.total_suggestions_count - df_usage_data.total_acceptances_count
 
     # Add an acceptance rate column
-    df_usage_data["acceptance_rate"] = round(df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2)
+    df_usage_data["acceptance_rate"] = round(
+        df_usage_data.total_acceptances_count / df_usage_data.total_suggestions_count * 100, 2
+    )
 
     # Create a subset of data based on slider selection
-    df_usage_data_subset = df_usage_data.loc[(df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])].reset_index(drop=True)
+    df_usage_data_subset = df_usage_data.loc[
+        (df_usage_data["day"] >= date_range[0]) & (df_usage_data["day"] <= date_range[1])
+    ].reset_index(drop=True)
 
     # Breakdown Data
     breakdown = pd.DataFrame()
@@ -117,22 +122,30 @@ def generate_datasets(date_range: tuple, usage_data):
     editor_grouped_breakdown_avg = breakdown_subset.groupby(["editor", "day"]).mean().reset_index()
     editor_grouped_breakdown_sum = breakdown_subset.groupby(["editor", "day"]).sum().reset_index()
 
-    return df_usage_data_subset, breakdown, language_grouped_breakdown, editor_grouped_breakdown_avg, editor_grouped_breakdown_sum
+    return (
+        df_usage_data_subset,
+        breakdown,
+        language_grouped_breakdown,
+        editor_grouped_breakdown_avg,
+        editor_grouped_breakdown_sum,
+    )
 
 
 # Streamlit UI starts here
-st.title('GitHub Team Copilot Usage')
+st.title("GitHub Team Copilot Usage")
 
-if 'profile' not in st.session_state:
+if "profile" not in st.session_state:
     st.session_state.profile = None
 
 # Step 1: GitHub Login
 if st.session_state.profile is None:
-    login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email'})}"
+    login_url = (
+        f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email'})}"
+    )
     st.link_button("Login with GitHub", login_url)
     query_params = st.query_params
-    if 'code' in query_params:
-        code = query_params['code']
+    if "code" in query_params:
+        code = query_params["code"]
         try:
             access_token = get_access_token(code)
             profile = get_user_profile(access_token)
@@ -146,7 +159,7 @@ else:
     st.success(f"Hello, {profile['login']}!")
 
     # Step 2: Check if user belongs to the organization
-    if is_user_in_org(profile['login'], org):
+    if is_user_in_org(profile["login"], org):
         # Step 3: Get Team Name
         team_slug = st.text_input("Enter team name:")
 
@@ -165,6 +178,9 @@ else:
                     usage_data = usage_data.json()
                 except:
                     st.error("Error fetching data from GitHub API. Please try again later.")
+                    st.stop()
+                if not usage_data:
+                    st.error(f"No data found for team '{team_slug}' or you're not in the team.")
                     st.stop()
 
                 # Get the maximum and minimum date which we have data for
@@ -188,7 +204,7 @@ else:
                     breakdown,
                     language_grouped_breakdown,
                     editor_grouped_breakdown_avg,
-                    editor_grouped_breakdown_sum
+                    editor_grouped_breakdown_sum,
                 ) = generate_datasets(date_range, usage_data)
 
                 # Display Metrics
