@@ -102,11 +102,10 @@ with live_tab:
         value=(min_date, max_date),
         format="YYYY-MM-DD",
     )
-    
+
     @st.cache_data
     def generate_datasets(date_range: tuple):
-        """Converts the 2 JSON responses from the Github API into Pandas Dataframes
-        """
+        """Converts the 2 JSON responses from the Github API into Pandas Dataframes"""
         # Converts copilot_usage_data.json into a dataframe
         df_usage_data = pd.json_normalize(usage_data)
 
@@ -172,7 +171,7 @@ with live_tab:
         # Get a JSON version of Seat Data
         if use_example_data:
             with open("./src/example_data/copilot_seats_data.json") as f:
-                
+
                 seat_data = json.load(f)
         else:
             gh = github_api_toolkit.github_interface(access_token[0])
@@ -187,8 +186,7 @@ with live_tab:
             df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
         def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
-            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string
-            """
+            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string"""
             if use_example_data:
                 if x not in (None, ""):
                     sections = x.split(":")
@@ -227,7 +225,7 @@ with live_tab:
         df_seat_data,
         seat_data,
     ) = generate_datasets(date_range)
-    
+
     # Add toggle buttons for each day of the week
     days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     selected_days = []
@@ -238,25 +236,48 @@ with live_tab:
     with col1:
         total_shown = df_usage_data_subset["total_suggestions_count"].sum()
         initial_suggestions = df_usage_data_subset.iloc[0]["total_suggestions_count"]
-        percent_difference_suggestions = ((df_usage_data_subset.iloc[-1]["total_suggestions_count"] - initial_suggestions) / initial_suggestions) * 100
-        st.metric("Total Suggestions", total_shown, delta=f"{percent_difference_suggestions:.2f}%", delta_color="normal")
+        percent_difference_suggestions = (
+            (df_usage_data_subset.iloc[-1]["total_suggestions_count"] - initial_suggestions) / initial_suggestions
+        ) * 100
+        st.metric(
+            "Total Suggestions", total_shown, delta=f"{percent_difference_suggestions:.2f}%", delta_color="normal"
+        )
 
     with col2:
         total_accepts = df_usage_data_subset["total_acceptances_count"].sum()
         initial_accepts = df_usage_data_subset.iloc[0]["total_acceptances_count"]
-        percent_difference_accepts = ((df_usage_data_subset.iloc[-1]["total_acceptances_count"] - initial_accepts) / initial_accepts) * 100
+        percent_difference_accepts = (
+            (df_usage_data_subset.iloc[-1]["total_acceptances_count"] - initial_accepts) / initial_accepts
+        ) * 100
         st.metric("Total Accepts", total_accepts, delta=f"{percent_difference_accepts:.2f}%", delta_color="normal")
     with col3:
         acceptance_rate = round(total_accepts / total_shown * 100, 2)
-        initial_acceptance_rate = round(df_usage_data_subset.iloc[0]["total_acceptances_count"] / df_usage_data_subset.iloc[0]["total_suggestions_count"] * 100, 2)
+        initial_acceptance_rate = round(
+            df_usage_data_subset.iloc[0]["total_acceptances_count"]
+            / df_usage_data_subset.iloc[0]["total_suggestions_count"]
+            * 100,
+            2,
+        )
         print(acceptance_rate, initial_acceptance_rate)
         percent_difference_acceptance_rate = acceptance_rate - initial_acceptance_rate
-        st.metric("Acceptance Rate", str(acceptance_rate) + "%", delta=f"{percent_difference_acceptance_rate:.2f}", delta_color="normal")
+        st.metric(
+            "Acceptance Rate",
+            str(acceptance_rate) + "%",
+            delta=f"{percent_difference_acceptance_rate:.2f}",
+            delta_color="normal",
+        )
     with col4:
         total_lines_accepted = df_usage_data_subset["total_lines_accepted"].sum()
         initial_lines_accepted = df_usage_data_subset.iloc[0]["total_lines_accepted"]
-        percent_difference_lines_accepted = ((df_usage_data_subset.iloc[-1]["total_lines_accepted"] - initial_lines_accepted) / initial_lines_accepted) * 100
-        st.metric("Lines of Code Accepted", total_lines_accepted, delta=f"{percent_difference_lines_accepted:.2f}%", delta_color="normal")
+        percent_difference_lines_accepted = (
+            (df_usage_data_subset.iloc[-1]["total_lines_accepted"] - initial_lines_accepted) / initial_lines_accepted
+        ) * 100
+        st.metric(
+            "Lines of Code Accepted",
+            total_lines_accepted,
+            delta=f"{percent_difference_lines_accepted:.2f}%",
+            delta_color="normal",
+        )
 
     # Acceptance Graph
 
