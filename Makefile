@@ -52,3 +52,8 @@ install:  ## Install the dependencies excluding dev.
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
 	poetry install --no-root
+
+
+.PHONY: run-local
+run-local:  ## Install the dependencies including dev.
+	poetry run streamlit run src/app.py --server.port 8502

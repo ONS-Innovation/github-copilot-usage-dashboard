@@ -121,7 +121,7 @@ def generate_datasets(date_range: tuple, usage_data):
 
 
 # Streamlit UI starts here
-st.title('GitHub Copilot Usage Dashboard')
+st.title('GitHub Team Copilot Usage')
 
 if 'profile' not in st.session_state:
     st.session_state.profile = None
@@ -129,8 +129,7 @@ if 'profile' not in st.session_state:
 # Step 1: GitHub Login
 if st.session_state.profile is None:
     login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email'})}"
-    st.markdown(f"[Login with GitHub]({login_url})")
-
+    st.link_button("Login with GitHub", login_url)
     query_params = st.query_params
     if 'code' in query_params:
         code = query_params['code']
@@ -145,12 +144,9 @@ if st.session_state.profile is None:
 else:
     profile = st.session_state.profile
     st.success(f"Hello, {profile['login']}!")
-    st.json(profile)
 
     # Step 2: Check if user belongs to the organization
     if is_user_in_org(profile['login'], org):
-        st.write(f"In {org}!")
-
         # Step 3: Get Team Name
         team_slug = st.text_input("Enter team name:")
 
@@ -167,7 +163,7 @@ else:
                 usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
                 try:
                     usage_data = usage_data.json()
-                except json.JSONDecodeError:
+                except:
                     st.error("Error fetching data from GitHub API. Please try again later.")
                     st.stop()
 
