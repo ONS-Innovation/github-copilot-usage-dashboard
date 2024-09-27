@@ -21,9 +21,8 @@ secret_reigon = os.getenv("AWS_DEFAULT_REGION")
 
 account = os.getenv("AWS_ACCOUNT_NAME")
 
-
-client_id = "Ov23liJPFTZTiHwrQiEq"
-client_secret = "SECRET_REMOVED"
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
 authorize_url = "https://github.com/login/oauth/authorize"
 access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
@@ -40,7 +39,7 @@ secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
 gh = github_api_toolkit.github_interface(access_token[0])
 
-
+@st.cache_data(show_spinner=True)
 def get_access_token(code):
     """Exchange code for access token"""
     data = {
@@ -68,9 +67,15 @@ def get_user_profile(access_token):
 
 def is_user_in_org(username, org):
     orgs = gh.get(f"/orgs/{org}/members/{username}")
+    if orgs.status_code == 204:
+        return get_org_access_token()
+    else: return False
 
-    return orgs.status_code == 204
+def get_org_access_token():
+    secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
+    access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
 
+    return access_token
 
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
@@ -132,10 +137,17 @@ def generate_datasets(date_range: tuple, usage_data):
 
 
 # Streamlit UI starts here
-st.title("GitHub Team Copilot Usage")
+st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
+col1, col2 = st.columns([0.8, 0.2])
+
+col1.title(":blue-background[GitHub Team Copilot Usage]")
+
+col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 
 if "profile" not in st.session_state:
     st.session_state.profile = None
+if "slugs" not in st.session_state:
+    st.session_state.slugs = []
 
 # Step 1: GitHub Login
 if st.session_state.profile is None:
@@ -151,107 +163,107 @@ if st.session_state.profile is None:
             profile = get_user_profile(access_token)
             st.session_state.profile = profile
             st.query_params.clear()
-            st.success(f"Hello, {profile['login']}!")
         except Exception as e:
             st.error(f"Error during login: {e}")
-else:
+if st.session_state.profile is not None:
     profile = st.session_state.profile
     st.success(f"Hello, {profile['login']}!")
+    access_token = is_user_in_org(profile["login"], org)
 
-    # Step 2: Check if user belongs to the organization
-    if is_user_in_org(profile["login"], org):
-        # Step 3: Get Team Name
+    if access_token:
         team_slug = st.text_input("Enter team name:")
-
-        if team_slug:
-            # Step 4: Fetch and Display Data
-            secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
-
-            # Get the access token
-            access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
-
-            if isinstance(access_token, tuple):
+        if team_slug and isinstance(access_token, tuple):
+            if team_slug not in st.session_state:
                 gh = github_api_toolkit.github_interface(access_token[0])
 
                 usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
                 try:
                     usage_data = usage_data.json()
-                except:
-                    st.error("Error fetching data from GitHub API. Please try again later.")
+                    if usage_data:
+                        st.session_state[team_slug] = usage_data
+                    else:
+                        st.error(f"The user '{profile["login"]}', from the {org} organization, is not in the {team_slug} team.")
+                        st.stop()
+                except Exception as error:
+                    print(error)
+                    st.error("Team does not exist.")
                     st.stop()
-                if not usage_data:
-                    st.error(f"No data found for team '{team_slug}' or you're not in the team.")
-                    st.stop()
+                    
+            else:
+                usage_data = st.session_state[team_slug]
 
-                # Get the maximum and minimum date which we have data for
-                min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
-                max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
+            st.markdown(f"### {team_slug} Team Copilot Usage")
 
-                # Date Range Slider
-                if min_date == max_date:
-                    min_date -= pd.Timedelta(days=1)
 
-                date_range = st.slider(
-                    "Date Range",
-                    min_value=min_date,
-                    max_value=max_date,
-                    value=(min_date, max_date),
-                    format="YYYY-MM-DD",
-                )
+            # Get the maximum and minimum date which we have data for
+            min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
+            max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
 
-                (
-                    df_usage_data_subset,
-                    breakdown,
-                    language_grouped_breakdown,
-                    editor_grouped_breakdown_avg,
-                    editor_grouped_breakdown_sum,
-                ) = generate_datasets(date_range, usage_data)
+            # Date Range Slider
+            if min_date == max_date:
+                min_date -= pd.Timedelta(days=1)
 
-                # Display Metrics
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("Total Suggestions", df_usage_data_subset["total_suggestions_count"].sum())
-                with col2:
-                    st.metric("Total Accepts", df_usage_data_subset["total_acceptances_count"].sum())
-                with col3:
-                    st.metric("Acceptance Rate", f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%")
-                with col4:
-                    st.metric("Lines of Code Accepted", df_usage_data_subset["total_lines_accepted"].sum())
+            date_range = st.slider(
+                "Date Range",
+                min_value=min_date,
+                max_value=max_date,
+                value=(min_date, max_date),
+                format="YYYY-MM-DD",
+            )
 
-                # Acceptance Graph
-                fig = make_subplots(specs=[[{"secondary_y": True}]])
-                fig.add_trace(
-                    go.Scatter(
-                        mode="lines+markers+text",
-                        x=df_usage_data_subset["display_day"],
-                        y=df_usage_data_subset["acceptance_rate"],
-                        name="Acceptance Rate (%)",
-                        text=df_usage_data_subset["acceptance_rate"],
-                        textposition="top center",
-                    ),
-                    secondary_y=True,
-                )
-                fig.add_trace(
-                    go.Bar(
-                        x=df_usage_data_subset["display_day"],
-                        y=df_usage_data_subset["total_acceptances_count"],
-                        name="Acceptance Count",
-                        marker_color="darkblue",
-                    ),
-                    secondary_y=False,
-                )
+            (
+                df_usage_data_subset,
+                breakdown,
+                language_grouped_breakdown,
+                editor_grouped_breakdown_avg,
+                editor_grouped_breakdown_sum,
+            ) = generate_datasets(date_range, usage_data)
 
-                # Edit Layout
-                fig.update_layout(
-                    title="Copilot Acceptance Rate",
-                    xaxis_title="Day",
-                    yaxis_title="Acceptance Count",
-                    yaxis2_title="Acceptance Rate (%)",
-                    height=600,
-                )
+            # Display Metrics
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Total Suggestions", df_usage_data_subset["total_suggestions_count"].sum())
+            with col2:
+                st.metric("Total Accepts", df_usage_data_subset["total_acceptances_count"].sum())
+            with col3:
+                st.metric("Acceptance Rate", f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%")
+            with col4:
+                st.metric("Lines of Code Accepted", df_usage_data_subset["total_lines_accepted"].sum())
 
-                # Display plot in Streamlit
-                st.plotly_chart(fig)
+            # Acceptance Graph
+            fig = make_subplots(specs=[[{"secondary_y": True}]])
+            fig.add_trace(
+                go.Scatter(
+                    mode="lines+markers+text",
+                    x=df_usage_data_subset["display_day"],
+                    y=df_usage_data_subset["acceptance_rate"],
+                    name="Acceptance Rate (%)",
+                    text=df_usage_data_subset["acceptance_rate"],
+                    textposition="top center",
+                ),
+                secondary_y=True,
+            )
+            fig.add_trace(
+                go.Bar(
+                    x=df_usage_data_subset["display_day"],
+                    y=df_usage_data_subset["total_acceptances_count"],
+                    name="Acceptance Count",
+                    marker_color="darkblue",
+                ),
+                secondary_y=False,
+            )
+
+            # Edit Layout
+            fig.update_layout(
+                title="Copilot Acceptance Rate",
+                xaxis_title="Day",
+                yaxis_title="Acceptance Count",
+                yaxis2_title="Acceptance Rate (%)",
+                height=600,
+            )
+
+            # Display plot in Streamlit
+            st.plotly_chart(fig)
 
     else:
         st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")

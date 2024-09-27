@@ -258,7 +258,6 @@ with live_tab:
             * 100,
             2,
         )
-        print(acceptance_rate, initial_acceptance_rate)
         percent_difference_acceptance_rate = acceptance_rate - initial_acceptance_rate
         st.metric(
             "Acceptance Rate",
