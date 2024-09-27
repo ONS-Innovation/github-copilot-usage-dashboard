@@ -53,3 +53,9 @@ terraform.rc
 
 # Ignore the terraform/service prority calc
 terraform/service/highest_priority.txt
+
+
+# Testing
+src/auth.py
+aws_lambda_scripts/team.py
+.env
