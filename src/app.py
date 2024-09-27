@@ -512,9 +512,9 @@ with historic_tab:
     # Create a date picker for the user to select the date range
     col1, col2 = st.columns(2)
     with col1:
-        starting_date = st.date_input("Enter starting date", min(df_historic_data["day"]))
+        starting_date = st.date_input("Start Date", min(df_historic_data["day"]))
     with col2:
-        ending_date = st.date_input("Enter ending date", date.today())
+        ending_date = st.date_input("End Date", date.today())
 
     # Drop the breakdown column as it is unused
     df_historic_data = df_historic_data.drop(columns=["breakdown"])
