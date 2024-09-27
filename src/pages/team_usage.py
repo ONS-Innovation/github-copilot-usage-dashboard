@@ -47,7 +47,7 @@ def get_access_token(code):
         "client_secret": client_secret,
         "code": code,
         "redirect_uri": redirect_uri,
-        "scope": "user:email,read:org",
+        "scope": "user:email",
     }
     headers = {"Accept": "application/json"}
     response = requests.post(access_token_url, data=data, headers=headers)
@@ -182,7 +182,7 @@ if st.session_state.profile is not None:
                     if usage_data:
                         st.session_state[team_slug] = usage_data
                     else:
-                        st.error(f"The user '{profile["login"]}', from the {org} organization, is not in the {team_slug} team.")
+                        st.error(f"The user '{profile["login"]}', from the '{org}' organization, is not in the '{team_slug}' team.")
                         st.stop()
                 except Exception as error:
                     print(error)
