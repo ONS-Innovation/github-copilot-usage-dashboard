@@ -359,6 +359,3 @@ To run mypy (static type checking)
 ```bash
 make mypy
 ```
-
-
-
