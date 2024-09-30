@@ -282,7 +282,7 @@ if st.session_state.profile is None:
 
     # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
     login_url = (f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}")
-    st.markdown(f'<a href="{login_url}" target="_self">Login with GitHub</a>', unsafe_allow_html=True)
+    st.markdown(f'<a href="{login_url}" target="_self">:blue-background[Login with GitHub]</a>', unsafe_allow_html=True)
 
     # Step 2: Get url params
     query_params = st.query_params
