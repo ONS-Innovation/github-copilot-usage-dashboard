@@ -258,7 +258,6 @@ def get_team_seats(access_token, team):
 
     return df_team_seat_data
 
-
 # Streamlit UI starts here
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
 col1, col2 = st.columns([0.8, 0.2])
@@ -420,14 +419,13 @@ if st.session_state.profile is not None:
                     x=df_usage_data_subset["display_day"],
                     y=df_usage_data_subset["total_acceptances_count"],
                     name="Acceptance Count",
-                    marker_color="darkblue",
                 ),
                 secondary_y=False,
             )
 
             # Edit Layout
             fig.update_layout(
-                title="Copilot Acceptance Rate",
+                title="Accepts and Acceptance Rate",
                 xaxis_title="Day",
                 yaxis_title="Acceptance Count",
                 yaxis2_title="Acceptance Rate (%)",
@@ -572,7 +570,7 @@ if st.session_state.profile is not None:
                 hide_index=True,
                 use_container_width=True,
                 column_config={
-                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=1),
+                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
                 "assignee.login": st.column_config.Column("User"),
                 "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
@@ -593,7 +591,7 @@ if st.session_state.profile is not None:
                 hide_index=True,
                 use_container_width=True,
                 column_config={
-                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=1),
+                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
                 "assignee.login": st.column_config.Column("User"),
                 "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
                 "assignee.html_url": st.column_config.LinkColumn(
