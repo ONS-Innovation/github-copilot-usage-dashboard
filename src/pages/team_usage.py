@@ -181,8 +181,6 @@ def get_user_teams(access_token):
         headers=headers,
         json={'query': query, 'variables': variables}
     )
-    print(response.json())
-
     return response.text
 
 
@@ -235,6 +233,31 @@ def get_user_teams(access_token, profile):
 #         file_path = f"./src/example_data/copilot_teams_{date_str}.json"
 #         with open(file_path, "a") as file:
 #             json.dump(copilot_teams, file)
+
+
+def get_team_seats(access_token, team):
+    gh = github_api_toolkit.github_interface(access_token[0])
+
+    seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page":100})
+    seat_data = seat_data.json()
+
+    df_seat_data = pd.DataFrame()
+
+    # Puts the seat information from copilot_seats_data.json into a dataframe
+    for row in seat_data["seats"]:
+        df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
+    
+    # Filter the dataframe to include only the rows where the team matches
+    # Get the members of the team
+    team_members_response = gh.get(f"/orgs/{org}/teams/{team}/members")
+    team_members = team_members_response.json()
+    team_member_logins = [member['login'] for member in team_members]
+
+    # Filter the dataframe to include only the rows where the team matches and the user is in the team
+    df_team_seat_data = df_seat_data[df_seat_data['assignee.login'].isin(team_member_logins)]
+
+    return df_team_seat_data
+
 
 # Streamlit UI starts here
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
@@ -326,7 +349,7 @@ if st.session_state.profile is not None:
                         st.error("Team has no data.")
                         st.stop()
                 except Exception as error:
-                    print(error)
+                    # print(error)
                     st.error("Team does not exist.")
                     st.stop()
                     
@@ -413,6 +436,86 @@ if st.session_state.profile is not None:
 
             # Display plot in Streamlit
             st.plotly_chart(fig)
+
+
+            # User Breakdown
+
+        df_seat_data = get_team_seats(access_token, team_slug)
+
+
+        st.header(":blue-background[User Breakdown]")
+        st.write("Users from this team who have a CoPilot seat. Active users have used CoPilot within the last 30 days. Inactive users have not used CoPilot within the last 30 days or have not used CoPilot yet.")
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            st.metric("Number of Seats", len(df_seat_data))
+
+        with col2:
+            number_of_engaged_users = 0
+
+            df_unused_users = pd.DataFrame(columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"])
+
+            for index, row in df_seat_data.iterrows():
+                if pd.isnull(row.last_activity_at) == False:
+                    last_activity_date = datetime.strptime(row.last_activity_at, "%Y-%m-%dT%H:%M:%SZ")
+                    if (datetime.now() - last_activity_date).days <= 30:
+                        number_of_engaged_users += 1
+                    else:
+                        df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
+                        df_seat_data.drop(index, inplace=True)
+                else:
+                    df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
+                    df_seat_data.drop(index, inplace=True)
+
+            st.metric("Number of Engaged Users", number_of_engaged_users)
+        with col3:
+            st.metric("Number of Inactive Users", len(df_unused_users))
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Active Users")
+
+            # Dataframe showing only active users (this with a latest activity)
+            st.dataframe(
+                df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
+                ["assignee.avatar_url","assignee.login", "last_activity_at", "assignee.html_url"]
+                ],
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=1),
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                "assignee.html_url": st.column_config.LinkColumn(
+                    "Github Profile",
+                    help="A link to this user's profile",
+                    display_text="Go to Profile",
+                ),
+                },
+            )
+        with col2:
+            st.subheader("Inactive Users")
+            
+            # Dataframe showing inactive users (users with no latest activity or not within a month)
+            st.dataframe(
+                df_unused_users[
+                ["assignee.avatar_url","assignee.login", "last_activity_at", "assignee.html_url"]
+                ],
+                hide_index=True,
+                use_container_width=True,
+                column_config={
+                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=1),
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                "assignee.html_url": st.column_config.LinkColumn(
+                    "Github Profile",
+                    help="A link to this user's profile",
+                    display_text="Go to Profile",
+                ),
+                },
+            )
+
 
     else:
         st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")
