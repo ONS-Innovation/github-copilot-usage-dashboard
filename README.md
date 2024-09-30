@@ -29,13 +29,14 @@ Make sure no other apps are running on `localhost:8502`. Once setup, use `make r
 
 Once the app is running, head to `localhost:8502/team_usage` or by clicking the `Team Usage` in the sidebar. Click the `Login with GitHub` button. This redirects the user to the GitHub OAuth page. Click the green `Authorize` button, which redirects you back to the main application and logs you in.
 
-An input box should appear where you can enter your team name.
+If you are part of the `keh-dev` team then you can either select a team that you are in from the select box or you can enter another team name. As of 30-09-2024, there are only these teams with team copilot data: `all`, `Blaise5`, `CSS`, `keh-dev`, `Ops`.
+
+If you are not part of the `keh-dev` team then you can select a team that you are in from the select box.
 
 **IMPORTANT**
 The team must have a **minimum of 5 users with active copilot licenses**. 
 The team must be in the ONSDigital org.
 The authorized user (your account) must be in that team.
-
 
 ---------
 # GitHub Copilot Usage Dashboard
