@@ -31,8 +31,6 @@ redirect_uri = "http://localhost:8502/team_usage"
 session = boto3.Session()
 s3 = session.client("s3")
 secret_manager = session.client("secretsmanager", region_name=secret_reigon)
-
-
 secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 
 # Get updated copilot usage data from GitHub API
@@ -58,9 +56,9 @@ def get_access_token(code):
     return access_token
 
 
-def get_user_profile(access_token):
+def get_user_profile(oauth_token):
     """Fetch authenticated user's GitHub profile"""
-    headers = {"Authorization": f"token {access_token}"}
+    headers = {"Authorization": f"token {oauth_token}"}
     response = requests.get(user_api_url, headers=headers)
     response.raise_for_status()
     return response.json()
@@ -69,14 +67,6 @@ def get_user_profile(access_token):
 def is_user_in_org(username, org):
     orgs = gh.get(f"/orgs/{org}/members/{username}")
     return orgs.status_code == 204
-
-
-def get_org_access_token():
-    secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
-    access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
-
-    return access_token
-
 
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
@@ -137,49 +127,6 @@ def generate_datasets(date_range: tuple, usage_data):
     )
 
 
-def get_user_teams(access_token):
-    """Fetch authenticated user's GitHub profile"""
-    # Define the GraphQL query
-    query = """
-    query($login: String!, $org: String!) {
-  user(login: $login) {
-    organization(login: $org) {
-      teams(first: 10, query: $login) {
-        edges {
-          node {
-            name
-            members(first: 10) {
-              edges {
-                node {
-                  login
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-"""
-
-    # Set variables for the query
-    variables = {
-        "login": st.session_state.profile["login"],  # Replace with the GitHub username
-        "org": org,  # Replace with the organization name
-    }
-    # return st.session_state.profile["login"]
-
-    # Set the headers, including the authorization token
-    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
-
-    # Make the request
-    response = requests.post(
-        "https://api.github.com/graphql", headers=headers, json={"query": query, "variables": variables}
-    )
-    return response.text
-
-
 def get_user_teams(access_token, profile):
     query = """
         query($org: String!, $name: String!) {
@@ -233,8 +180,6 @@ def get_user_teams(access_token, profile):
 
 
 def get_team_seats(access_token, team):
-    gh = github_api_toolkit.github_interface(access_token[0])
-
     seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 
@@ -278,9 +223,8 @@ if "oauth_token" not in st.session_state:
 if st.session_state.profile is None:
 
     # Step 2: Get url params
-    query_params = st.query_params
-    if "code" in query_params:
-        code = query_params["code"]
+    if "code" in st.query_params:
+        code = st.query_params["code"]
         try:
             # Set the session state oauth token
             st.session_state.oauth_token = get_access_token(code)
@@ -304,25 +248,23 @@ if st.session_state.profile is None:
 
 # If the user is logged in then display the flow
 if st.session_state.profile:
-    profile = st.session_state.profile
+
+
     col1, col2 = st.columns([0.4, 0.6])
     with col1:
-        st.success(f"Welcome, {profile['name']}.")
+        st.success(f"Welcome, {st.session_state.profile['name']}.")
     with col2:
         st.info(
             "A GitHub team must have a minumum of 5 members with active CoPilot licenses for at least 1 day to display usage data."
         )
 
     # If user is in the org, get the access token. If not display an error and stop
-    if is_user_in_org(profile["login"], org):
-        access_token = get_org_access_token()
-
-    else:
-        st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")
+    if not is_user_in_org(st.session_state.profile["login"], org):
+        st.error(f"Sorry, {st.session_state.profile['login']}, you are not part of the {org} organization.")
         st.stop()
 
     # Get the users teams
-    user_teams = get_user_teams(access_token[0], profile)
+    user_teams = get_user_teams(access_token[0], st.session_state.profile)
 
     if access_token and user_teams:
         if "keh-dev" in user_teams:
@@ -343,7 +285,6 @@ if st.session_state.profile:
 
         if team_slug and isinstance(access_token, tuple):
             if team_slug not in st.session_state:
-                gh = github_api_toolkit.github_interface(access_token[0])
                 usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
                 # Get the team description
                 try:
@@ -365,19 +306,18 @@ if st.session_state.profile:
                         st.error("Team has no data.")
                         st.stop()
                 except Exception:
-                    # print(error)
                     st.error("Team does not exist.")
                     st.stop()
 
             else:
                 usage_data = st.session_state[team_slug]
 
-            # Display a horizontal rule
             st.markdown("---")
-            # Display the team description
+
             st.subheader(f"Team: {team_slug}")
             description = st.session_state.get(f"{team_slug}-description")
             st.write(description)
+
             # Get the maximum and minimum date which we have data for
             min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
             max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
@@ -697,4 +637,4 @@ if st.session_state.profile:
         st.plotly_chart(fig)
 
     else:
-        st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")
+        st.error(f"Sorry, {st.session_state.profile['login']}, you are not part of the {org} organization.")
