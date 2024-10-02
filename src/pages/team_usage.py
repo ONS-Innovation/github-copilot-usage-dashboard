@@ -4,13 +4,11 @@ from urllib.parse import urlencode
 
 import boto3
 import github_api_toolkit
-from github_api_toolkit import github_interface, github_graphql_interface
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
 from plotly.subplots import make_subplots
-import json
 
 org = os.getenv("GITHUB_ORG")
 
@@ -40,6 +38,7 @@ secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 # Get updated copilot usage data from GitHub API
 access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
 gh = github_api_toolkit.github_interface(access_token[0])
+
 
 @st.cache_data(show_spinner=True)
 def get_access_token(code):
@@ -71,11 +70,13 @@ def is_user_in_org(username, org):
     orgs = gh.get(f"/orgs/{org}/members/{username}")
     return orgs.status_code == 204
 
+
 def get_org_access_token():
     secret = get_pem_from_secret_manager(session, secret_name, secret_reigon)
     access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
 
     return access_token
+
 
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
@@ -135,6 +136,7 @@ def generate_datasets(date_range: tuple, usage_data):
         editor_grouped_breakdown_sum,
     )
 
+
 def get_user_teams(access_token):
     """Fetch authenticated user's GitHub profile"""
     # Define the GraphQL query
@@ -161,25 +163,19 @@ def get_user_teams(access_token):
 }
 """
 
-
     # Set variables for the query
     variables = {
         "login": st.session_state.profile["login"],  # Replace with the GitHub username
-        "org": org  # Replace with the organization name
+        "org": org,  # Replace with the organization name
     }
     # return st.session_state.profile["login"]
 
     # Set the headers, including the authorization token
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
 
     # Make the request
     response = requests.post(
-        "https://api.github.com/graphql",
-        headers=headers,
-        json={'query': query, 'variables': variables}
+        "https://api.github.com/graphql", headers=headers, json={"query": query, "variables": variables}
     )
     return response.text
 
@@ -201,24 +197,25 @@ def get_user_teams(access_token, profile):
         }
     """
 
-    params={"org": org, "name": profile["login"]}
+    params = {"org": org, "name": profile["login"]}
     ghql = github_api_toolkit.github_graphql_interface(access_token)
 
     teams = ghql.make_ql_request(query=query, params=params)
     teams_data = teams.json()
-    team_names = [edge['node']['name'] for edge in teams_data['data']['organization']['teams']['edges']]
+    team_names = [edge["node"]["name"] for edge in teams_data["data"]["organization"]["teams"]["edges"]]
     return team_names
+
 
 # # Run to get the copilot teams that are available.
 # def get_copilot_teams(access_token):
 #     print("Running get_copilot_teams")
 #     gh = github_api_toolkit.github_interface(access_token[0])
+#     copilot_teams = []
+
 #     for x in [1, 2]:
 #         print(x)
 #         teams = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": x})
 #         teams = teams.json()
-        
-#         copilot_teams = []
 #         for team in teams:
 #             usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
 #             try:
@@ -227,7 +224,7 @@ def get_user_teams(access_token, profile):
 #                     print(copilot_teams)
 #             except Exception as error:
 #                 print(error)
-    
+
 #     if copilot_teams:
 #         date_str = datetime.now().strftime("%Y-%m-%d")
 #         file_path = f"./src/example_data/copilot_teams_{date_str}.json"
@@ -238,7 +235,7 @@ def get_user_teams(access_token, profile):
 def get_team_seats(access_token, team):
     gh = github_api_toolkit.github_interface(access_token[0])
 
-    seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page":100})
+    seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 
     df_seat_data = pd.DataFrame()
@@ -246,17 +243,18 @@ def get_team_seats(access_token, team):
     # Puts the seat information from copilot_seats_data.json into a dataframe
     for row in seat_data["seats"]:
         df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
-    
+
     # Filter the dataframe to include only the rows where the team matches
     # Get the members of the team
     team_members_response = gh.get(f"/orgs/{org}/teams/{team}/members")
     team_members = team_members_response.json()
-    team_member_logins = [member['login'] for member in team_members]
+    team_member_logins = [member["login"] for member in team_members]
 
     # Filter the dataframe to include only the rows where the team matches and the user is in the team
-    df_team_seat_data = df_seat_data[df_seat_data['assignee.login'].isin(team_member_logins)]
+    df_team_seat_data = df_seat_data[df_seat_data["assignee.login"].isin(team_member_logins)]
 
     return df_team_seat_data
+
 
 # Streamlit UI starts here
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
@@ -279,10 +277,6 @@ if "oauth_token" not in st.session_state:
 # If the session profile is still None,  (meaning its just been initialized) then display the login button
 if st.session_state.profile is None:
 
-    # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
-    login_url = (f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}")
-    st.markdown(f'<a href="{login_url}" target="_self">:blue-background[Login with GitHub]</a>', unsafe_allow_html=True)
-
     # Step 2: Get url params
     query_params = st.query_params
     if "code" in query_params:
@@ -300,34 +294,49 @@ if st.session_state.profile is None:
             # This would be an error with either getting the access token or getting their profile
             st.error(f"Error during login: {e}")
             st.stop()
+    else:
+        # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
+        login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}"
+        st.markdown(
+            f'<a href="{login_url}" target="_self">:blue-background[Login with GitHub]</a>', unsafe_allow_html=True
+        )
+
 
 # If the user is logged in then display the flow
-if st.session_state.profile is not None:
+if st.session_state.profile:
     profile = st.session_state.profile
-    st.success(f"Welcome, {profile['name']}.")
+    col1, col2 = st.columns([0.4, 0.6])
+    with col1:
+        st.success(f"Welcome, {profile['name']}.")
+    with col2:
+        st.info(
+            "A GitHub team must have a minumum of 5 members with active CoPilot licenses for at least 1 day to display usage data."
+        )
 
     # If user is in the org, get the access token. If not display an error and stop
     if is_user_in_org(profile["login"], org):
         access_token = get_org_access_token()
-        
+
     else:
         st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")
         st.stop()
-    # get_copilot_teams(access_token)
 
     # Get the users teams
     user_teams = get_user_teams(access_token[0], profile)
 
     if access_token and user_teams:
-        if 'keh-dev' in user_teams:
-
+        if "keh-dev" in user_teams:
             # Add a toggle option
-            input_method = st.radio("You are part of an admin team, so you can either:", ("Select your team", "Search for a team"), horizontal=True)
+            input_method = st.radio(
+                "You are part of an admin team, so you can either:",
+                ("Select your team", "Search for a team"),
+                horizontal=True,
+            )
 
             if input_method == "Select your team":
                 team_slug = st.selectbox("Select team:", options=user_teams)
             else:
-                team_slug = st.text_input("Enter team name:", value='keh-dev')
+                team_slug = st.text_input("Enter team name:", value="keh-dev")
 
         else:
             team_slug = st.selectbox("Select team:", options=user_teams)
@@ -335,11 +344,19 @@ if st.session_state.profile is not None:
         if team_slug and isinstance(access_token, tuple):
             if team_slug not in st.session_state:
                 gh = github_api_toolkit.github_interface(access_token[0])
-                
-
-                
                 usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
-                
+                # Get the team description
+                try:
+                    team_info = gh.get(f"/orgs/{org}/teams/{team_slug}")
+                    team_info = team_info.json()
+                    team_description = team_info.get("description")
+                    if team_description == "":
+                        team_description = "No description available."
+                    st.session_state[f"{team_slug}-description"] = team_description
+                except:
+                    st.error("Team does not exist.")
+                    st.stop()
+
                 try:
                     usage_data = usage_data.json()
                     if usage_data:
@@ -347,15 +364,20 @@ if st.session_state.profile is not None:
                     else:
                         st.error("Team has no data.")
                         st.stop()
-                except Exception as error:
+                except Exception:
                     # print(error)
                     st.error("Team does not exist.")
                     st.stop()
-                    
+
             else:
                 usage_data = st.session_state[team_slug]
 
-
+            # Display a horizontal rule
+            st.markdown("---")
+            # Display the team description
+            st.subheader(f"Team: {team_slug}")
+            description = st.session_state.get(f"{team_slug}-description")
+            st.write(description)
             # Get the maximum and minimum date which we have data for
             min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
             max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
@@ -382,24 +404,49 @@ if st.session_state.profile is not None:
 
             # Display Metrics
             col1, col2, col3, col4 = st.columns(4)
-            
+
             # Calculate deltas
             first_day = df_usage_data_subset.iloc[0]
             last_day = df_usage_data_subset.iloc[-1]
-            
-            total_suggestions_delta = ((last_day["total_suggestions_count"] - first_day["total_suggestions_count"]) / first_day["total_suggestions_count"]) * 100
-            total_accepts_delta = ((last_day["total_acceptances_count"] - first_day["total_acceptances_count"]) / first_day["total_acceptances_count"]) * 100
-            acceptance_rate_delta = ((last_day["acceptance_rate"] - first_day["acceptance_rate"]))
-            lines_of_code_accepted_delta = ((last_day["total_lines_accepted"] - first_day["total_lines_accepted"]) / first_day["total_lines_accepted"]) * 100
-            
+
+            total_suggestions_delta = (
+                (last_day["total_suggestions_count"] - first_day["total_suggestions_count"])
+                / first_day["total_suggestions_count"]
+            ) * 100
+            total_accepts_delta = (
+                (last_day["total_acceptances_count"] - first_day["total_acceptances_count"])
+                / first_day["total_acceptances_count"]
+            ) * 100
+            acceptance_rate_delta = last_day["acceptance_rate"] - first_day["acceptance_rate"]
+            lines_of_code_accepted_delta = (
+                (last_day["total_lines_accepted"] - first_day["total_lines_accepted"])
+                / first_day["total_lines_accepted"]
+            ) * 100
+
             with col1:
-                st.metric("Total Suggestions", df_usage_data_subset["total_suggestions_count"].sum(), f"{total_suggestions_delta:.2f}%")
+                st.metric(
+                    "Total Suggestions",
+                    df_usage_data_subset["total_suggestions_count"].sum(),
+                    f"{total_suggestions_delta:.2f}%",
+                )
             with col2:
-                st.metric("Total Accepts", df_usage_data_subset["total_acceptances_count"].sum(), f"{total_accepts_delta:.2f}%")
+                st.metric(
+                    "Total Accepts",
+                    df_usage_data_subset["total_acceptances_count"].sum(),
+                    f"{total_accepts_delta:.2f}%",
+                )
             with col3:
-                st.metric("Acceptance Rate", f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%", f"{acceptance_rate_delta:.2f}%")
+                st.metric(
+                    "Acceptance Rate",
+                    f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%",
+                    f"{acceptance_rate_delta:.2f}%",
+                )
             with col4:
-                st.metric("Lines of Code Accepted", df_usage_data_subset["total_lines_accepted"].sum(), f"{lines_of_code_accepted_delta:.2f}%")
+                st.metric(
+                    "Lines of Code Accepted",
+                    df_usage_data_subset["total_lines_accepted"].sum(),
+                    f"{lines_of_code_accepted_delta:.2f}%",
+                )
 
             # Acceptance Graph
             fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -435,7 +482,7 @@ if st.session_state.profile is not None:
             # Display plot in Streamlit
             st.plotly_chart(fig)
 
-    # Language breakdown
+        # Language breakdown
 
         st.header(":blue-background[Language Breakdown]")
 
@@ -523,14 +570,14 @@ if st.session_state.profile is not None:
         except IndexError:
             st.caption("Please select a row for more information.")
 
-
         # User Breakdown
 
         df_seat_data = get_team_seats(access_token, team_slug)
 
-
         st.header(":blue-background[User Breakdown]")
-        st.write("Active users have used CoPilot within the last 30 days. Inactive users have not used CoPilot within the last 30 days or have not used CoPilot yet.")
+        st.write(
+            "Active users have used CoPilot within the last 30 days. Inactive users have not used CoPilot within the last 30 days or have not used CoPilot yet."
+        )
 
         col1, col2, col3 = st.columns(3)
 
@@ -540,7 +587,9 @@ if st.session_state.profile is not None:
         with col2:
             number_of_engaged_users = 0
 
-            df_unused_users = pd.DataFrame(columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"])
+            df_unused_users = pd.DataFrame(
+                columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
+            )
 
             for index, row in df_seat_data.iterrows():
                 if pd.isnull(row.last_activity_at) == False:
@@ -565,43 +614,40 @@ if st.session_state.profile is not None:
             # Dataframe showing only active users (this with a latest activity)
             st.dataframe(
                 df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
-                ["assignee.avatar_url","assignee.login", "last_activity_at", "assignee.html_url"]
+                    ["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
                 ],
                 hide_index=True,
                 use_container_width=True,
                 column_config={
-                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
-                "assignee.login": st.column_config.Column("User"),
-                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-                "assignee.html_url": st.column_config.LinkColumn(
-                    "Github Profile",
-                    help="A link to this user's profile",
-                    display_text="Go to Profile",
-                ),
+                    "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
+                    "assignee.login": st.column_config.Column("User"),
+                    "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                    "assignee.html_url": st.column_config.LinkColumn(
+                        "Github Profile",
+                        help="A link to this user's profile",
+                        display_text="Go to Profile",
+                    ),
                 },
             )
         with col2:
             st.subheader("Inactive Users")
-            
+
             # Dataframe showing inactive users (users with no latest activity or not within a month)
             st.dataframe(
-                df_unused_users[
-                ["assignee.avatar_url","assignee.login", "last_activity_at", "assignee.html_url"]
-                ],
+                df_unused_users[["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]],
                 hide_index=True,
                 use_container_width=True,
                 column_config={
-                "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
-                "assignee.login": st.column_config.Column("User"),
-                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-                "assignee.html_url": st.column_config.LinkColumn(
-                    "Github Profile",
-                    help="A link to this user's profile",
-                    display_text="Go to Profile",
-                ),
+                    "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
+                    "assignee.login": st.column_config.Column("User"),
+                    "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                    "assignee.html_url": st.column_config.LinkColumn(
+                        "Github Profile",
+                        help="A link to this user's profile",
+                        display_text="Go to Profile",
+                    ),
                 },
             )
-
 
         # Engaged Users By Day
 
@@ -649,7 +695,6 @@ if st.session_state.profile is not None:
         )
 
         st.plotly_chart(fig)
-
 
     else:
         st.error(f"Sorry, {profile['login']}, you are not part of the {org} organization.")
