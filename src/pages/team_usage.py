@@ -65,6 +65,14 @@ def get_user_profile(oauth_token):
 
 
 def is_user_in_org(username, org):
+    """
+    Check if a user is a member of a specified GitHub organization.
+    Args:
+        username (str): The GitHub username to check.
+        org (str): The GitHub organization name.
+    Returns:
+        bool: True if the user is a member of the organization, False otherwise.
+    """
     orgs = gh.get(f"/orgs/{org}/members/{username}")
     return orgs.status_code == 204
 
@@ -128,6 +136,13 @@ def generate_datasets(date_range: tuple, usage_data):
 
 
 def get_user_teams(access_token, profile):
+    """Fetches the list of team names that a user belongs to within a specified GitHub organization.
+        Args:
+            access_token (str): The GitHub access token for authentication.
+            profile (dict): The user's profile information containing at least the 'login' key.
+        Returns:
+            list: A list of team names that the user belongs to within the organization.
+    """
     query = """
         query($org: String!, $name: String!) {
         organization(login: $org) {
@@ -180,6 +195,15 @@ def get_user_teams(access_token, profile):
 
 
 def get_team_seats(access_token, team):
+    """
+    Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
+    Args:
+        access_token (str): The GitHub access token for authentication.
+        team (str): The name of the team within the organization.
+    Returns:
+        pandas.DataFrame: A DataFrame containing the filtered seat data for the specified team.
+    """
+
     seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 

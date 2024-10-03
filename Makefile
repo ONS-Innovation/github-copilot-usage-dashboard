@@ -1,6 +1,3 @@
-.DEFAULT_GOAL := all
-
-
 .PHONY: all
 all: ## Show the available make targets.
 	@echo "Usage: make <target>"
@@ -19,18 +16,22 @@ format:  ## Format the code.
 	poetry run ruff check . --fix
 
 .PHONY: black
-black:
-	poetry run black src
-	poetry run black aws_lambda_scripts
-
+black: ## Run black.
+	poetry run black src --check
+	poetry run black aws_lambda_scripts --check
 
 .PHONY: ruff
-ruff:
+ruff: ## Run ruff without fixing.
+	poetry run ruff check src
+	poetry run ruff check aws_lambda_scripts
+
+.PHONY: ruff-fix
+ruff-fx: ## Run ruff with fixing.
 	poetry run ruff check src --fix
 	poetry run ruff check aws_lambda_scripts --fix
 
 .PHONY: pylint
-pylint:
+pylint: ## Run pylint.
 	poetry run pylint src
 	poetry run pylint aws_lambda_scripts
 
@@ -52,7 +53,6 @@ install:  ## Install the dependencies excluding dev.
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
 	poetry install --no-root
-
 
 .PHONY: run-local
 run-local:  ## Install the dependencies including dev.
