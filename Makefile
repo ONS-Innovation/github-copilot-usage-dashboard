@@ -25,11 +25,6 @@ ruff: ## Run ruff without fixing.
 	poetry run ruff check src
 	poetry run ruff check aws_lambda_scripts
 
-.PHONY: ruff-fix
-ruff-fx: ## Run ruff with fixing.
-	poetry run ruff check src --fix
-	poetry run ruff check aws_lambda_scripts --fix
-
 .PHONY: pylint
 pylint: ## Run pylint.
 	poetry run pylint src
