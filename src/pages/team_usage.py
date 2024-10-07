@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 from urllib.parse import urlencode
@@ -8,6 +9,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+from botocore.exceptions import ClientError
 from plotly.subplots import make_subplots
 
 org = os.getenv("GITHUB_ORG")
@@ -27,6 +29,9 @@ authorize_url = "https://github.com/login/oauth/authorize"
 access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
 redirect_uri = "http://localhost:8502/team_usage"
+
+bucket_name = "copilot-usage-dashboard"
+object_name = "admin_teams.json"
 
 session = boto3.Session()
 s3 = session.client("s3")
@@ -291,7 +296,19 @@ if st.session_state.profile:
     user_teams = get_user_teams(access_token[0], st.session_state.profile)
 
     if access_token and user_teams:
-        if "keh-dev" in user_teams:
+        # Get admin_teams.json from S3
+        try:
+            response = s3.get_object(Bucket=bucket_name, Key=object_name)
+            admin_teams = json.loads(response["Body"].read().decode("utf-8"))
+
+        except ClientError as e:
+            st.error(
+                f"An error occurred while trying to get the historic data from S3 ({object_name}). Please check the error message below."
+            )
+            st.error(e)
+            st.stop()
+
+        if any(admin_team in user_teams for admin_team in admin_teams):
             # Add a toggle option
             input_method = st.radio(
                 "You are part of an admin team, so you can either:",
