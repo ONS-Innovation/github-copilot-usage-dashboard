@@ -64,7 +64,7 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
 
 ## Setup Team Usage Page
 
-For testing purposes, create a 'New OAuth App' by going to this [page](https://github.com/settings/developers). You can name the app anything e.g. copilot-usage-auth-app. Note down the Client ID and Client secret.
+For testing purposes, create a 'New OAuth App' by going to this [page](https://github.com/settings/developers). You can name the app anything (can't start with git or github) e.g. copilot-usage-auth-app. Note down the Client ID and Client secret.
 
 - Set the application name to anything.
 - Set the homepage URL to `http://localhost:8502`.
