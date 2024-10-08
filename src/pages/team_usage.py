@@ -229,6 +229,14 @@ def get_team_seats(access_token, team):
 
     return df_team_seat_data
 
+def initialize_states():
+    # Initialize session states
+    if "profile" not in st.session_state:
+        st.session_state.profile = None
+    if "slugs" not in st.session_state:
+        st.session_state.slugs = []
+    if "oauth_token" not in st.session_state:
+        st.session_state.oauth_token = None
 
 # Streamlit UI starts here
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
@@ -239,13 +247,7 @@ col1.title(":blue-background[GitHub Team Copilot Usage]")
 
 col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 
-# Initialize session states
-if "profile" not in st.session_state:
-    st.session_state.profile = None
-if "slugs" not in st.session_state:
-    st.session_state.slugs = []
-if "oauth_token" not in st.session_state:
-    st.session_state.oauth_token = None
+initialize_states()
 
 # Step 1: GitHub Login
 # If the session profile is still None,  (meaning its just been initialized) then display the login button
