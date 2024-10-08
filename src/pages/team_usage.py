@@ -388,47 +388,38 @@ if st.session_state.profile:
             # Display Metrics
             col1, col2, col3, col4 = st.columns(4)
 
-            # Calculate deltas
-            first_day = df_usage_data_subset.iloc[0]
-            last_day = df_usage_data_subset.iloc[-1]
-
-            total_suggestions_delta = (
-                (last_day["total_suggestions_count"] - first_day["total_suggestions_count"])
-                / first_day["total_suggestions_count"]
-            ) * 100
-            total_accepts_delta = (
-                (last_day["total_acceptances_count"] - first_day["total_acceptances_count"])
-                / first_day["total_acceptances_count"]
-            ) * 100
-            acceptance_rate_delta = last_day["acceptance_rate"] - first_day["acceptance_rate"]
-            lines_of_code_accepted_delta = (
-                (last_day["total_lines_accepted"] - first_day["total_lines_accepted"])
-                / first_day["total_lines_accepted"]
-            ) * 100
+            def calculate_delta(df_usage_data_subset, key):
+                # Calculate deltas
+                first_day = df_usage_data_subset.iloc[0]
+                last_day = df_usage_data_subset.iloc[-1]
+                if key == "acceptance_rate":
+                    return last_day[key] - first_day[key]
+                else:
+                    return ((last_day[key] - first_day[key]) / first_day[key]) * 100
 
             with col1:
                 st.metric(
                     "Total Suggestions",
                     df_usage_data_subset["total_suggestions_count"].sum(),
-                    f"{total_suggestions_delta:.2f}%",
+                    f"{calculate_delta(df_usage_data_subset, "total_suggestions_count"):.2f}%",
                 )
             with col2:
                 st.metric(
                     "Total Accepts",
                     df_usage_data_subset["total_acceptances_count"].sum(),
-                    f"{total_accepts_delta:.2f}%",
+                    f"{calculate_delta(df_usage_data_subset, "total_acceptances_count"):.2f}%",
                 )
             with col3:
                 st.metric(
                     "Acceptance Rate",
                     f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%",
-                    f"{acceptance_rate_delta:.2f}%",
+                    f"{calculate_delta(df_usage_data_subset, "acceptance_rate"):.2f}%",
                 )
             with col4:
                 st.metric(
                     "Lines of Code Accepted",
                     df_usage_data_subset["total_lines_accepted"].sum(),
-                    f"{lines_of_code_accepted_delta:.2f}%",
+                    f"{calculate_delta(df_usage_data_subset, "total_lines_accepted"):.2f}%",
                 )
 
             # Acceptance Graph

@@ -230,52 +230,41 @@ with live_tab:
     days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     selected_days = []
 
-    # Metrics for total shown, total accepts, acceptance rate and total lines accepted
+    # Display Metrics
     col1, col2, col3, col4 = st.columns(4)
 
-    with col1:
-        total_shown = df_usage_data_subset["total_suggestions_count"].sum()
-        initial_suggestions = df_usage_data_subset.iloc[0]["total_suggestions_count"]
-        percent_difference_suggestions = (
-            (df_usage_data_subset.iloc[-1]["total_suggestions_count"] - initial_suggestions) / initial_suggestions
-        ) * 100
-        st.metric(
-            "Total Suggestions", total_shown, delta=f"{percent_difference_suggestions:.2f}%", delta_color="normal"
-        )
+    def calculate_delta(df_usage_data_subset, key):
+        # Calculate deltas
+        first_day = df_usage_data_subset.iloc[0]
+        last_day = df_usage_data_subset.iloc[-1]
+        if key == "acceptance_rate":
+            return last_day[key] - first_day[key]
+        else:
+            return ((last_day[key] - first_day[key]) / first_day[key]) * 100
 
-    with col2:
-        total_accepts = df_usage_data_subset["total_acceptances_count"].sum()
-        initial_accepts = df_usage_data_subset.iloc[0]["total_acceptances_count"]
-        percent_difference_accepts = (
-            (df_usage_data_subset.iloc[-1]["total_acceptances_count"] - initial_accepts) / initial_accepts
-        ) * 100
-        st.metric("Total Accepts", total_accepts, delta=f"{percent_difference_accepts:.2f}%", delta_color="normal")
-    with col3:
-        acceptance_rate = round(total_accepts / total_shown * 100, 2)
-        initial_acceptance_rate = round(
-            df_usage_data_subset.iloc[0]["total_acceptances_count"]
-            / df_usage_data_subset.iloc[0]["total_suggestions_count"]
-            * 100,
-            2,
+    with col1:
+        st.metric(
+            "Total Suggestions",
+            df_usage_data_subset["total_suggestions_count"].sum(),
+            f"{calculate_delta(df_usage_data_subset, "total_suggestions_count"):.2f}%",
         )
-        percent_difference_acceptance_rate = acceptance_rate - initial_acceptance_rate
+    with col2:
+        st.metric(
+            "Total Accepts",
+            df_usage_data_subset["total_acceptances_count"].sum(),
+            f"{calculate_delta(df_usage_data_subset, "total_acceptances_count"):.2f}%",
+        )
+    with col3:
         st.metric(
             "Acceptance Rate",
-            str(acceptance_rate) + "%",
-            delta=f"{percent_difference_acceptance_rate:.2f}",
-            delta_color="normal",
+            f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%",
+            f"{calculate_delta(df_usage_data_subset, "acceptance_rate"):.2f}%",
         )
     with col4:
-        total_lines_accepted = df_usage_data_subset["total_lines_accepted"].sum()
-        initial_lines_accepted = df_usage_data_subset.iloc[0]["total_lines_accepted"]
-        percent_difference_lines_accepted = (
-            (df_usage_data_subset.iloc[-1]["total_lines_accepted"] - initial_lines_accepted) / initial_lines_accepted
-        ) * 100
         st.metric(
             "Lines of Code Accepted",
-            total_lines_accepted,
-            delta=f"{percent_difference_lines_accepted:.2f}%",
-            delta_color="normal",
+            df_usage_data_subset["total_lines_accepted"].sum(),
+            f"{calculate_delta(df_usage_data_subset, "total_lines_accepted"):.2f}%",
         )
 
     # Acceptance Graph
