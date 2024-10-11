@@ -97,6 +97,8 @@ If you are part of the `keh-dev` team then you can either select a team that you
 
 If you are not part of the `keh-dev` team then you can select a team that you are in from the select box.
 
+To update the pool of admin teams, navigate to the s3 bucket `copilot-usage-dashboard` and append the team name to `admin_teams.json`. Currently `keh-dev` and `sdp-dev` are the admin teams within the json file.
+
 **IMPORTANT**
 The team must have a **minimum of 5 users with active copilot licenses**. 
 The team must be in the ONSDigital org.
