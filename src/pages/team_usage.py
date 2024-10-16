@@ -45,7 +45,7 @@ gh = github_api_toolkit.github_interface(access_token[0])
 
 @st.cache_data(show_spinner=True)
 def get_access_token(code):
-    """Exchange code for access token"""
+    """Exchange code for access token."""
     data = {
         "client_id": client_id,
         "client_secret": client_secret,
@@ -54,7 +54,7 @@ def get_access_token(code):
         "scope": "user:email read:org",
     }
     headers = {"Accept": "application/json"}
-    response = requests.post(access_token_url, data=data, headers=headers)
+    response = requests.post(access_token_url, data=data, headers=headers, timeout=10)
     response.raise_for_status()
     access_token = response.json().get("access_token")
     st.session_state.access_token = access_token
@@ -62,34 +62,36 @@ def get_access_token(code):
 
 
 def get_user_profile(oauth_token):
-    """Fetch authenticated user's GitHub profile"""
+    """Fetch authenticated user's GitHub profile."""
     headers = {"Authorization": f"token {oauth_token}"}
-    response = requests.get(user_api_url, headers=headers)
+    response = requests.get(user_api_url, headers=headers, timeout=10)
     response.raise_for_status()
     return response.json()
 
 
 def is_user_in_org(username, org):
-    """
-    Check if a user is a member of a specified GitHub organization.
+    """Check if a user is a member of a specified GitHub organization.
+
     Args:
         username (str): The GitHub username to check.
         org (str): The GitHub organization name.
+
     Returns:
         bool: True if the user is a member of the organization, False otherwise.
     """
     orgs = gh.get(f"/orgs/{org}/members/{username}")
     return orgs.status_code == 204
 
+
 @st.cache_data
 def get_pem_from_secret_manager(_session: boto3.Session, secret_name: str, region_name: str) -> str:
-    """Gets the .pem file contents from AWS Secret Manager"""
+    """Gets the .pem file contents from AWS Secret Manager."""
     secret_manager = session.client("secretsmanager", region_name=region_name)
     return secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 
 
 def generate_datasets(date_range: tuple, usage_data):
-    """Converts the JSON responses from the Github API into Pandas Dataframes"""
+    """Converts the JSON responses from the Github API into Pandas Dataframes."""
     # Convert copilot_usage_data.json into a dataframe
     df_usage_data = pd.json_normalize(usage_data)
 
@@ -142,11 +144,13 @@ def generate_datasets(date_range: tuple, usage_data):
 
 def get_user_teams(access_token, profile):
     """Fetches the list of team names that a user belongs to within a specified GitHub organization.
-        Args:
-            access_token (str): The GitHub access token for authentication.
-            profile (dict): The user's profile information containing at least the 'login' key.
-        Returns:
-            list: A list of team names that the user belongs to within the organization.
+
+    Args:
+        access_token (str): The GitHub access token for authentication.
+        profile (dict): The user's profile information containing at least the 'login' key.
+
+    Returns:
+        list: A list of team names that the user belongs to within the organization.
     """
     query = """
         query($org: String!, $name: String!) {
@@ -200,15 +204,15 @@ def get_user_teams(access_token, profile):
 
 
 def get_team_seats(access_token, team):
-    """
-    Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
+    """Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
+
     Args:
         access_token (str): The GitHub access token for authentication.
         team (str): The name of the team within the organization.
+
     Returns:
         pandas.DataFrame: A DataFrame containing the filtered seat data for the specified team.
     """
-
     seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 
@@ -229,6 +233,7 @@ def get_team_seats(access_token, team):
 
     return df_team_seat_data
 
+
 def initialize_states():
     # Initialize session states
     if "profile" not in st.session_state:
@@ -237,6 +242,7 @@ def initialize_states():
         st.session_state.slugs = []
     if "oauth_token" not in st.session_state:
         st.session_state.oauth_token = None
+
 
 # Streamlit UI starts here
 st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
@@ -272,14 +278,11 @@ if st.session_state.profile is None:
     else:
         # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
         login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}"
-        st.html(
-            f'<a href="{login_url}" target="_self">Login with GitHub</a>'
-        )
+        st.html(f'<a href="{login_url}" target="_self">Login with GitHub</a>')
 
 
 # If the user is logged in then display the flow
 if st.session_state.profile:
-
 
     col1, col2 = st.columns([0.4, 0.6])
     with col1:
@@ -337,7 +340,7 @@ if st.session_state.profile:
                     if team_description == "":
                         team_description = "No description available."
                     st.session_state[f"{team_slug}-description"] = team_description
-                except:
+                except Exception:
                     st.error("Team does not exist.")
                     st.stop()
 
@@ -564,11 +567,11 @@ if st.session_state.profile:
             df_unused_users = pd.DataFrame(
                 columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
             )
-
+            month = 30
             for index, row in df_seat_data.iterrows():
-                if pd.isnull(row.last_activity_at) == False:
+                if not pd.isnull(row.last_activity_at):
                     last_activity_date = datetime.strptime(row.last_activity_at, "%Y-%m-%dT%H:%M:%SZ")
-                    if (datetime.now() - last_activity_date).days <= 30:
+                    if (datetime.now() - last_activity_date).days <= month:
                         number_of_engaged_users += 1
                     else:
                         df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
