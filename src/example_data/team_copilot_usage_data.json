@@ -1,0 +1,136 @@
+[
+    {
+        "day": "2024-09-24",
+        "total_suggestions_count": 282,
+        "total_acceptances_count": 58,
+        "total_lines_suggested": 394,
+        "total_lines_accepted": 47,
+        "total_active_users": 4,
+        "total_chat_acceptances": 13,
+        "total_chat_turns": 13,
+        "total_active_chat_users": 1,
+        "breakdown": [
+            {
+                "language": "unknown",
+                "editor": "vscode",
+                "suggestions_count": 2,
+                "acceptances_count": 0,
+                "lines_suggested": 3,
+                "lines_accepted": 0,
+                "active_users": 1
+            },
+            {
+                "language": "python",
+                "editor": "vscode",
+                "suggestions_count": 236,
+                "acceptances_count": 49,
+                "lines_suggested": 309,
+                "lines_accepted": 38,
+                "active_users": 4
+            },
+            {
+                "language": "makefile",
+                "editor": "vscode",
+                "suggestions_count": 22,
+                "acceptances_count": 6,
+                "lines_suggested": 30,
+                "lines_accepted": 3,
+                "active_users": 2
+            },
+            {
+                "language": "html",
+                "editor": "vscode",
+                "suggestions_count": 17,
+                "acceptances_count": 2,
+                "lines_suggested": 47,
+                "lines_accepted": 5,
+                "active_users": 2
+            },
+            {
+                "language": "json",
+                "editor": "vscode",
+                "suggestions_count": 2,
+                "acceptances_count": 0,
+                "lines_suggested": 2,
+                "lines_accepted": 0,
+                "active_users": 1
+            },
+            {
+                "language": "yaml",
+                "editor": "vscode",
+                "suggestions_count": 3,
+                "acceptances_count": 1,
+                "lines_suggested": 3,
+                "lines_accepted": 1,
+                "active_users": 2
+            }
+        ]
+    },
+    {
+        "day": "2024-09-25",
+        "total_suggestions_count": 282,
+        "total_acceptances_count": 58,
+        "total_lines_suggested": 394,
+        "total_lines_accepted": 47,
+        "total_active_users": 4,
+        "total_chat_acceptances": 13,
+        "total_chat_turns": 13,
+        "total_active_chat_users": 1,
+        "breakdown": [
+            {
+                "language": "unknown",
+                "editor": "vscode",
+                "suggestions_count": 2,
+                "acceptances_count": 0,
+                "lines_suggested": 3,
+                "lines_accepted": 0,
+                "active_users": 1
+            },
+            {
+                "language": "python",
+                "editor": "vscode",
+                "suggestions_count": 236,
+                "acceptances_count": 49,
+                "lines_suggested": 309,
+                "lines_accepted": 38,
+                "active_users": 4
+            },
+            {
+                "language": "makefile",
+                "editor": "vscode",
+                "suggestions_count": 22,
+                "acceptances_count": 6,
+                "lines_suggested": 30,
+                "lines_accepted": 3,
+                "active_users": 2
+            },
+            {
+                "language": "html",
+                "editor": "vscode",
+                "suggestions_count": 17,
+                "acceptances_count": 2,
+                "lines_suggested": 47,
+                "lines_accepted": 5,
+                "active_users": 2
+            },
+            {
+                "language": "json",
+                "editor": "vscode",
+                "suggestions_count": 2,
+                "acceptances_count": 0,
+                "lines_suggested": 2,
+                "lines_accepted": 0,
+                "active_users": 1
+            },
+            {
+                "language": "yaml",
+                "editor": "vscode",
+                "suggestions_count": 3,
+                "acceptances_count": 1,
+                "lines_suggested": 3,
+                "lines_accepted": 1,
+                "active_users": 2
+            }
+        ]
+    }
+]

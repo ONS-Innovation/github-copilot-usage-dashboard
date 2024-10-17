@@ -53,3 +53,5 @@ terraform.rc
 
 # Ignore the terraform/service prority calc
 terraform/service/highest_priority.txt
+
+.env
