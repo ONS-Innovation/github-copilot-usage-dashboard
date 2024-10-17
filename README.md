@@ -66,6 +66,48 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
 
 5. Run the project using `streamlit run src/app.py`
 
+## Setup Team Usage Page
+
+For testing purposes, create a 'New OAuth App' by going to this [page](https://github.com/settings/developers). You can name the app anything (can't start with git or github) e.g. copilot-usage-auth-app. Note down the Client ID and Client secret.
+
+- Set the application name to anything.
+- Set the homepage URL to `http://localhost:8502`.
+- Set the authorization callback URL to `http://localhost:8502/team_usage`.
+
+Install the code as usual, by creating the virtual environment, `make install`. The additional dependencies that have been added are `github-api-toolkit` and `requests`.
+
+Take your generated client ID and secret and import them using export.
+
+```bash
+export AWS_ACCESS_KEY_ID=<aws_access_key_id> 
+export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> 
+export AWS_DEFAULT_REGION=eu-west-2 
+export AWS_SECRET_NAME=<aws_secret_name> 
+export GITHUB_ORG=ONSDigital 
+export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+export AWS_ACCOUNT_NAME=sdp-sandbox
+```
+
+```bash
+export CLIENT_ID=<client_id>
+export CLIENT_SECRET=<client_secret>
+```
+
+Make sure no other apps are running on `localhost:8502`. Once setup, use `make run-local`. This runs the the streamlit app on port **8502**, as *8501* is the default port.
+
+Once the app is running, head to `localhost:8502/team_usage` or by clicking the `Team Usage` in the sidebar. Click the `Login with GitHub` button. This redirects the user to the GitHub OAuth page. Click the green `Authorize` button, which redirects you back to the main application and logs you in.
+
+If you are part of the `keh-dev` team then you can either select a team that you are in from the select box or you can enter another team name. As of 30-09-2024, there are only these teams with team copilot data: `all`, `Blaise5`, `CSS`, `keh-dev`, `Ops`.
+
+If you are not part of the `keh-dev` team then you can select a team that you are in from the select box.
+
+To update the pool of admin teams, navigate to the s3 bucket `copilot-usage-dashboard` and append the team name to `admin_teams.json`. Currently `keh-dev` and `sdp-dev` are the admin teams within the json file.
+
+**IMPORTANT**
+The team must have a **minimum of 5 users with active copilot licenses**. 
+The team must be in the ONSDigital org.
+The authorized user (your account) must be in that team.
+
 ## Setup - Running in a container
 
 1. Build a Docker Image
@@ -358,4 +400,9 @@ make pylint
 To run mypy (static type checking)
 ```bash
 make mypy
+```
+
+To run the application locally
+```bash
+make run-local
 ```

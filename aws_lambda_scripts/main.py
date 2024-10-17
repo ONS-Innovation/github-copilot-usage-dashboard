@@ -1,11 +1,11 @@
+import json
+import logging
+import os
+
 import boto3
 import boto3.exceptions
-from botocore.exceptions import ClientError
-import json
-import os
-import logging
-
 import github_api_toolkit
+from botocore.exceptions import ClientError
 
 # GitHub Organisation
 org = os.getenv("GITHUB_ORG")
