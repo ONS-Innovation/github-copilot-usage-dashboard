@@ -293,17 +293,17 @@ There are associated README files in each of the Terraform modules in this repos
 Depending upon which environment you are deploying to you will want to run your terraform by pointing at an appropriate environment tfvars file.  
 
 Example service tfvars file:
-[service/env/sandbox/example_tfvars.txt](https://github.com/ONS-Innovation/code-github-copilot-usage-audit/terraform/service/env/sandbox/example_tfvars.txt)
+[dashboard/env/sandbox/example_tfvars.txt](./terraform/dashboard/env/sandbox/example_tfvars.txt)
 
 ### Updating the running service using Terraform
 
 If the application has been modified then the following can be performed to update the running service:
 
 - Build a new version of the container image and upload to ECR as per the instructions earlier in this guide.
-- Change directory to the **service terraform**
+- Change directory to the **dashboard terraform**
 
   ```bash
-  cd terraform/service
+  cd terraform/dashboard
   ```
 
 - In the appropriate environment variable file env/sandbox/sandbox.tfvars, env/dev/dev.tfvars or env/prod/prod.tfvars
@@ -355,7 +355,7 @@ If the application has been modified then the following can be performed to upda
 Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
 
   ```bash
-  cd terraform/service
+  cd terraform/dashboard
 
   terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
