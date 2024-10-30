@@ -44,7 +44,6 @@ resource "aws_lambda_function" "lambda_function" {
       GITHUB_ORG = var.github_org
       GITHUB_APP_CLIENT_ID = var.github_app_client_id
       AWS_SECRET_NAME = var.aws_secret_name
-      //AWS_DEFAULT_REGION = var.region // This is already set in AWS Lambda by default and is not needed
       AWS_ACCOUNT_NAME = var.env_name
     }
   }

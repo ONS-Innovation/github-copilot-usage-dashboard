@@ -1,4 +1,4 @@
-# For sandbox environment
+# For dev environment
 # terraform init -backend-config="env/dev/backend-dev.tfbackend"
 bucket         = "sdp-dev-tf-state"
 key            = "sdp-dev-ecs-copilot-usage-lambda/terraform.tfstate"
