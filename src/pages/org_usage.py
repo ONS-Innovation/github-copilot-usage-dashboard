@@ -176,8 +176,21 @@ with live_tab:
         else:
             gh = github_api_toolkit.github_interface(access_token[0])
 
-            seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={})
-            seat_data = seat_data.json()
+            response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
+
+            seat_data = response.json()
+
+            try:
+                last_page = int(response.links["last"]["url"].split("=")[-1])
+            except KeyError:
+                # If Key Error, Last doesn't exist therefore 1 page
+                last_page = 1
+
+            # Skip first page as we already have it
+            for i in range(1, last_page):
+                response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100, "page": i + 1})
+
+                seat_data["seats"].append(response.json()["seats"])
 
         df_seat_data = pd.DataFrame()
 
