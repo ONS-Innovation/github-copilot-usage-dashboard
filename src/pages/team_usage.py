@@ -23,12 +23,14 @@ secret_reigon = os.getenv("AWS_DEFAULT_REGION")
 
 account = os.getenv("AWS_ACCOUNT_NAME")
 
+# TODO: Remove these and use the existing GitHub App instead
 client_id = os.getenv("CLIENT_ID")
 client_secret = os.getenv("CLIENT_SECRET")
+
 authorize_url = "https://github.com/login/oauth/authorize"
 access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
-redirect_uri = "http://localhost:8502/team_usage"
+redirect_uri = "http://localhost:8502/team_usage"   # TODO: This should be dynamic. The URL will change based on the environment.
 
 bucket_name = "copilot-usage-dashboard"
 object_name = "admin_teams.json"
@@ -53,6 +55,9 @@ def get_access_token(code):
         "redirect_uri": redirect_uri,
         "scope": "user:email read:org",
     }
+
+    # TODO: Make this use GitHub API Toolkit
+
     headers = {"Accept": "application/json"}
     response = requests.post(access_token_url, data=data, headers=headers, timeout=10)
     response.raise_for_status()
@@ -63,6 +68,9 @@ def get_access_token(code):
 
 def get_user_profile(oauth_token):
     """Fetch authenticated user's GitHub profile."""
+
+    # TODO: Make this use GitHub API Toolkit
+
     headers = {"Authorization": f"token {oauth_token}"}
     response = requests.get(user_api_url, headers=headers, timeout=10)
     response.raise_for_status()
@@ -169,6 +177,9 @@ def get_user_teams(access_token, profile):
     """
 
     params = {"org": org, "name": profile["login"]}
+
+    # TODO: Move this to global scope. This class shouldn't be created every time this function is called.
+
     ghql = github_api_toolkit.github_graphql_interface(access_token)
 
     teams = ghql.make_ql_request(query=query, params=params)
@@ -176,6 +187,7 @@ def get_user_teams(access_token, profile):
     team_names = [edge["node"]["name"] for edge in teams_data["data"]["organization"]["teams"]["edges"]]
     return team_names
 
+# TODO: Remove the below code when it is no longer needed. Dashboard should be able to offer this.
 
 # # Run to get the copilot teams that are available.
 # def get_copilot_teams(access_token):
@@ -203,6 +215,8 @@ def get_user_teams(access_token, profile):
 #             json.dump(copilot_teams, file)
 
 
+# TODO: Remove unused access_token parameter
+
 def get_team_seats(access_token, team):
     """Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
 
@@ -213,6 +227,9 @@ def get_team_seats(access_token, team):
     Returns:
         pandas.DataFrame: A DataFrame containing the filtered seat data for the specified team.
     """
+
+    # This could be a future bug if a team has more than 100 members. In this use case, it is fine.
+    # If this becomes a problem, we can add pagination.
     seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 
@@ -278,6 +295,9 @@ if st.session_state.profile is None:
     else:
         # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
         login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}"
+
+        # TODO: Change to a Streamlit button over a link
+
         st.html(f'<a href="{login_url}" target="_self">Login with GitHub</a>')
 
 
