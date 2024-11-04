@@ -42,8 +42,14 @@ export AWS_DEFAULT_REGION=eu-west-2
 export AWS_SECRET_NAME=<aws_secret_name> 
 export GITHUB_ORG=ONSDigital 
 export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+export GITHUB_APP_CLIENT_SECRET=<github_app_client_secret>
 export AWS_ACCOUNT_NAME=sdp-sandbox
+export APP_URL=http://localhost:8501
 ```
+
+**Please Note:**
+- APP_URL should point to the url which the app is running at. For example, if running locally you'd use localhost:8501 and on AWS the appropriate domain url.
+- The GITHUB_APP_CLIENT_ID and GITHUB_APP_CLIENT_SECRET can be found from the GitHub App in developer settings.
 
 1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
 2. Activate the virtual environment using `source venv/bin/activate`
@@ -65,48 +71,6 @@ export AWS_ACCOUNT_NAME=sdp-sandbox
     ```
 
 5. Run the project using `streamlit run src/app.py`
-
-## Setup Team Usage Page
-
-For testing purposes, create a 'New OAuth App' by going to this [page](https://github.com/settings/developers). You can name the app anything (can't start with git or github) e.g. copilot-usage-auth-app. Note down the Client ID and Client secret.
-
-- Set the application name to anything.
-- Set the homepage URL to `http://localhost:8502`.
-- Set the authorization callback URL to `http://localhost:8502/team_usage`.
-
-Install the code as usual, by creating the virtual environment, `make install`. The additional dependencies that have been added are `github-api-toolkit` and `requests`.
-
-Take your generated client ID and secret and import them using export.
-
-```bash
-export AWS_ACCESS_KEY_ID=<aws_access_key_id> 
-export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> 
-export AWS_DEFAULT_REGION=eu-west-2 
-export AWS_SECRET_NAME=<aws_secret_name> 
-export GITHUB_ORG=ONSDigital 
-export GITHUB_APP_CLIENT_ID=<github_app_client_id>
-export AWS_ACCOUNT_NAME=sdp-sandbox
-```
-
-```bash
-export CLIENT_ID=<client_id>
-export CLIENT_SECRET=<client_secret>
-```
-
-Make sure no other apps are running on `localhost:8502`. Once setup, use `make run-local`. This runs the the streamlit app on port **8502**, as *8501* is the default port.
-
-Once the app is running, head to `localhost:8502/team_usage` or by clicking the `Team Usage` in the sidebar. Click the `Login with GitHub` button. This redirects the user to the GitHub OAuth page. Click the green `Authorize` button, which redirects you back to the main application and logs you in.
-
-If you are part of the `keh-dev` team then you can either select a team that you are in from the select box or you can enter another team name. As of 30-09-2024, there are only these teams with team copilot data: `all`, `Blaise5`, `CSS`, `keh-dev`, `Ops`.
-
-If you are not part of the `keh-dev` team then you can select a team that you are in from the select box.
-
-To update the pool of admin teams, navigate to the s3 bucket `copilot-usage-dashboard` and append the team name to `admin_teams.json`. Currently `keh-dev` and `sdp-dev` are the admin teams within the json file.
-
-**IMPORTANT**
-The team must have a **minimum of 5 users with active copilot licenses**. 
-The team must be in the ONSDigital org.
-The authorized user (your account) must be in that team.
 
 ## Setup - Running in a container
 
@@ -140,7 +104,9 @@ These credentials should also allow access to S3 for historic reporting.
     -e AWS_SECRET_NAME=<aws_secret_name> \
     -e GITHUB_ORG=ONSDigital \
     -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
-    -e AWS_ACCOUNT_NAME=sdp-sandbox
+    -e GITHUB_APP_CLIENT_SECRET=<github_app_client_secret> \
+    -e AWS_ACCOUNT_NAME=sdp-sandbox \
+    -e APP_URL=http://localhost:8501
     copilot-usage-dashboard
     ```
 
@@ -209,6 +175,28 @@ When running the dashboard, you can toggle between using Live and Example Data.
 To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)). 
 
 This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](../aws_lambda_scripts/README.md).
+
+## Team Usage Page
+
+This page shows CoPilot Usage at a team level.
+
+The user will be promted to login to GitHub on the page.
+
+Logged in users will only be able to see teams that they are a member of.
+
+If the logged in user is apart of an admin team, they can search for and view any team's metrics. See [Updating Admin Teams](#updating-admin-teams) for more information.
+
+**Please Note:**
+- The team must have a **minimum of 5 users with active copilot licenses** to have any data. 
+- The team must be in the organisation the tool is running in.
+
+### Updating Admin Teams
+
+Currently, there are 2 admin teams `keh-dev` and `sdp-dev`. 
+
+These teams are defined in `admin_teams.json` in the `copilot-usage-dashboard` bucket.
+
+To add another admin team, simply add the team name to `admin_teams.json`.
 
 ## Github App Permissions
 
