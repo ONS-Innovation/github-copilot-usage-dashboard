@@ -24,10 +24,12 @@ secret_reigon = os.getenv("AWS_DEFAULT_REGION")
 
 account = os.getenv("AWS_ACCOUNT_NAME")
 
+app_url = os.getenv("APP_URL")
+
 authorize_url = "https://github.com/login/oauth/authorize"
 access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
-redirect_uri = "http://localhost:8502/team_usage"   # TODO: This should be dynamic. The URL will change based on the environment.
+redirect_uri = f"{app_url}/team_usage"
 
 bucket_name = "copilot-usage-dashboard"
 object_name = "admin_teams.json"
