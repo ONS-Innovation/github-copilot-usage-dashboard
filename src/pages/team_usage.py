@@ -31,7 +31,7 @@ access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
 redirect_uri = f"{app_url}/team_usage"
 
-bucket_name = "copilot-usage-dashboard"
+bucket_name = f"{account}-copilot-usage-dashboard"
 object_name = "admin_teams.json"
 
 session = boto3.Session()
