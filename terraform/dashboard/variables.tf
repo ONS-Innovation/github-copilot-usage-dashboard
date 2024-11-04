@@ -102,6 +102,17 @@ variable "github_app_client_id" {
   type        = string
 }
 
+variable "github_app_client_secret" {
+  description = "Github App Client Secret"
+  type        = string
+}
+
+variable "app_url" {
+  description = "App URL"
+  type        = string
+  default     = "http://localhost:8501"
+}
+
 variable "project_tag" {
   description = "Project"
   type        = string

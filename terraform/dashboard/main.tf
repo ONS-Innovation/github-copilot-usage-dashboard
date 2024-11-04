@@ -59,8 +59,16 @@ resource "aws_ecs_task_definition" "ecs_service_definition" {
           value = var.github_app_client_id
         },
         {
+          name = "GITHUB_APP_CLIENT_SECRET",
+          value = var.github_app_client_secret
+        },
+        {
           name = "AWS_SECRET_NAME",
           value = var.aws_secret_name
+        },
+        {
+          name = "APP_URL",
+          value = var.app_url
         }
       ],
       logConfiguration = {
