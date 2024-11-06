@@ -198,7 +198,9 @@ These teams are defined in `admin_teams.json` in the `copilot-usage-dashboard` b
 
 To add another admin team, simply add the team name to `admin_teams.json`.
 
-## Github App Permissions
+## Github App 
+
+### Permissions
 
 A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
 The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
@@ -207,6 +209,14 @@ In order to get a .pem file, a Github App must be created an installed into the 
 This app should have **Read and Write Administration** organisation permission and **Read-only GitHub Copilot Business** organisation permission.
 
 This file should be uploaded to AWS Secret Manager as below.
+
+### Callback URLs
+
+It is vital that a callback URL is added to allow a login through GitHub when using the `/team_usage` page.
+
+To do this, add `<app_url>/team_usage` as a callback url within your GitHub App's settings.
+
+If you receive an error about an **invalid callback uri**, this callback url either doesn't exist or is incorrect.
 
 ## Deployment to AWS
 
