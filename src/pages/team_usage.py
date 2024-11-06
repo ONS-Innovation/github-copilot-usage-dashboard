@@ -14,8 +14,9 @@ from plotly.subplots import make_subplots
 
 org = os.getenv("GITHUB_ORG")
 
-# GitHub App Client ID
-org_client_id = os.getenv("GITHUB_APP_CLIENT_ID")
+# GitHub App Credentials
+client_id = os.getenv("GITHUB_APP_CLIENT_ID")
+client_secret = os.getenv("GITHUB_APP_CLIENT_SECRET")
 
 # AWS Secret Manager Secret Name for the .pem file
 secret_name = os.getenv("AWS_SECRET_NAME")
@@ -23,14 +24,14 @@ secret_reigon = os.getenv("AWS_DEFAULT_REGION")
 
 account = os.getenv("AWS_ACCOUNT_NAME")
 
-client_id = os.getenv("CLIENT_ID")
-client_secret = os.getenv("CLIENT_SECRET")
+app_url = os.getenv("APP_URL")
+
 authorize_url = "https://github.com/login/oauth/authorize"
 access_token_url = "https://github.com/login/oauth/access_token"
 user_api_url = "https://api.github.com/user"
-redirect_uri = "http://localhost:8502/team_usage"
+redirect_uri = f"{app_url}/team_usage"
 
-bucket_name = "copilot-usage-dashboard"
+bucket_name = f"{account}-copilot-usage-dashboard"
 object_name = "admin_teams.json"
 
 session = boto3.Session()
@@ -39,9 +40,10 @@ secret_manager = session.client("secretsmanager", region_name=secret_reigon)
 secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
 
 # Get updated copilot usage data from GitHub API
-access_token = github_api_toolkit.get_token_as_installation(org, secret, org_client_id)
+access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 gh = github_api_toolkit.github_interface(access_token[0])
 
+ql = github_api_toolkit.github_graphql_interface(access_token[0])
 
 @st.cache_data(show_spinner=True)
 def get_access_token(code):
@@ -53,6 +55,7 @@ def get_access_token(code):
         "redirect_uri": redirect_uri,
         "scope": "user:email read:org",
     }
+
     headers = {"Accept": "application/json"}
     response = requests.post(access_token_url, data=data, headers=headers, timeout=10)
     response.raise_for_status()
@@ -63,6 +66,7 @@ def get_access_token(code):
 
 def get_user_profile(oauth_token):
     """Fetch authenticated user's GitHub profile."""
+
     headers = {"Authorization": f"token {oauth_token}"}
     response = requests.get(user_api_url, headers=headers, timeout=10)
     response.raise_for_status()
@@ -169,13 +173,13 @@ def get_user_teams(access_token, profile):
     """
 
     params = {"org": org, "name": profile["login"]}
-    ghql = github_api_toolkit.github_graphql_interface(access_token)
 
-    teams = ghql.make_ql_request(query=query, params=params)
+    teams = ql.make_ql_request(query=query, params=params)
     teams_data = teams.json()
     team_names = [edge["node"]["name"] for edge in teams_data["data"]["organization"]["teams"]["edges"]]
     return team_names
 
+# TODO: Remove the below code when it is no longer needed. Dashboard should be able to offer this.
 
 # # Run to get the copilot teams that are available.
 # def get_copilot_teams(access_token):
@@ -203,7 +207,7 @@ def get_user_teams(access_token, profile):
 #             json.dump(copilot_teams, file)
 
 
-def get_team_seats(access_token, team):
+def get_team_seats(team):
     """Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
 
     Args:
@@ -213,6 +217,9 @@ def get_team_seats(access_token, team):
     Returns:
         pandas.DataFrame: A DataFrame containing the filtered seat data for the specified team.
     """
+
+    # This could be a future bug if a team has more than 100 members. In this use case, it is fine.
+    # If this becomes a problem, we can add pagination.
     seat_data = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
     seat_data = seat_data.json()
 
@@ -278,7 +285,8 @@ if st.session_state.profile is None:
     else:
         # Login button. User is directed to GitHub oauth page then once authorized they come back to this page and go to the next step
         login_url = f"{authorize_url}?{urlencode({'client_id': client_id, 'redirect_uri': redirect_uri, 'scope': 'user:email read:org'})}"
-        st.html(f'<a href="{login_url}" target="_self">Login with GitHub</a>')
+
+        st.html(f'<a href="{login_url}" target="_self"><button>Login with GitHub</button></a>')
 
 
 # If the user is logged in then display the flow
@@ -549,7 +557,7 @@ if st.session_state.profile:
 
         # User Breakdown
 
-        df_seat_data = get_team_seats(access_token, team_slug)
+        df_seat_data = get_team_seats(team_slug)
 
         st.header(":blue-background[User Breakdown]")
         st.write(
