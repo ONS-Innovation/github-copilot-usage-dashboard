@@ -11,7 +11,7 @@ WORKDIR /app
 COPY . /app
 
 # Run poetry install --without dev
-RUN poetry install --no-root 
+RUN poetry install --only main --no-root 
 
 # Expose the port the app runs on
 EXPOSE 8501
