@@ -5,8 +5,8 @@ terraform {
 }
 
 resource "aws_security_group" "lambda_sg" {
-  name = "lambda_security_group"
-  description = "Security group for Lambda function"
+  name = "${var.lambda_name}_security_group"
+  description = "Security group for ${var.lambda_name} Lambda function"
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
   ingress {
     from_port   = 443
@@ -69,8 +69,8 @@ resource "aws_iam_role" "lambda_function_role" {
 }
 
 resource "aws_iam_policy" "vpc_permissions" {
-  name        = "vpc_permissions"
-  description = "IAM policy for VPC permissions for Lambda function"
+  name        = "${var.lambda_name}_vpc_permissions"
+  description = "IAM policy for VPC permissions for ${var.lambda_name} Lambda function"
   policy      = data.aws_iam_policy_document.vpc_permissions.json
 }
 
@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "vpc_policy" {
 }
 
 resource "aws_iam_policy" "lambda_logging" {
-  name        = "lambda_logging"
+  name        = "${var.lambda_name}_logging"
   path        = "/"
   description = "IAM policy for logging from a lambda"
   policy      = data.aws_iam_policy_document.lambda_logging.json
