@@ -1,6 +1,8 @@
 module "eventbridge" {
   source = "terraform-aws-modules/eventbridge/aws"
 
+  role_name = "${var.lambda_name}-eventbridge-role"
+
   create_bus = false
 
   rules = {
@@ -13,7 +15,7 @@ module "eventbridge" {
   targets = {
     crons = [
       {
-        name  = "lambda-function-cron"
+        name  = "${var.lambda_name}-function-cron"
         arn   = aws_lambda_function.lambda_function.arn
         input = jsonencode({})
       }
