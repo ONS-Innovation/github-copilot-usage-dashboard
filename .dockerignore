@@ -1,17 +1,12 @@
-# Virtual Environment
-venv/
-
-# .pem file
-copilot-usage-dashboard.pem
-
-# aws_lambda_scripts
-aws_lambda_scripts
-
-# historic_usage_data file
-historic_usage_data.json
-
-# diagrams
-diagrams/
-
-# __pycache__
-__pycache__/
+.github/*
+docs/*
+lambda_data_logger/*
+mkdocs_deployment/*
+terraform/*
+.gitignore
+CODEOWNERS
+Makefile
+mkdocs_requirements.txt
+mkdocs.yml
+README.md
+venv/*
