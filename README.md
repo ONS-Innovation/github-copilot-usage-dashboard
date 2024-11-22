@@ -198,6 +198,12 @@ These teams are defined in `admin_teams.json` in the `copilot-usage-dashboard` b
 
 To add another admin team, simply add the team name to `admin_teams.json`.
 
+`admin_teams.json` is in the following format and must be created manually on a fresh deployment:
+
+```json
+["team-A", "team-B"]
+```
+
 ## Github App 
 
 ### Permissions
