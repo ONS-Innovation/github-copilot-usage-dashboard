@@ -55,6 +55,16 @@ if [ "$4" ]; then
   if [ $? -ne 0 ]; then
     echo "Usage: $0 container-ver must be a valid version number e.g v1.0.0 or v1.0.0-alpha or v1.0.0-rc1"
     exit 1
+  else
+    # Check if the version already exists in the repository
+    IMAGE_EXISTS=$(aws ecr describe-images --profile $PROFILE --region "eu-west-2" --repository-name "$ENV-$IMAGE_NAME" --query "imageDetails[?contains(imageTags, '$VER')]" --output text)
+    if [ -n "$IMAGE_EXISTS" ]; then
+      echo "Docker image with tag $VER already exists in repository $ENV-$IMAGE_NAME. Rename, remove or use a different version number"
+      exit 1
+    else:
+      # Reset the IMAGE_EXISTS variable
+      IMAGE_EXISTS=""
+    fi
   fi
 fi
 
@@ -91,7 +101,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-IMAGE_EXISTS=$(aws ecr describe-images --profile $PROFILE --repository-name "$ENV-$IMAGE_NAME" --query "imageDetails[?contains(imageTags, '$VER')]" --output text)
+IMAGE_EXISTS=$(aws ecr describe-images --profile $PROFILE --region "eu-west-2" --repository-name "$ENV-$IMAGE_NAME" --query "imageDetails[?contains(imageTags, '$VER')]" --output text)
 
 if [ -n "$IMAGE_EXISTS" ]; then
   echo "Success - Docker image with tag $VER exists in repository $ENV-$IMAGE_NAME"
