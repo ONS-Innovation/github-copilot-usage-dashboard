@@ -3,4 +3,4 @@
 bucket         = "sdp-dev-tf-state"
 key            = "sdp-dev-ecs-copilot-usage-lambda/terraform.tfstate"
 region         = "eu-west-2"
-dynamodb_table = "terraform-state-lock"
+dynamodb_table = "sdp-dev-terraform-state-lock"
