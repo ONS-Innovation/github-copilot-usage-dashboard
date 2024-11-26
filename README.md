@@ -3,6 +3,7 @@
 A Streamlit dashboard to display information from the Github Copilot Usage API endpoints.
 
 ## Disclaimer
+
 ### Early Stage & Accessibility Disclaimer
 
 Please note that the code available in this repository for creating a Dashboard to track GitHub Copilot usage within your organisation is in its **early stages of development**. It may **not** fully comply with all Civil Service / ONS best practices for software development. Currently, it is being used by a **limited number of individuals** within ONS. Additionally, due to the limited number of users, this project has **not** been tested for WACG 2.1 compliance nor accessibility. Please consider this when using the project.
@@ -48,6 +49,7 @@ export APP_URL=http://localhost:8501
 ```
 
 **Please Note:**
+
 - APP_URL should point to the url which the app is running at. For example, if running locally you'd use localhost:8501 and on AWS the appropriate domain url.
 - The GITHUB_APP_CLIENT_ID and GITHUB_APP_CLIENT_SECRET can be found from the GitHub App in developer settings.
 
@@ -141,6 +143,48 @@ These credentials should also allow access to S3 for historic reporting.
 
 When you make changes to the application a new container image must be pushed to ECR.
 
+### Scripted Push to ECR
+
+This script assumes you have a ~/.aws/credentials file set up with profiles of the credentials for pushing to ECR and that a suitably named repository (environmentname-toolname) is already created in the ECR.  In the credential file you should use the profile that matches the IAM user associated with permissions to push to the ECR.
+
+Setup the environment for the correct credentials. Ensure the script is executable:
+
+```bash
+chmod a+x set_aws_env.sh
+```
+
+Run the script:
+
+```bash
+./set_aws_env.sh <aws-profile e.g ons_sdp_dev_ecr> <environment  e.g sdp-dev> 
+```
+
+Verify the output is as expected:
+
+```bash
+Environment variables are set as:
+export AWS_ACCESS_KEY_ID=MYACCESSKEY
+export AWS_SECRET_ACCESS_KEY=MYSECRETACCESSKEY
+export AWS_DEFAULT_REGION=eu-west-2
+export APP_NAME=sdp-dev-copilot-usage
+```
+
+Ensure the script to build and push the image is executable:
+
+```bash
+chmod a+x publish_container.sh
+```
+
+Check the version of the image you want to build (verify the next available release by looking in ECR)
+
+Run the script, which will build an image locally, connect to ECR, push the image and then check the image is uploaded correctly.
+
+```bash
+./publish_container.sh <AWS Profile - e.g ons_sdp_dev_ecr> <AWS_ACCOUNT_NUMBER> <AWS Env - e.g sdp-dev> <image version - e.g v0.0.1>
+```
+
+### Manual Push to ECR
+
 These instructions assume:
 
 1. You have a repository set up in your AWS account named copilot-usage-dashboard.
@@ -172,7 +216,7 @@ You can find the AWS repo push commands under your repository in ECR by selectin
 
 When running the dashboard, you can toggle between using Live and Example Data.
 
-To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)). 
+To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)).
 
 This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](../aws_lambda_scripts/README.md).
 
@@ -180,31 +224,31 @@ This project also supports historic reporting outside of the 28 days which the A
 
 This page shows CoPilot Usage at a team level.
 
-The user will be promted to login to GitHub on the page.
+The user will be prompted to login to GitHub on the page.
 
 Logged in users will only be able to see teams that they are a member of.
 
 If the logged in user is apart of an admin team, they can search for and view any team's metrics. See [Updating Admin Teams](#updating-admin-teams) for more information.
 
 **Please Note:**
-- The team must have a **minimum of 5 users with active copilot licenses** to have any data. 
+
+- The team must have a **minimum of 5 users with active copilot licenses** to have any data.
 - The team must be in the organisation the tool is running in.
 
 ### Updating Admin Teams
 
-Currently, there are 2 admin teams `keh-dev` and `sdp-dev`. 
+Currently, there are 2 admin teams `keh-dev` and `sdp-dev`.
 
 These teams are defined in `admin_teams.json` in the `copilot-usage-dashboard` bucket.
 
 To add another admin team, simply add the team name to `admin_teams.json`.
+
 
 `admin_teams.json` is in the following format and must be created manually on a fresh deployment:
 
 ```json
 ["team-A", "team-B"]
 ```
-
-## Github App 
 
 ### Permissions
 
@@ -284,7 +328,7 @@ The service requires access to an associated Github App secret, this secret is c
 
 AWS Secret Manager must be set up with a secret:
 
-- /sdp/tools/copilot-uasge/copilot-usage-dashboard.pem
+- /sdp/tools/copilot-usage/copilot-usage-dashboard.pem
   - A plaintext secret, containing the contents of the .pem file created when a Github App was installed.
 
 #### Running the Terraform
@@ -368,33 +412,40 @@ Delete the service resources by running the following ensuring your reference th
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
 
-  ## Linting and Formatting
+## Linting and Formatting
+
 To view all commands
+
 ```bash
 make all
 ```
 
 Linting tools must first be installed before they can be used
+
 ```bash
 make install-dev
 ```
 
 To clean residue files
+
 ```bash
 make clean
 ```
 
 To format your code
+
 ```bash
 make format
 ```
 
 To run all linting tools
+
 ```bash
 make lint
 ```
 
 To run a specific linter (black, ruff, pylint)
+
 ```bash
 make black
 make ruff
@@ -402,11 +453,13 @@ make pylint
 ```
 
 To run mypy (static type checking)
+
 ```bash
 make mypy
 ```
 
 To run the application locally
+
 ```bash
 make run-local
 ```
