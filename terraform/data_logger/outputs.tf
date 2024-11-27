@@ -15,5 +15,5 @@ output "repo_name" {
 }
 
 output "rule_arn" {
-  value = module.eventbridge.eventbridge_rules["crons"]["arn"]
+  value = module.eventbridge.eventbridge_rules["${var.lambda_name}-crons"]["arn"]
 }
