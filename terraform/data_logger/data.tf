@@ -50,7 +50,8 @@ data "aws_iam_policy_document" "lambda_s3_policy" {
     actions = [
       "s3:ListAllMyBuckets", # Allows listing all buckets in the account
       "s3:GetObject",        # Allows reading objects in buckets
-      "s3:PutObject"         # Allows writing objects to buckets
+      "s3:PutObject",        # Allows writing objects to buckets
+      "s3:ListBucket"
     ]
 
     resources = [
