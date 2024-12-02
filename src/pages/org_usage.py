@@ -396,6 +396,16 @@ with live_tab:
 
     st.header(":blue-background[User Breakdown]")
 
+    st.subheader("Inactivity Threshold")
+
+    inactivity_threshold = st.number_input("Inactive after x days:", value=28, step=1)
+
+    inactivity_date = datetime.now() - pd.Timedelta(days=inactivity_threshold)
+
+    st.write("Users are considered inactive after:", inactivity_date.strftime("%-d %B %Y"))
+
+    st.divider()
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -405,7 +415,7 @@ with live_tab:
         number_of_engaged_users = 0
 
         for index, row in df_seat_data.iterrows():
-            if pd.isnull(row.last_activity_at) == False:
+            if row.last_activity_at >= inactivity_date:
                 number_of_engaged_users += 1
 
         st.metric("Number of Engaged Users", number_of_engaged_users)
@@ -422,7 +432,7 @@ with live_tab:
 
         # Dataframe showing only active users (this with a latest activity)
         st.dataframe(
-            df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
+            df_seat_data.loc[df_seat_data["last_activity_at"] >= inactivity_date][
                 ["assignee.login", "last_activity_at", "assignee.html_url"]
             ],
             hide_index=True,
@@ -443,7 +453,7 @@ with live_tab:
 
         # Dataframe showing only inactive users (those where last_activity_at is None)
         st.dataframe(
-            df_seat_data.loc[df_seat_data["last_activity_at"].isnull()][
+            df_seat_data.loc[(df_seat_data["last_activity_at"].isnull()) | (df_seat_data["last_activity_at"] < inactivity_date)][
                 ["assignee.login", "last_activity_at", "assignee.html_url"]
             ],
             hide_index=True,
