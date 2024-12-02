@@ -79,6 +79,8 @@ def handler(event, context):
 
     logger.info("API Controller created")
 
+    # CoPilot Usage Data (Historic)
+
     # Get the usage data
     usage_data = gh.get(f"/orgs/{org}/copilot/usage")
     usage_data = usage_data.json()
@@ -117,6 +119,45 @@ def handler(event, context):
 
     logger.info(f"Uploaded updated {object_name} to S3")
 
+    # GitHub Teams with CoPilot Data
+
+    logger.info("Getting GitHub Teams with CoPilot Data")
+
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100})
+
+    # Get the last page of teams
+    try:
+        last_page = int(response.links["last"]["url"].split("=")[-1])
+    except KeyError:
+        last_page = 1
+
+    for page in range(1, last_page + 1):
+        response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
+        teams = response.json()
+        for team in teams:
+            usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
+            try:
+                if usage_data.json() != []:
+                    copilot_teams.append(team["name"])
+            except Exception as error:
+                # If Exception, then the team does not have copilot usage data and can be skipped
+                pass
+
+    logger.info(
+        "Got GitHub Teams with CoPilot Data",
+        extra={"no_teams": len(copilot_teams)},
+    )
+
+    s3.put_object(
+        Bucket=bucket_name,
+        Key="copilot_teams.json",
+        Body=json.dumps(copilot_teams, indent=4).encode("utf-8"),
+    )
+
+    logger.info("Uploaded updated copilot_teams.json to S3")
+
     logger.info(
         "Process complete",
         extra={
@@ -125,5 +166,6 @@ def handler(event, context):
             "dates_added": dates_added,
             "no_dates_before": len(historic_usage) - len(dates_added),
             "no_dates_after": len(historic_usage),
+            "no_copilot_teams": len(copilot_teams),
         },
     )
