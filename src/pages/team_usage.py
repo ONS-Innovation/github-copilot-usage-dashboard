@@ -207,6 +207,27 @@ def get_user_teams(access_token, profile):
 #             json.dump(copilot_teams, file)
 
 
+@st.cache_data
+def get_org_copilot_teams(run_day: int) -> list:
+    """Retrieves a list of GitHub Teams which have GitHub Copilot usage data from AWS S3.
+
+    Args:
+        run_day (int): The day the function was run. This is used to cache the data for a day.
+
+    Returns:
+        list: A list of team names that have GitHub Copilot usage data.
+    """
+    
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key="copilot_teams.json")
+        copilot_teams = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        st.error("An error occurred while trying to get the copilot_teams.json from S3. Please check the error message below.")
+        st.error(e)
+        st.stop()
+
+    return copilot_teams
+
 def get_team_seats(team):
     """Retrieves and filters GitHub Copilot seat data for a specific team within an organization.
 
@@ -308,6 +329,8 @@ if st.session_state.profile:
     # Get the users teams
     user_teams = get_user_teams(access_token[0], st.session_state.profile)
 
+    org_teams = get_org_copilot_teams(datetime.now().day)
+
     if access_token and user_teams:
         # Get admin_teams.json from S3
         try:
@@ -332,10 +355,12 @@ if st.session_state.profile:
             if input_method == "Select your team":
                 team_slug = st.selectbox("Select team:", options=user_teams)
             else:
-                team_slug = st.text_input("Enter team name:", value=user_teams[0] if user_teams else "")
+                team_slug = st.selectbox("Enter team name:", options=org_teams)
 
         else:
             team_slug = st.selectbox("Select team:", options=user_teams)
+
+        st.html("<b>Please Note:</b> You can type within the input to search for a team.")
 
         if team_slug and isinstance(access_token, tuple):
             if team_slug not in st.session_state:
