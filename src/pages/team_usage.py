@@ -179,33 +179,6 @@ def get_user_teams(access_token, profile):
     team_names = [edge["node"]["name"] for edge in teams_data["data"]["organization"]["teams"]["edges"]]
     return team_names
 
-# TODO: Remove the below code when it is no longer needed. Dashboard should be able to offer this.
-
-# # Run to get the copilot teams that are available.
-# def get_copilot_teams(access_token):
-#     print("Running get_copilot_teams")
-#     gh = github_api_toolkit.github_interface(access_token[0])
-#     copilot_teams = []
-
-#     for x in [1, 2]:
-#         print(x)
-#         teams = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": x})
-#         teams = teams.json()
-#         for team in teams:
-#             usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
-#             try:
-#                 if usage_data.json() != []:
-#                     copilot_teams.append(team['name'])
-#                     print(copilot_teams)
-#             except Exception as error:
-#                 print(error)
-
-#     if copilot_teams:
-#         date_str = datetime.now().strftime("%Y-%m-%d")
-#         file_path = f"./src/example_data/copilot_teams_{date_str}.json"
-#         with open(file_path, "a") as file:
-#             json.dump(copilot_teams, file)
-
 
 @st.cache_data
 def get_org_copilot_teams(run_day: int) -> list:
