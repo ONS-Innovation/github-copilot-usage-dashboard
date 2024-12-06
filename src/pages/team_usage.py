@@ -236,7 +236,7 @@ def get_team_seats(team):
 
 
 @st.cache_data
-def get_team_acceptnace(run_day: int) -> pd.DataFrame:
+def get_team_acceptance(run_day: int) -> pd.DataFrame:
     """Get the acceptance rate for each team with CoPilot Data.
 
     Args:
@@ -281,24 +281,24 @@ def get_team_acceptnace(run_day: int) -> pd.DataFrame:
     for index, row in df_team_acceptance.iterrows():
         acceptance_rate = row["Acceptance Rate"]
 
-        acceptnace_group = ""
+        acceptance_group = ""
 
         # Groups: 0-20%, 20-30%, 30-40%, 40-50%, 50-60%, 60%+
 
         if acceptance_rate < 20:
-            acceptnace_group = "0-20%"
+            acceptance_group = "0-20%"
         elif acceptance_rate >= 20 and acceptance_rate < 30:
-            acceptnace_group = "20-30%"
+            acceptance_group = "20-30%"
         elif acceptance_rate >= 30 and acceptance_rate < 40:
-            acceptnace_group = "30-40%"
+            acceptance_group = "30-40%"
         elif acceptance_rate >= 40 and acceptance_rate < 50:
-            acceptnace_group = "40-50%"
+            acceptance_group = "40-50%"
         elif acceptance_rate >= 50 and acceptance_rate < 60:
-            acceptnace_group = "50-60%"
+            acceptance_group = "50-60%"
         else:
-            acceptnace_group = "60%+"
+            acceptance_group = "60%+"
 
-        df_team_acceptance["Acceptance Group"][index] = acceptnace_group
+        df_team_acceptance["Acceptance Group"][index] = acceptance_group
 
     return df_team_acceptance
 
@@ -394,7 +394,7 @@ if st.session_state.profile:
         # Team Usage Overview
         if admin_team:
 
-            df_team_acceptance = get_team_acceptnace(datetime.now().day)
+            df_team_acceptance = get_team_acceptance(datetime.now().day)
 
             st.header(":blue-background[Team Usage Overview]")
 
