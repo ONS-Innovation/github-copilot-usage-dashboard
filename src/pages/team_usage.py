@@ -235,6 +235,77 @@ def get_team_seats(team):
     return df_team_seat_data
 
 
+@st.cache_data
+def get_team_acceptance(run_day: int) -> pd.DataFrame:
+    """Get the acceptance rate for each team with CoPilot Data.
+
+    Args:
+        run_day (int): The day the function was run. This is used to cache the data for a day.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the team name and acceptance rate.
+    """
+    df_team_acceptance = pd.DataFrame(columns=["Team", "Acceptance Rate"])
+
+    # Get Team Acceptance Figures
+    for team in org_teams:
+        response = gh.get(f"/orgs/{org}/team/{team}/copilot/usage")
+
+        usage_data = response.json()
+
+        total_acceptances = 0
+        total_suggestions = 0
+        
+        for day in usage_data:
+            try:
+                total_acceptances += day["total_acceptances_count"]
+            except KeyError as e:
+                # If key does not exist pass as nothing to add
+                pass
+                
+            try:
+                total_suggestions += day["total_suggestions_count"]
+            except KeyError as e:
+                # If key does not exist pass as nothing to add
+                pass
+
+        team_acceptance_rate = round((total_acceptances / total_suggestions) * 100, 2)
+
+        df_team_acceptance = pd.concat(
+            [
+                df_team_acceptance,
+                pd.DataFrame({"Team": [team], "Acceptance Rate": [team_acceptance_rate]}),
+            ],
+            ignore_index=True,
+        )
+
+    df_team_acceptance["Acceptance Group"] = ""
+
+    for index, row in df_team_acceptance.iterrows():
+        acceptance_rate = row["Acceptance Rate"]
+
+        acceptance_group = ""
+
+        # Groups: 0-20%, 20-30%, 30-40%, 40-50%, 50-60%, 60%+
+
+        if acceptance_rate < 20:
+            acceptance_group = "0-20%"
+        elif acceptance_rate >= 20 and acceptance_rate < 30:
+            acceptance_group = "20-30%"
+        elif acceptance_rate >= 30 and acceptance_rate < 40:
+            acceptance_group = "30-40%"
+        elif acceptance_rate >= 40 and acceptance_rate < 50:
+            acceptance_group = "40-50%"
+        elif acceptance_rate >= 50 and acceptance_rate < 60:
+            acceptance_group = "50-60%"
+        else:
+            acceptance_group = "60%+"
+
+        df_team_acceptance["Acceptance Group"][index] = acceptance_group
+
+    return df_team_acceptance
+
+
 def initialize_states():
     # Initialize session states
     if "profile" not in st.session_state:
@@ -318,6 +389,112 @@ if st.session_state.profile:
             st.stop()
 
         if any(admin_team in user_teams for admin_team in admin_teams):
+            admin_team = True
+        else:
+            admin_team = False
+
+
+        # Team Usage Overview
+        if admin_team:
+
+            df_team_acceptance = get_team_acceptance(datetime.now().day)
+
+            st.header(":blue-background[Team Usage Overview]")
+
+            col1, col2 = st.columns([0.8, 0.2])
+
+            with col1:
+                col1a, col1b = st.columns(2)
+
+                with col1a:
+                    st.subheader("Top 5 Highest Acceptance Rate Teams")
+
+                    st.dataframe(
+                        df_team_acceptance.sort_values(by="Acceptance Rate", ascending=False).head(5), 
+                        column_config={
+                            "Acceptance Group": None
+                        }, 
+                        use_container_width=True, 
+                        hide_index=True
+                    )
+
+                with col1b:
+                    st.subheader("Top 5 Lowest Acceptance Rate Teams")
+
+                    st.dataframe(
+                        df_team_acceptance.sort_values(by="Acceptance Rate", ascending=True).head(5), 
+                        column_config={
+                            "Acceptance Group": None
+                        },
+                        use_container_width=True, 
+                        hide_index=True
+                    )
+
+                # Group Dataframe by Acceptance Rate Group
+
+                df_grouped_acceptances = df_team_acceptance.groupby("Acceptance Group").count()["Team"]
+
+                st.subheader("Number of Teams Per Acceptance Rate")
+
+                col1a, col1b = st.columns([0.3, 0.7])
+
+                with col1a:
+                    # Pie Chart of Acceptance Rate Groups
+                    fig = go.Figure()
+
+                    fig.add_trace(
+                        go.Pie(
+                            labels=df_grouped_acceptances.index,
+                            values=df_grouped_acceptances.values,
+                        )
+                    )
+
+                    fig.update_traces(
+                        hoverinfo='label+value', 
+                        textinfo='percent',
+                    )
+
+                    fig.update_layout(
+                        title="Percentage of Teams by Acceptance Rate",
+                    )
+
+                    st.plotly_chart(fig)
+
+                with col1b:
+                    # Bar Chart of Acceptance Rate Groups
+                    fig = go.Figure()
+
+                    fig.add_trace(
+                        go.Bar(
+                            x=df_grouped_acceptances.index,
+                            y=df_grouped_acceptances.values,
+                            text=df_grouped_acceptances.values,
+                        )
+                    )
+
+                    fig.update_layout(
+                        title="Number of Teams by Acceptance Rate",
+                    )
+
+                    st.plotly_chart(fig)
+
+            with col2:
+                total_teams = len(df_team_acceptance)
+                average_acceptance_rate = df_team_acceptance["Acceptance Rate"].mean()
+                teams_above_50 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] > 50])
+                teams_below_25 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] < 25])
+
+                st.metric("Number of Teams with Data", total_teams)
+                st.metric("Average Acceptance Rate Per Team", f"{average_acceptance_rate:.2f}%")
+                st.metric("Teams with Acceptance Rate Above 50%", teams_above_50)
+                st.metric("Teams with Acceptance Rate Below 25%", teams_below_25)
+
+
+        st.header(":blue-background[Individual Team Analysis]")
+
+        # Team Selection
+        
+        if admin_team:
             # Add a toggle option
             input_method = st.radio(
                 "You are part of an admin team, so you can either:",
