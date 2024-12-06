@@ -393,468 +393,474 @@ if st.session_state.profile:
         else:
             admin_team = False
 
+        
+        tab1, tab2 = st.tabs(["Team Usage Overview", "Individual Team Analysis"])
+
 
         # Team Usage Overview
         if admin_team:
 
-            df_team_acceptance = get_team_acceptance(datetime.now().day)
+            with tab1:
 
-            st.header(":blue-background[Team Usage Overview]")
+                df_team_acceptance = get_team_acceptance(datetime.now().day)
 
-            col1, col2 = st.columns([0.8, 0.2])
+                st.header(":blue-background[Team Usage Overview]")
 
-            with col1:
-                col1a, col1b = st.columns(2)
+                col1, col2 = st.columns([0.8, 0.2])
 
-                with col1a:
-                    st.subheader("Top 5 Highest Acceptance Rate Teams")
+                with col1:
+                    col1a, col1b = st.columns(2)
 
-                    st.dataframe(
-                        df_team_acceptance.sort_values(by="Acceptance Rate", ascending=False).head(5), 
-                        column_config={
-                            "Acceptance Group": None
-                        }, 
-                        use_container_width=True, 
-                        hide_index=True
-                    )
+                    with col1a:
+                        st.subheader("Top 5 Highest Acceptance Rate Teams")
 
-                with col1b:
-                    st.subheader("Top 5 Lowest Acceptance Rate Teams")
-
-                    st.dataframe(
-                        df_team_acceptance.sort_values(by="Acceptance Rate", ascending=True).head(5), 
-                        column_config={
-                            "Acceptance Group": None
-                        },
-                        use_container_width=True, 
-                        hide_index=True
-                    )
-
-                # Group Dataframe by Acceptance Rate Group
-
-                df_grouped_acceptances = df_team_acceptance.groupby("Acceptance Group").count()["Team"]
-
-                st.subheader("Number of Teams Per Acceptance Rate")
-
-                col1a, col1b = st.columns([0.3, 0.7])
-
-                with col1a:
-                    # Pie Chart of Acceptance Rate Groups
-                    fig = go.Figure()
-
-                    fig.add_trace(
-                        go.Pie(
-                            labels=df_grouped_acceptances.index,
-                            values=df_grouped_acceptances.values,
+                        st.dataframe(
+                            df_team_acceptance.sort_values(by="Acceptance Rate", ascending=False).head(5), 
+                            column_config={
+                                "Acceptance Group": None
+                            }, 
+                            use_container_width=True, 
+                            hide_index=True
                         )
+
+                    with col1b:
+                        st.subheader("Top 5 Lowest Acceptance Rate Teams")
+
+                        st.dataframe(
+                            df_team_acceptance.sort_values(by="Acceptance Rate", ascending=True).head(5), 
+                            column_config={
+                                "Acceptance Group": None
+                            },
+                            use_container_width=True, 
+                            hide_index=True
+                        )
+
+                    # Group Dataframe by Acceptance Rate Group
+
+                    df_grouped_acceptances = df_team_acceptance.groupby("Acceptance Group").count()["Team"]
+
+                    st.subheader("Number of Teams Per Acceptance Rate")
+
+                    col1a, col1b = st.columns([0.3, 0.7])
+
+                    with col1a:
+                        # Pie Chart of Acceptance Rate Groups
+                        fig = go.Figure()
+
+                        fig.add_trace(
+                            go.Pie(
+                                labels=df_grouped_acceptances.index,
+                                values=df_grouped_acceptances.values,
+                            )
+                        )
+
+                        fig.update_traces(
+                            hoverinfo='label+value', 
+                            textinfo='percent',
+                        )
+
+                        fig.update_layout(
+                            title="Percentage of Teams by Acceptance Rate",
+                        )
+
+                        st.plotly_chart(fig)
+
+                    with col1b:
+                        # Bar Chart of Acceptance Rate Groups
+                        fig = go.Figure()
+
+                        fig.add_trace(
+                            go.Bar(
+                                x=df_grouped_acceptances.index,
+                                y=df_grouped_acceptances.values,
+                                text=df_grouped_acceptances.values,
+                            )
+                        )
+
+                        fig.update_layout(
+                            title="Number of Teams by Acceptance Rate",
+                        )
+
+                        st.plotly_chart(fig)
+
+                with col2:
+                    total_teams = len(df_team_acceptance)
+                    average_acceptance_rate = df_team_acceptance["Acceptance Rate"].mean()
+                    teams_above_50 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] > 50])
+                    teams_below_25 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] < 25])
+
+                    st.metric("Number of Teams with Data", total_teams)
+                    st.metric("Average Acceptance Rate Per Team", f"{average_acceptance_rate:.2f}%")
+                    st.metric("Teams with Acceptance Rate Above 50%", teams_above_50)
+                    st.metric("Teams with Acceptance Rate Below 25%", teams_below_25)
+
+        with tab2:
+
+            st.header(":blue-background[Individual Team Analysis]")
+
+            # Team Selection
+            
+            if admin_team:
+                # Add a toggle option
+                input_method = st.radio(
+                    "You are part of an admin team, so you can either:",
+                    ("Select your team", "Search for a team"),
+                    horizontal=True,
+                )
+
+                if input_method == "Select your team":
+                    team_slug = st.selectbox("Select team:", options=user_teams)
+                else:
+                    team_slug = st.selectbox("Enter team name:", options=org_teams)
+
+            else:
+                team_slug = st.selectbox("Select team:", options=user_teams)
+
+            st.html("<b>Please Note:</b> You can type within the input to search for a team.")
+
+            if team_slug and isinstance(access_token, tuple):
+                if team_slug not in st.session_state:
+                    usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
+                    # Get the team description
+                    try:
+                        team_info = gh.get(f"/orgs/{org}/teams/{team_slug}")
+                        team_info = team_info.json()
+                        team_description = team_info.get("description")
+                        if team_description == "":
+                            team_description = "No description available."
+                        st.session_state[f"{team_slug}-description"] = team_description
+                    except Exception:
+                        st.error("Team does not exist.")
+                        st.stop()
+
+                    try:
+                        usage_data = usage_data.json()
+                        if usage_data:
+                            st.session_state[team_slug] = usage_data
+                        else:
+                            st.error("Team has no data.")
+                            st.stop()
+                    except Exception:
+                        st.error("Team does not exist.")
+                        st.stop()
+
+                else:
+                    usage_data = st.session_state[team_slug]
+
+                st.markdown("---")
+
+                st.subheader(f"Team: {team_slug}")
+                description = st.session_state.get(f"{team_slug}-description")
+                st.write(description)
+
+                # Get the maximum and minimum date which we have data for
+                min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
+                max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
+
+                # Date Range Slider
+                if min_date == max_date:
+                    min_date -= pd.Timedelta(days=1)
+
+                date_range = st.slider(
+                    "Date Range",
+                    min_value=min_date,
+                    max_value=max_date,
+                    value=(min_date, max_date),
+                    format="YYYY-MM-DD",
+                )
+
+                (
+                    df_usage_data_subset,
+                    breakdown,
+                    language_grouped_breakdown,
+                    editor_grouped_breakdown_avg,
+                    editor_grouped_breakdown_sum,
+                ) = generate_datasets(date_range, usage_data)
+
+                # Display Metrics
+                col1, col2, col3, col4 = st.columns(4)
+
+                def calculate_delta(df_usage_data_subset, key):
+                    # Calculate deltas
+                    first_day = df_usage_data_subset.iloc[0]
+                    last_day = df_usage_data_subset.iloc[-1]
+                    if key == "acceptance_rate":
+                        return last_day[key] - first_day[key]
+                    else:
+                        return ((last_day[key] - first_day[key]) / first_day[key]) * 100
+
+                with col1:
+                    st.metric(
+                        "Total Suggestions",
+                        df_usage_data_subset["total_suggestions_count"].sum(),
+                        f"{calculate_delta(df_usage_data_subset, "total_suggestions_count"):.2f}%",
+                    )
+                with col2:
+                    st.metric(
+                        "Total Accepts",
+                        df_usage_data_subset["total_acceptances_count"].sum(),
+                        f"{calculate_delta(df_usage_data_subset, "total_acceptances_count"):.2f}%",
+                    )
+                with col3:
+                    st.metric(
+                        "Acceptance Rate",
+                        f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%",
+                        f"{calculate_delta(df_usage_data_subset, "acceptance_rate"):.2f}%",
+                    )
+                with col4:
+                    st.metric(
+                        "Lines of Code Accepted",
+                        df_usage_data_subset["total_lines_accepted"].sum(),
+                        f"{calculate_delta(df_usage_data_subset, "total_lines_accepted"):.2f}%",
                     )
 
-                    fig.update_traces(
-                        hoverinfo='label+value', 
-                        textinfo='percent',
-                    )
+                # Acceptance Graph
+                fig = make_subplots(specs=[[{"secondary_y": True}]])
+                fig.add_trace(
+                    go.Scatter(
+                        mode="lines+markers+text",
+                        x=df_usage_data_subset["display_day"],
+                        y=df_usage_data_subset["acceptance_rate"],
+                        name="Acceptance Rate (%)",
+                        text=df_usage_data_subset["acceptance_rate"],
+                        textposition="top center",
+                    ),
+                    secondary_y=True,
+                )
+                fig.add_trace(
+                    go.Bar(
+                        x=df_usage_data_subset["display_day"],
+                        y=df_usage_data_subset["total_acceptances_count"],
+                        name="Acceptance Count",
+                    ),
+                    secondary_y=False,
+                )
 
-                    fig.update_layout(
-                        title="Percentage of Teams by Acceptance Rate",
-                    )
+                # Edit Layout
+                fig.update_layout(
+                    title="Accepts and Acceptance Rate",
+                    xaxis_title="Day",
+                    yaxis_title="Acceptance Count",
+                    yaxis2_title="Acceptance Rate (%)",
+                    height=600,
+                )
 
-                    st.plotly_chart(fig)
+                # Display plot in Streamlit
+                st.plotly_chart(fig)
 
-                with col1b:
-                    # Bar Chart of Acceptance Rate Groups
-                    fig = go.Figure()
+            # Language breakdown
+
+            st.header(":blue-background[Language Breakdown]")
+
+            language_drill = st.dataframe(
+                language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]],
+                use_container_width=True,
+                on_select="rerun",
+                selection_mode=["single-row"],
+                column_config={
+                    "acceptances_count": st.column_config.Column("Total Accepts"),
+                    "acceptance_rate": st.column_config.ProgressColumn(
+                        "Acceptance Rate",
+                        help="The percentage of which Copilot suggestions are accepted",
+                        min_value=0,
+                        max_value=1,
+                    ),
+                    "lines_accepted": st.column_config.Column("Lines of Code Accepted"),
+                },
+            )
+
+            # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
+            try:
+                selected_row = language_grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
+
+                col1, col2, col3, col4, col5 = st.columns(5)
+
+                with col1:
+                    st.metric("Language", selected_row.index.values[0])
+                with col2:
+                    st.metric("Total Suggestions", selected_row["suggestions_count"])
+                with col3:
+                    st.metric("Total Accepts", selected_row["acceptances_count"])
+                with col4:
+                    st.metric("Lines Suggested", selected_row["lines_suggested"])
+                with col5:
+                    st.metric("Lines Accepted", selected_row["lines_accepted"])
+
+                # Creates a subset of breakdown dataframe to only hold information for the selected language
+                df_breakdown_by_day = (
+                    breakdown.loc[breakdown["language"] == selected_row.index.values[0]]
+                    .groupby(["day", "language", "editor"])
+                    .sum()
+                )
+                df_breakdown_by_day = df_breakdown_by_day.reset_index()
+
+                # Calculates the total copilot suggestion for the date
+                df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
+                df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
+                df_date_totals = df_date_totals.reset_index()
+
+                # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
+                df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
+
+                # Create a graph showing number of suggestions by day, split by IDE.
+                fig = make_subplots()
+
+                list_of_editors = df_breakdown_by_day["editor"].unique()
+
+                for editor in list_of_editors:
+                    df = df_breakdown_by_day.loc[df_breakdown_by_day["editor"] == editor]
 
                     fig.add_trace(
                         go.Bar(
-                            x=df_grouped_acceptances.index,
-                            y=df_grouped_acceptances.values,
-                            text=df_grouped_acceptances.values,
+                            name=editor,
+                            x=df["day"],
+                            y=df["suggestions_count"],
+                            customdata=df["total_suggestions"],
+                            hovertemplate="<br>"
+                            + "Number of Suggestions: %{y} <br>"
+                            + "Total Suggestions for Day: %{customdata} <br>",
                         )
                     )
 
-                    fig.update_layout(
-                        title="Number of Teams by Acceptance Rate",
-                    )
+                fig.update_layout(
+                    barmode="stack",
+                    title="Suggestions by Day Per Editor",
+                    xaxis_title="Day",
+                    yaxis_title="Number of Suggestions",
+                    hovermode="x unified",
+                    legend_orientation="h",
+                )
 
-                    st.plotly_chart(fig)
+                st.plotly_chart(fig)
 
-            with col2:
-                total_teams = len(df_team_acceptance)
-                average_acceptance_rate = df_team_acceptance["Acceptance Rate"].mean()
-                teams_above_50 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] > 50])
-                teams_below_25 = len(df_team_acceptance.loc[df_team_acceptance["Acceptance Rate"] < 25])
+            except IndexError:
+                st.caption("Please select a row for more information.")
 
-                st.metric("Number of Teams with Data", total_teams)
-                st.metric("Average Acceptance Rate Per Team", f"{average_acceptance_rate:.2f}%")
-                st.metric("Teams with Acceptance Rate Above 50%", teams_above_50)
-                st.metric("Teams with Acceptance Rate Below 25%", teams_below_25)
+            # User Breakdown
 
+            df_seat_data = get_team_seats(team_slug)
 
-        st.header(":blue-background[Individual Team Analysis]")
-
-        # Team Selection
-        
-        if admin_team:
-            # Add a toggle option
-            input_method = st.radio(
-                "You are part of an admin team, so you can either:",
-                ("Select your team", "Search for a team"),
-                horizontal=True,
+            st.header(":blue-background[User Breakdown]")
+            st.write(
+                "Active users have used CoPilot within the last 30 days. Inactive users have not used CoPilot within the last 30 days or have not used CoPilot yet."
             )
 
-            if input_method == "Select your team":
-                team_slug = st.selectbox("Select team:", options=user_teams)
-            else:
-                team_slug = st.selectbox("Enter team name:", options=org_teams)
-
-        else:
-            team_slug = st.selectbox("Select team:", options=user_teams)
-
-        st.html("<b>Please Note:</b> You can type within the input to search for a team.")
-
-        if team_slug and isinstance(access_token, tuple):
-            if team_slug not in st.session_state:
-                usage_data = gh.get(f"/orgs/{org}/team/{team_slug}/copilot/usage")
-                # Get the team description
-                try:
-                    team_info = gh.get(f"/orgs/{org}/teams/{team_slug}")
-                    team_info = team_info.json()
-                    team_description = team_info.get("description")
-                    if team_description == "":
-                        team_description = "No description available."
-                    st.session_state[f"{team_slug}-description"] = team_description
-                except Exception:
-                    st.error("Team does not exist.")
-                    st.stop()
-
-                try:
-                    usage_data = usage_data.json()
-                    if usage_data:
-                        st.session_state[team_slug] = usage_data
-                    else:
-                        st.error("Team has no data.")
-                        st.stop()
-                except Exception:
-                    st.error("Team does not exist.")
-                    st.stop()
-
-            else:
-                usage_data = st.session_state[team_slug]
-
-            st.markdown("---")
-
-            st.subheader(f"Team: {team_slug}")
-            description = st.session_state.get(f"{team_slug}-description")
-            st.write(description)
-
-            # Get the maximum and minimum date which we have data for
-            min_date = datetime.strptime(usage_data[0]["day"], "%Y-%m-%d")
-            max_date = datetime.strptime(usage_data[-1]["day"], "%Y-%m-%d")
-
-            # Date Range Slider
-            if min_date == max_date:
-                min_date -= pd.Timedelta(days=1)
-
-            date_range = st.slider(
-                "Date Range",
-                min_value=min_date,
-                max_value=max_date,
-                value=(min_date, max_date),
-                format="YYYY-MM-DD",
-            )
-
-            (
-                df_usage_data_subset,
-                breakdown,
-                language_grouped_breakdown,
-                editor_grouped_breakdown_avg,
-                editor_grouped_breakdown_sum,
-            ) = generate_datasets(date_range, usage_data)
-
-            # Display Metrics
-            col1, col2, col3, col4 = st.columns(4)
-
-            def calculate_delta(df_usage_data_subset, key):
-                # Calculate deltas
-                first_day = df_usage_data_subset.iloc[0]
-                last_day = df_usage_data_subset.iloc[-1]
-                if key == "acceptance_rate":
-                    return last_day[key] - first_day[key]
-                else:
-                    return ((last_day[key] - first_day[key]) / first_day[key]) * 100
+            col1, col2, col3 = st.columns(3)
 
             with col1:
-                st.metric(
-                    "Total Suggestions",
-                    df_usage_data_subset["total_suggestions_count"].sum(),
-                    f"{calculate_delta(df_usage_data_subset, "total_suggestions_count"):.2f}%",
-                )
+                st.metric("Number of Seats", len(df_seat_data))
+
             with col2:
-                st.metric(
-                    "Total Accepts",
-                    df_usage_data_subset["total_acceptances_count"].sum(),
-                    f"{calculate_delta(df_usage_data_subset, "total_acceptances_count"):.2f}%",
+                number_of_engaged_users = 0
+
+                df_unused_users = pd.DataFrame(
+                    columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
                 )
-            with col3:
-                st.metric(
-                    "Acceptance Rate",
-                    f"{round(df_usage_data_subset['acceptance_rate'].mean(), 2)}%",
-                    f"{calculate_delta(df_usage_data_subset, "acceptance_rate"):.2f}%",
-                )
-            with col4:
-                st.metric(
-                    "Lines of Code Accepted",
-                    df_usage_data_subset["total_lines_accepted"].sum(),
-                    f"{calculate_delta(df_usage_data_subset, "total_lines_accepted"):.2f}%",
-                )
-
-            # Acceptance Graph
-            fig = make_subplots(specs=[[{"secondary_y": True}]])
-            fig.add_trace(
-                go.Scatter(
-                    mode="lines+markers+text",
-                    x=df_usage_data_subset["display_day"],
-                    y=df_usage_data_subset["acceptance_rate"],
-                    name="Acceptance Rate (%)",
-                    text=df_usage_data_subset["acceptance_rate"],
-                    textposition="top center",
-                ),
-                secondary_y=True,
-            )
-            fig.add_trace(
-                go.Bar(
-                    x=df_usage_data_subset["display_day"],
-                    y=df_usage_data_subset["total_acceptances_count"],
-                    name="Acceptance Count",
-                ),
-                secondary_y=False,
-            )
-
-            # Edit Layout
-            fig.update_layout(
-                title="Accepts and Acceptance Rate",
-                xaxis_title="Day",
-                yaxis_title="Acceptance Count",
-                yaxis2_title="Acceptance Rate (%)",
-                height=600,
-            )
-
-            # Display plot in Streamlit
-            st.plotly_chart(fig)
-
-        # Language breakdown
-
-        st.header(":blue-background[Language Breakdown]")
-
-        language_drill = st.dataframe(
-            language_grouped_breakdown[["acceptances_count", "acceptance_rate", "lines_accepted"]],
-            use_container_width=True,
-            on_select="rerun",
-            selection_mode=["single-row"],
-            column_config={
-                "acceptances_count": st.column_config.Column("Total Accepts"),
-                "acceptance_rate": st.column_config.ProgressColumn(
-                    "Acceptance Rate",
-                    help="The percentage of which Copilot suggestions are accepted",
-                    min_value=0,
-                    max_value=1,
-                ),
-                "lines_accepted": st.column_config.Column("Lines of Code Accepted"),
-            },
-        )
-
-        # Extra Drill through information. Only shows when a row is selected from language_drill dataframe above
-        try:
-            selected_row = language_grouped_breakdown.iloc[[language_drill.selection["rows"][0]]]
-
-            col1, col2, col3, col4, col5 = st.columns(5)
-
-            with col1:
-                st.metric("Language", selected_row.index.values[0])
-            with col2:
-                st.metric("Total Suggestions", selected_row["suggestions_count"])
-            with col3:
-                st.metric("Total Accepts", selected_row["acceptances_count"])
-            with col4:
-                st.metric("Lines Suggested", selected_row["lines_suggested"])
-            with col5:
-                st.metric("Lines Accepted", selected_row["lines_accepted"])
-
-            # Creates a subset of breakdown dataframe to only hold information for the selected language
-            df_breakdown_by_day = (
-                breakdown.loc[breakdown["language"] == selected_row.index.values[0]]
-                .groupby(["day", "language", "editor"])
-                .sum()
-            )
-            df_breakdown_by_day = df_breakdown_by_day.reset_index()
-
-            # Calculates the total copilot suggestion for the date
-            df_date_totals = df_breakdown_by_day[["day", "suggestions_count"]].groupby(["day"]).sum()
-            df_date_totals = df_date_totals.rename(columns={"suggestions_count": "total_suggestions"})
-            df_date_totals = df_date_totals.reset_index()
-
-            # Merges df_date_totals into df_breakdown_by_day. This adds the total_suggestions column for each record
-            df_breakdown_by_day = df_breakdown_by_day.merge(df_date_totals, on="day", how="left")
-
-            # Create a graph showing number of suggestions by day, split by IDE.
-            fig = make_subplots()
-
-            list_of_editors = df_breakdown_by_day["editor"].unique()
-
-            for editor in list_of_editors:
-                df = df_breakdown_by_day.loc[df_breakdown_by_day["editor"] == editor]
-
-                fig.add_trace(
-                    go.Bar(
-                        name=editor,
-                        x=df["day"],
-                        y=df["suggestions_count"],
-                        customdata=df["total_suggestions"],
-                        hovertemplate="<br>"
-                        + "Number of Suggestions: %{y} <br>"
-                        + "Total Suggestions for Day: %{customdata} <br>",
-                    )
-                )
-
-            fig.update_layout(
-                barmode="stack",
-                title="Suggestions by Day Per Editor",
-                xaxis_title="Day",
-                yaxis_title="Number of Suggestions",
-                hovermode="x unified",
-                legend_orientation="h",
-            )
-
-            st.plotly_chart(fig)
-
-        except IndexError:
-            st.caption("Please select a row for more information.")
-
-        # User Breakdown
-
-        df_seat_data = get_team_seats(team_slug)
-
-        st.header(":blue-background[User Breakdown]")
-        st.write(
-            "Active users have used CoPilot within the last 30 days. Inactive users have not used CoPilot within the last 30 days or have not used CoPilot yet."
-        )
-
-        col1, col2, col3 = st.columns(3)
-
-        with col1:
-            st.metric("Number of Seats", len(df_seat_data))
-
-        with col2:
-            number_of_engaged_users = 0
-
-            df_unused_users = pd.DataFrame(
-                columns=["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
-            )
-            month = 30
-            for index, row in df_seat_data.iterrows():
-                if not pd.isnull(row.last_activity_at):
-                    last_activity_date = datetime.strptime(row.last_activity_at, "%Y-%m-%dT%H:%M:%SZ")
-                    if (datetime.now() - last_activity_date).days <= month:
-                        number_of_engaged_users += 1
+                month = 30
+                for index, row in df_seat_data.iterrows():
+                    if not pd.isnull(row.last_activity_at):
+                        last_activity_date = datetime.strptime(row.last_activity_at, "%Y-%m-%dT%H:%M:%SZ")
+                        if (datetime.now() - last_activity_date).days <= month:
+                            number_of_engaged_users += 1
+                        else:
+                            df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
+                            df_seat_data.drop(index, inplace=True)
                     else:
                         df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
                         df_seat_data.drop(index, inplace=True)
-                else:
-                    df_unused_users = pd.concat([df_unused_users, pd.DataFrame([row])], ignore_index=True)
-                    df_seat_data.drop(index, inplace=True)
 
-            st.metric("Number of Engaged Users", number_of_engaged_users)
-        with col3:
-            st.metric("Number of Inactive Users", len(df_unused_users))
+                st.metric("Number of Engaged Users", number_of_engaged_users)
+            with col3:
+                st.metric("Number of Inactive Users", len(df_unused_users))
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("Active Users")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.subheader("Active Users")
 
-            # Dataframe showing only active users (this with a latest activity)
-            st.dataframe(
-                df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
-                    ["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
-                ],
-                hide_index=True,
-                use_container_width=True,
-                column_config={
-                    "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
-                    "assignee.login": st.column_config.Column("User"),
-                    "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-                    "assignee.html_url": st.column_config.LinkColumn(
-                        "Github Profile",
-                        help="A link to this user's profile",
-                        display_text="Go to Profile",
-                    ),
-                },
+                # Dataframe showing only active users (this with a latest activity)
+                st.dataframe(
+                    df_seat_data.loc[df_seat_data["last_activity_at"].isnull() == False][
+                        ["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]
+                    ],
+                    hide_index=True,
+                    use_container_width=True,
+                    column_config={
+                        "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
+                        "assignee.login": st.column_config.Column("User"),
+                        "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                        "assignee.html_url": st.column_config.LinkColumn(
+                            "Github Profile",
+                            help="A link to this user's profile",
+                            display_text="Go to Profile",
+                        ),
+                    },
+                )
+            with col2:
+                st.subheader("Inactive Users")
+
+                # Dataframe showing inactive users (users with no latest activity or not within a month)
+                st.dataframe(
+                    df_unused_users[["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]],
+                    hide_index=True,
+                    use_container_width=True,
+                    column_config={
+                        "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
+                        "assignee.login": st.column_config.Column("User"),
+                        "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                        "assignee.html_url": st.column_config.LinkColumn(
+                            "Github Profile",
+                            help="A link to this user's profile",
+                            display_text="Go to Profile",
+                        ),
+                    },
+                )
+
+            # Engaged Users By Day
+
+            fig = make_subplots()
+
+            fig.add_trace(go.Bar(x=df_usage_data_subset["day"], y=df_usage_data_subset["total_active_users"]))
+
+            fig.update_layout(
+                title="Engaged Users By Day (All Editors)",
+                xaxis_title="Day",
+                yaxis_title="Number of Users",
+                hovermode="x unified",
             )
-        with col2:
-            st.subheader("Inactive Users")
 
-            # Dataframe showing inactive users (users with no latest activity or not within a month)
-            st.dataframe(
-                df_unused_users[["assignee.avatar_url", "assignee.login", "last_activity_at", "assignee.html_url"]],
-                hide_index=True,
-                use_container_width=True,
-                column_config={
-                    "assignee.avatar_url": st.column_config.ImageColumn("Avatar", width=10),
-                    "assignee.login": st.column_config.Column("User"),
-                    "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-                    "assignee.html_url": st.column_config.LinkColumn(
-                        "Github Profile",
-                        help="A link to this user's profile",
-                        display_text="Go to Profile",
-                    ),
-                },
+            st.plotly_chart(fig)
+
+            # Engaged Users By IDE
+
+            fig = make_subplots(
+                rows=1,
+                cols=2,
+                specs=[[{"type": "pie"}, {"type": "pie"}]],
+                subplot_titles=(
+                    "Average Engaged User by IDE Per Day",
+                    "Total Engaged Users by IDE",
+                ),
             )
 
-        # Engaged Users By Day
+            fig.add_trace(
+                go.Pie(
+                    values=editor_grouped_breakdown_avg["active_users"],
+                    labels=editor_grouped_breakdown_avg["editor"],
+                ),
+                row=1,
+                col=1,
+            )
 
-        fig = make_subplots()
+            fig.add_trace(
+                go.Pie(
+                    values=editor_grouped_breakdown_sum["active_users"],
+                    labels=editor_grouped_breakdown_sum["editor"],
+                ),
+                row=1,
+                col=2,
+            )
 
-        fig.add_trace(go.Bar(x=df_usage_data_subset["day"], y=df_usage_data_subset["total_active_users"]))
-
-        fig.update_layout(
-            title="Engaged Users By Day (All Editors)",
-            xaxis_title="Day",
-            yaxis_title="Number of Users",
-            hovermode="x unified",
-        )
-
-        st.plotly_chart(fig)
-
-        # Engaged Users By IDE
-
-        fig = make_subplots(
-            rows=1,
-            cols=2,
-            specs=[[{"type": "pie"}, {"type": "pie"}]],
-            subplot_titles=(
-                "Average Engaged User by IDE Per Day",
-                "Total Engaged Users by IDE",
-            ),
-        )
-
-        fig.add_trace(
-            go.Pie(
-                values=editor_grouped_breakdown_avg["active_users"],
-                labels=editor_grouped_breakdown_avg["editor"],
-            ),
-            row=1,
-            col=1,
-        )
-
-        fig.add_trace(
-            go.Pie(
-                values=editor_grouped_breakdown_sum["active_users"],
-                labels=editor_grouped_breakdown_sum["editor"],
-            ),
-            row=1,
-            col=2,
-        )
-
-        st.plotly_chart(fig)
+            st.plotly_chart(fig)
 
     else:
         st.error(f"Sorry, {st.session_state.profile['login']}, you are not part of the {org} organization.")
