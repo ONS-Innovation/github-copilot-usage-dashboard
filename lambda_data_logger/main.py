@@ -47,6 +47,31 @@ logger = logging.getLogger()
 # }
 
 
+def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
+    """Gets a list of GitHub Teams with CoPilot Data for a given API page.
+
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        page (int): The page number of the API request.
+
+    Returns:
+        list: A list of GitHub Teams with CoPilot Data.
+    """
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
+    teams = response.json()
+    for team in teams:
+        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
+        try:
+            if usage_data.json():
+                copilot_teams.append(team["name"])
+        except Exception as error:
+            # If Exception, then the team does not have copilot usage data and can be skipped
+            pass
+
+    return copilot_teams
+
 def handler(event, context):
 
     # Create an S3 client
@@ -134,16 +159,9 @@ def handler(event, context):
         last_page = 1
 
     for page in range(1, last_page + 1):
-        response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
-        teams = response.json()
-        for team in teams:
-            usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
-            try:
-                if usage_data.json() != []:
-                    copilot_teams.append(team["name"])
-            except Exception as error:
-                # If Exception, then the team does not have copilot usage data and can be skipped
-                pass
+        page_teams = get_copilot_team_date(gh, page)
+
+        copilot_teams = copilot_teams + page_teams
 
     logger.info(
         "Got GitHub Teams with CoPilot Data",
