@@ -47,6 +47,31 @@ logger = logging.getLogger()
 # }
 
 
+def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
+    """Gets a list of GitHub Teams with CoPilot Data for a given API page.
+
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        page (int): The page number of the API request.
+
+    Returns:
+        list: A list of GitHub Teams with CoPilot Data.
+    """
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
+    teams = response.json()
+    for team in teams:
+        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
+        try:
+            if usage_data.json():
+                copilot_teams.append(team["name"])
+        except Exception as error:
+            # If Exception, then the team does not have copilot usage data and can be skipped
+            pass
+
+    return copilot_teams
+
 def handler(event, context):
 
     # Create an S3 client
@@ -78,6 +103,8 @@ def handler(event, context):
     gh = github_api_toolkit.github_interface(access_token[0])
 
     logger.info("API Controller created")
+
+    # CoPilot Usage Data (Historic)
 
     # Get the usage data
     usage_data = gh.get(f"/orgs/{org}/copilot/usage")
@@ -117,6 +144,38 @@ def handler(event, context):
 
     logger.info(f"Uploaded updated {object_name} to S3")
 
+    # GitHub Teams with CoPilot Data
+
+    logger.info("Getting GitHub Teams with CoPilot Data")
+
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100})
+
+    # Get the last page of teams
+    try:
+        last_page = int(response.links["last"]["url"].split("=")[-1])
+    except KeyError:
+        last_page = 1
+
+    for page in range(1, last_page + 1):
+        page_teams = get_copilot_team_date(gh, page)
+
+        copilot_teams = copilot_teams + page_teams
+
+    logger.info(
+        "Got GitHub Teams with CoPilot Data",
+        extra={"no_teams": len(copilot_teams)},
+    )
+
+    s3.put_object(
+        Bucket=bucket_name,
+        Key="copilot_teams.json",
+        Body=json.dumps(copilot_teams, indent=4).encode("utf-8"),
+    )
+
+    logger.info("Uploaded updated copilot_teams.json to S3")
+
     logger.info(
         "Process complete",
         extra={
@@ -125,5 +184,6 @@ def handler(event, context):
             "dates_added": dates_added,
             "no_dates_before": len(historic_usage) - len(dates_added),
             "no_dates_after": len(historic_usage),
+            "no_copilot_teams": len(copilot_teams),
         },
     )
