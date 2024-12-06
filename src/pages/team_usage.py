@@ -251,30 +251,33 @@ def get_team_acceptance(run_day: int) -> pd.DataFrame:
     for team in org_teams:
         response = gh.get(f"/orgs/{org}/team/{team}/copilot/usage")
 
-        try:
-            usage_data = response.json()
+        usage_data = response.json()
 
-            total_acceptances = 0
-            total_suggestions = 0
-            
-            for day in usage_data:
+        total_acceptances = 0
+        total_suggestions = 0
+        
+        for day in usage_data:
+            try:
                 total_acceptances += day["total_acceptances_count"]
+            except KeyError as e:
+                # If key does not exist pass as nothing to add
+                pass
+                
+            try:
                 total_suggestions += day["total_suggestions_count"]
+            except KeyError as e:
+                # If key does not exist pass as nothing to add
+                pass
 
-            team_acceptance_rate = round((total_acceptances / total_suggestions) * 100, 2)
+        team_acceptance_rate = round((total_acceptances / total_suggestions) * 100, 2)
 
-            df_team_acceptance = pd.concat(
-                [
-                    df_team_acceptance,
-                    pd.DataFrame({"Team": [team], "Acceptance Rate": [team_acceptance_rate]}),
-                ],
-                ignore_index=True,
-            )
-
-        except Exception as e:
-            st.error("Error getting team overview data.")
-            st.error(e)
-            st.stop()
+        df_team_acceptance = pd.concat(
+            [
+                df_team_acceptance,
+                pd.DataFrame({"Team": [team], "Acceptance Rate": [team_acceptance_rate]}),
+            ],
+            ignore_index=True,
+        )
 
     df_team_acceptance["Acceptance Group"] = ""
 
