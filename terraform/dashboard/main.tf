@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "ecs_service_definition" {
         },
         {
           name = "APP_URL",
-          value = var.app_url
+          value = "https://${local.service_url}"
         }
       ],
       logConfiguration = {
