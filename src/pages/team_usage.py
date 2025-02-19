@@ -325,6 +325,10 @@ col1.title(":blue-background[GitHub Team Copilot Usage]")
 
 col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 
+st.header("Important Notice")
+st.write("Due to an update to GitHub's APIs, this dashboard is currently only able to show data up to the **1st of February 2025**.")
+st.write("We are working on refactoring the dashboard to use the new API endpoints.")
+
 initialize_states()
 
 # Step 1: GitHub Login
