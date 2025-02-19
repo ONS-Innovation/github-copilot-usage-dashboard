@@ -2,6 +2,8 @@
 
 A Streamlit dashboard to display information from the Github Copilot Usage API endpoints.
 
+---
+
 ## Important Notice
 
 This repository is currently using depreciated endpoints to collect CoPilot Usage information and will not be able to show information past the 1st of February 2025.
@@ -12,6 +14,8 @@ We are working on refactoring the dashboard and its lambda to make use of the ne
 | ------------- | ---- |
 | Old Endpoint  | https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28 |
 | New Endpoint  | https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28 |
+
+---
 
 ## Disclaimer
 
