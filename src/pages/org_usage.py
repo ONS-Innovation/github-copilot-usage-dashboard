@@ -24,7 +24,7 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 
 # AWS Bucket Path
 bucket_name = f"{account}-copilot-usage-dashboard"
-object_name = "historic_usage_data.json"
+object_name = "historic_usage_data_pre_feb_25.json"
 
 
 @st.cache_data
