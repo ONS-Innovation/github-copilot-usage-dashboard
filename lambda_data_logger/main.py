@@ -62,7 +62,7 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
     response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
     teams = response.json()
     for team in teams:
-        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/usage")
+        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
         try:
             if usage_data.json():
                 copilot_teams.append(team["name"])
@@ -107,7 +107,7 @@ def handler(event, context):
     # CoPilot Usage Data (Historic)
 
     # Get the usage data
-    usage_data = gh.get(f"/orgs/{org}/copilot/usage")
+    usage_data = gh.get(f"/orgs/{org}/copilot/metrics")
     usage_data = usage_data.json()
 
     logger.info("Usage data retrieved")
@@ -124,11 +124,11 @@ def handler(event, context):
     dates_added = []
 
     # Append the new usage data to the historic_usage_data.json
-    for day in usage_data:
-        if not any(d["day"] == day["day"] for d in historic_usage):
-            historic_usage.append(day)
+    for date in usage_data:
+        if not any(d["date"] == date["date"] for d in historic_usage):
+            historic_usage.append(date)
 
-            dates_added.append(day["day"])
+            dates_added.append(date["date"])
 
     logger.info(
         f"New usage data added to {object_name}",

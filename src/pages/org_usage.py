@@ -24,7 +24,7 @@ account = os.getenv("AWS_ACCOUNT_NAME")
 
 # AWS Bucket Path
 bucket_name = f"{account}-copilot-usage-dashboard"
-object_name = "historic_usage_data.json"
+object_name = "historic_usage_data_pre_feb_25.json"
 
 
 @st.cache_data
@@ -53,6 +53,10 @@ col1, col2 = st.columns([0.8, 0.2])
 col1.title(":blue-background[Github Copilot Usage Dashboard]")
 
 col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
+
+st.header("Important Notice")
+st.write("Due to an update to GitHub's APIs, this dashboard is currently only able to show data up to the **1st of February 2025**.")
+st.write("We are working on refactoring the dashboard to use the new API endpoints.")
 
 live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 
