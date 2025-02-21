@@ -124,11 +124,11 @@ def handler(event, context):
     dates_added = []
 
     # Append the new usage data to the historic_usage_data.json
-    for day in usage_data:
-        if not any(d["day"] == day["day"] for d in historic_usage):
-            historic_usage.append(day)
+    for date in usage_data:
+        if not any(d["date"] == date["date"] for d in historic_usage):
+            historic_usage.append(date)
 
-            dates_added.append(day["day"])
+            dates_added.append(date["date"])
 
     logger.info(
         f"New usage data added to {object_name}",
