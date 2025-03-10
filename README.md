@@ -17,6 +17,18 @@ We are working on refactoring the dashboard and its lambda to make use of the ne
 
 ---
 
+## Interim Solution
+
+While we work on refactoring the CoPilot Dashboard, this repository will contain a temporary solution.
+
+This solution will display high-level information from the new API endpoints.
+
+The old dashboard pages (Organisation Usage & Team Usage) have been toggled to use example data in order to still see them.
+
+The data on these pages is completely synthetic.
+
+---
+
 ## Disclaimer
 
 ### Early Stage & Accessibility Disclaimer
