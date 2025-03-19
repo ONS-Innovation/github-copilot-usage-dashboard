@@ -41,11 +41,11 @@ token = get_access_token(secret_manager, aws_secret_name, org, app_client_id) # 
 rest = github_api_toolkit.github_interface(token[0]) # Setup github_interface()
 
 # Get usage data
-response = rest.get('/orgs/ONSDigital/copilot/metrics')
+response = rest.get(f"/orgs/{org}/copilot/metrics")
 usage_data = response.json()
 
 # Get seat data
-response = rest.get('/orgs/ONSDigital/copilot/billing/seats', params={"per_page": 100})
+response = rest.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
 seat_data = response.json()
 
 try:
@@ -56,7 +56,7 @@ except KeyError:
     
 # Skip first page as we already have it
 for i in range(1, last_page):
-    response = rest.get("/orgs/ONSDigital/copilot/billing/seats", params={"per_page": 100, "page": i + 1})
+    response = rest.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100, "page": i + 1})
 
     seat_data["seats"].append(response.json()["seats"])
 
