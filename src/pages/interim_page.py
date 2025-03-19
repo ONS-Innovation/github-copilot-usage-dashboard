@@ -78,16 +78,6 @@ max_date = datetime.strptime(usage_data[-1]["date"], "%Y-%m-%d")
 if min_date == max_date:
     min_date -= pd.Timedelta(days=1)
 
-date_range = st.slider(
-    "Date range",
-    min_value=min_date,
-    max_value=max_date,
-    value=(min_date, max_date),
-    format="YYYY-MM-DD",
-)
-
-# st.json(usage_data)
-
 @st.cache_data
 def generate_datasets(date_range: tuple):
     
@@ -152,6 +142,21 @@ def generate_datasets(date_range: tuple):
         ide_completions
     )
 
+st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
+
+col1, col2 = st.columns([0.8, 0.2])
+col1.title(":blue-background[Interim Page]")
+col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
+st.write("This page serves as a fix for an update in GitHub's APIs by using the new API endpoints.")
+
+date_range = st.slider(
+    "Date range",
+    min_value=min_date,
+    max_value=max_date,
+    value=(min_date, max_date),
+    format="YYYY-MM-DD",
+)
+
 (
     df_usage_data_subset,
     copilot_chat,
@@ -161,13 +166,6 @@ def generate_datasets(date_range: tuple):
 # Calculate totals
 copilot_chat_totals = copilot_chat[["total_chats", "total_engaged_users", "total_copies", "total_insertions"]].sum()
 ide_completions_totals = ide_completions[["engaged_users", "code_acceptances", "code_suggestions", "lines_of_code_suggested", "lines_of_code_accepted"]].sum()
-
-st.logo("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.svg")
-
-col1, col2 = st.columns([0.8, 0.2])
-col1.title(":blue-background[Interim Page]")
-col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
-st.write("This page serves as a fix for an update in GitHub's APIs by using the new API endpoints.")
 
 # IDE Code Completions Metrics
 st.header(":blue-background[IDE Code Completions]")
