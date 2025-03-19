@@ -67,7 +67,7 @@ with live_tab:
     # Get the access token
     access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 
-    use_example_data = False
+    use_example_data = True
 
     # If the access token isn't a tuple an error occurred.
     if type(access_token) != tuple:
@@ -83,7 +83,7 @@ with live_tab:
 
     # Get a JSON version of usage data
     if use_example_data:
-        with open("./src/example_data/team_copilot_usage_data.json") as f:
+        with open("./src/example_data/copilot_usage_data.json") as f:
             usage_data = json.load(f)
     else:
         gh = github_api_toolkit.github_interface(access_token[0])
@@ -173,28 +173,28 @@ with live_tab:
         # Seat Data
 
         # Get a JSON version of Seat Data
-        if use_example_data:
-            with open("./src/example_data/copilot_seats_data.json") as f:
+        # if use_example_data:
+        #     with open("./src/example_data/copilot_seats_data.json") as f:
 
-                seat_data = json.load(f)
-        else:
-            gh = github_api_toolkit.github_interface(access_token[0])
+        #         seat_data = json.load(f)
+        # else:
+        gh = github_api_toolkit.github_interface(access_token[0])
 
-            response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
+        response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100})
 
-            seat_data = response.json()
+        seat_data = response.json()
 
-            try:
-                last_page = int(response.links["last"]["url"].split("=")[-1])
-            except KeyError:
-                # If Key Error, Last doesn't exist therefore 1 page
-                last_page = 1
+        try:
+            last_page = int(response.links["last"]["url"].split("=")[-1])
+        except KeyError:
+            # If Key Error, Last doesn't exist therefore 1 page
+            last_page = 1
 
-            # Skip first page as we already have it
-            for i in range(1, last_page):
-                response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100, "page": i + 1})
+        # Skip first page as we already have it
+        for i in range(1, last_page):
+            response = gh.get(f"/orgs/{org}/copilot/billing/seats", params={"per_page": 100, "page": i + 1})
 
-                seat_data["seats"].append(response.json()["seats"])
+            seat_data["seats"].append(response.json()["seats"])
 
         df_seat_data = pd.DataFrame()
 
@@ -202,25 +202,26 @@ with live_tab:
         for row in seat_data["seats"]:
             df_seat_data = pd.concat([df_seat_data, pd.json_normalize(row)], ignore_index=True)
 
-        def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
-            """A function used to convert the last_activity column of df_seat_data into a formatted datetime string"""
-            if use_example_data:
-                if x not in (None, ""):
-                    sections = x.split(":")
+        # def last_activity_to_datetime(use_example_data: bool, x: str | None) -> str | None:
+        #     """A function used to convert the last_activity column of df_seat_data into a formatted datetime string"""
+        #     if use_example_data:
+        #         if x not in (None, ""):
+        #             sections = x.split(":")
 
-                    corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
+        #             corrected_string = sections[0] + ":" + sections[1] + ":" + sections[2] + sections[3]
 
-                    return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
-                else:
-                    return None
-            elif x not in (None, ""):
-                return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
-            else:
-                return None
+        #             return datetime.strptime(corrected_string, "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d %H:%M")
+        #         else:
+        #             return None
+        #     elif x not in (None, ""):
+        #         return datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ")
+        #     else:
+        #         return None
 
         # Converts last_activity_at to a formatted string
         df_seat_data["last_activity_at"] = df_seat_data["last_activity_at"].apply(
-            lambda x: last_activity_to_datetime(use_example_data, x)
+            # lambda x: last_activity_to_datetime(use_example_data, x)
+            lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M:%SZ") if x not in (None, "") else None
         )
 
         return (

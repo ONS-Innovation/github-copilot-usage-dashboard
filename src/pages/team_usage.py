@@ -269,7 +269,10 @@ def get_team_acceptance(run_day: int) -> pd.DataFrame:
                 # If key does not exist pass as nothing to add
                 pass
 
-        team_acceptance_rate = round((total_acceptances / total_suggestions) * 100, 2)
+        try:
+            team_acceptance_rate = round((total_acceptances / total_suggestions) * 100, 2)
+        except ZeroDivisionError as e:
+            team_acceptance_rate = 0
 
         df_team_acceptance = pd.concat(
             [
@@ -366,7 +369,7 @@ if st.session_state.profile:
         st.success(f"Welcome, {st.session_state.profile['name']}.")
     with col2:
         st.info(
-            "A GitHub team must have a minumum of 5 members with active CoPilot licenses for at least 1 day to display usage data."
+            "A GitHub team must have a minimum of 5 members with active CoPilot licenses for at least 1 day to display usage data."
         )
 
     # If user is in the org, get the access token. If not display an error and stop
