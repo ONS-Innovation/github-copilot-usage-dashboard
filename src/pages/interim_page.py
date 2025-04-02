@@ -481,7 +481,6 @@ with historic_tab:
             x=df_combined["date"],
             y=df_combined["total_engaged_users"],
             name="Engaged Users",
-            hovertext=df_combined["total_engaged_users"],
             )
         )
 
