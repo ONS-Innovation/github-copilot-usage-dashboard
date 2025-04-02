@@ -429,7 +429,7 @@ with historic_tab:
     fig.add_trace(
         go.Scatter(
             mode="lines+markers+text",
-            x=df_historic_data["date"],
+            x=df_combined["date"],
             y=df_combined["acceptance_rate"],
             name="Acceptance Rate (%)",
             text=df_combined["acceptance_rate"],
@@ -440,7 +440,7 @@ with historic_tab:
 
     fig.add_trace(
         go.Bar(
-            x=df_historic_data["date"],
+            x=df_combined["date"],
             y=df_combined["total_code_acceptances"],
             name="Total Acceptances",
             hovertext=df_combined["total_code_acceptances"],
@@ -464,7 +464,12 @@ with historic_tab:
 
     fig = make_subplots()
 
-    fig.add_trace(go.Bar(x=df_historic_data["date"], y=df_historic_data["total_active_users"]))
+    fig.add_trace(
+        go.Bar(
+            x=df_combined["date"],
+            y=df_historic_data["total_active_users"]
+            )
+        )
 
     title = (
         "Engaged Users By Day (All Editors)"
