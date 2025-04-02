@@ -387,7 +387,7 @@ with historic_tab:
     # Aggregate chat totals
     df_chat_totals = df_chat.groupby("date").agg({
         "total_chats": "sum",
-        "total_engaged_users": "sum",
+        # "total_engaged_users": "sum",
         "total_chat_copy_events": "sum",
         "total_chat_insertion_events": "sum"
     }).reset_index()
@@ -402,6 +402,18 @@ with historic_tab:
 
     # Merge chat and IDE totals on date
     df_combined = pd.merge(df_chat_totals, df_ide_totals, on="date", how="outer")
+
+    # Merge in engaged users from df_historic_data
+    # Extract engaged users data
+    df_engaged_users = df_historic_data[["date", "total_engaged_users"]]
+
+    # Group df_engaged_users by date
+    df_engaged_users = df_engaged_users.groupby("date").agg({
+        "total_engaged_users": "sum"
+    }).reset_index()
+
+    # Merge
+    df_combined = pd.merge(df_combined, df_engaged_users, on="date", how="outer")
 
     # Calculate acceptance rate
     df_combined["acceptance_rate"] = round(
@@ -467,7 +479,9 @@ with historic_tab:
     fig.add_trace(
         go.Bar(
             x=df_combined["date"],
-            y=df_historic_data["total_active_users"]
+            y=df_combined["total_engaged_users"],
+            name="Engaged Users",
+            hovertext=df_combined["total_engaged_users"],
             )
         )
 
