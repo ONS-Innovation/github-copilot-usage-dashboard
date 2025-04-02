@@ -183,32 +183,40 @@ with live_tab:
     st.header(":blue-background[IDE Code Completions]")
 
     # Display Metrics
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3 = st.columns(3)
     col1.metric(
-        "Total Acceptances",
-        ide_completions_totals['code_acceptances'],
-        border=True
-        )
-    col2.metric(
         "Total Suggestions",
         ide_completions_totals['code_suggestions'],
         border=True
         )
+    col2.metric(
+        "Total Acceptances",
+        ide_completions_totals['code_acceptances'],
+        border=True
+        )
     col3.metric(
-        "Total Lines of Code Accepted",
-        ide_completions_totals['lines_of_code_accepted'],
-        border=True
-        )
-    col4.metric(
-        "Total Lines of Code Suggested",
-        ide_completions_totals['lines_of_code_suggested'],
-        border=True
-        )
-    col5.metric(
         "Acceptance Rate",
         f"{round(ide_completions_totals['code_acceptances'] / ide_completions_totals['code_suggestions'] * 100, 2)}%",
         border=True
         )
+
+    col1, col2, col3 = st.columns(3) 
+    col1.metric(
+        "Total Lines of Code Suggested",
+        ide_completions_totals['lines_of_code_suggested'],
+        border=True
+        )   
+    col2.metric(
+        "Total Lines of Code Accepted",
+        ide_completions_totals['lines_of_code_accepted'],
+        border=True
+        )
+    col3.metric(
+    "Line Acceptance Rate",
+    f"{round(ide_completions_totals['lines_of_code_accepted'] / ide_completions_totals['lines_of_code_suggested'] * 100, 2)}%",
+    border=True
+    )
+
 
     # CoPilot Chat Metrics
     st.header(":blue-background[CoPilot Chat]")
@@ -226,13 +234,13 @@ with live_tab:
         border=True
         )
     col3.metric(
-        "Total Copies",
-        copilot_chat_totals['total_copies'],
+        "Insert Rate",
+        f"{round(copilot_chat_totals['total_insertions'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
         border=True
         )
     col4.metric(
-        "Insert Rate",
-        f"{round(copilot_chat_totals['total_insertions'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
+        "Total Copies",
+        copilot_chat_totals['total_copies'],
         border=True
         )
     col5.metric(
