@@ -5,11 +5,20 @@ import github_api_toolkit
 from typing import Any, Tuple
 from datetime import datetime
 import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from botocore.exceptions import ClientError
+import json
 
 org = os.getenv("GITHUB_ORG")                           # The name of the organisation to query
 app_client_id = os.getenv("GITHUB_APP_CLIENT_ID")       # The client id for the GitHub App used to make requests
 aws_default_region = os.getenv("AWS_DEFAULT_REGION")    # The AWS region the secret is in 
 aws_secret_name = os.getenv("AWS_SECRET_NAME")          # Path to the .pem file in Secret Manager on AWS
+account = os.getenv("AWS_ACCOUNT_NAME")
+
+# AWS Bucket Path
+bucket_name = f"{account}-copilot-usage-dashboard"
+object_name = "historic_usage_data.json"
 
 def get_access_token(secret_manager: Any, secret_name: str, org: str, app_client_id: str) -> Tuple[str, str]:
     """Gets the access token from the AWS Secret Manager.
@@ -149,157 +158,357 @@ col1.title(":blue-background[Interim Page]")
 col2.image("./src/branding/ONS_Logo_Digital_Colour_Landscape_Bilingual_RGB.png")
 st.write("This page serves as a fix for an update in GitHub's APIs by using the new API endpoints.")
 
-date_range = st.slider(
-    "Date range",
-    min_value=min_date,
-    max_value=max_date,
-    value=(min_date, max_date),
-    format="YYYY-MM-DD",
-)
+live_tab, historic_tab = st.tabs(["Live Data", "Historic Data"])
 
-(
-    df_usage_data_subset,
-    copilot_chat,
-    ide_completions,
-) = generate_datasets(date_range)
-
-# Calculate totals
-copilot_chat_totals = copilot_chat[["total_chats", "total_engaged_users", "total_copies", "total_insertions"]].sum()
-ide_completions_totals = ide_completions[["engaged_users", "code_acceptances", "code_suggestions", "lines_of_code_suggested", "lines_of_code_accepted"]].sum()
-
-# IDE Code Completions Metrics
-st.header(":blue-background[IDE Code Completions]")
-
-# Display Metrics
-col1, col2, col3, col4, col5 = st.columns(5)
-col1.metric(
-    "Total Acceptances",
-    ide_completions_totals['code_acceptances'],
-    border=True
-    )
-col2.metric(
-    "Total Suggestions",
-    ide_completions_totals['code_suggestions'],
-    border=True
-    )
-col3.metric(
-    "Total Lines of Code Accepted",
-    ide_completions_totals['lines_of_code_accepted'],
-    border=True
-    )
-col4.metric(
-    "Total Lines of Code Suggested",
-    ide_completions_totals['lines_of_code_suggested'],
-    border=True
-    )
-col5.metric(
-    "Acceptance Rate",
-    f"{round(ide_completions_totals['code_acceptances'] / ide_completions_totals['code_suggestions'] * 100, 2)}%",
-    border=True
+with live_tab:
+    date_range = st.slider(
+        "Date range",
+        min_value=min_date,
+        max_value=max_date,
+        value=(min_date, max_date),
+        format="YYYY-MM-DD",
     )
 
-# CoPilot Chat Metrics
-st.header(":blue-background[CoPilot Chat]")
+    (
+        df_usage_data_subset,
+        copilot_chat,
+        ide_completions,
+    ) = generate_datasets(date_range)
 
-# Display Metrics
-col1, col2, col3, col4, col5 = st.columns(5)
-col1.metric(
-    "Total Chats",
-    copilot_chat_totals['total_chats'],
-    border=True
-    )
-col2.metric(
-    "Total Insertions",
-    copilot_chat_totals['total_insertions'],
-    border=True
-    )
-col3.metric(
-    "Total Copies",
-    copilot_chat_totals['total_copies'],
-    border=True
-    )
-col4.metric(
-    "Insert Rate",
-    f"{round(copilot_chat_totals['total_insertions'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
-    border=True
-    )
-col5.metric(
-    "Copy Rate",
-    f"{round(copilot_chat_totals['total_copies'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
+    # Calculate totals
+    copilot_chat_totals = copilot_chat[["total_chats", "total_engaged_users", "total_copies", "total_insertions"]].sum()
+    ide_completions_totals = ide_completions[["engaged_users", "code_acceptances", "code_suggestions", "lines_of_code_suggested", "lines_of_code_accepted"]].sum()
+
+    # IDE Code Completions Metrics
+    st.header(":blue-background[IDE Code Completions]")
+
+    # Display Metrics
+    col1, col2, col3 = st.columns(3)
+    col1.metric(
+        "Total Suggestions",
+        ide_completions_totals['code_suggestions'],
+        border=True
+        )
+    col2.metric(
+        "Total Acceptances",
+        ide_completions_totals['code_acceptances'],
+        border=True
+        )
+    col3.metric(
+        "Acceptance Rate",
+        f"{round(ide_completions_totals['code_acceptances'] / ide_completions_totals['code_suggestions'] * 100, 2)}%",
+        border=True
+        )
+
+    col1, col2, col3 = st.columns(3) 
+    col1.metric(
+        "Total Lines of Code Suggested",
+        ide_completions_totals['lines_of_code_suggested'],
+        border=True
+        )   
+    col2.metric(
+        "Total Lines of Code Accepted",
+        ide_completions_totals['lines_of_code_accepted'],
+        border=True
+        )
+    col3.metric(
+    "Line Acceptance Rate",
+    f"{round(ide_completions_totals['lines_of_code_accepted'] / ide_completions_totals['lines_of_code_suggested'] * 100, 2)}%",
     border=True
     )
 
-# Seat information
-st.header(":blue-background[Seat Information]")
 
-st.subheader("Inactivity Threshold")
+    # CoPilot Chat Metrics
+    st.header(":blue-background[CoPilot Chat]")
 
-inactivity_threshold = st.number_input("Inactive after x days:", value=28, step=1)
+    # Display Metrics
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric(
+        "Total Chats",
+        copilot_chat_totals['total_chats'],
+        border=True
+        )
+    col2.metric(
+        "Total Insertions",
+        copilot_chat_totals['total_insertions'],
+        border=True
+        )
+    col3.metric(
+        "Insert Rate",
+        f"{round(copilot_chat_totals['total_insertions'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
+        border=True
+        )
+    col4.metric(
+        "Total Copies",
+        copilot_chat_totals['total_copies'],
+        border=True
+        )
+    col5.metric(
+        "Copy Rate",
+        f"{round(copilot_chat_totals['total_copies'] / copilot_chat_totals['total_chats'] * 100, 2)}%",
+        border=True
+        )
 
-inactivity_date = datetime.now() - pd.Timedelta(days=inactivity_threshold)
+    # Seat information
+    st.header(":blue-background[Seat Information]")
 
-st.write("Users are considered inactive after:", inactivity_date.strftime("%-d %B %Y"))
+    st.subheader("Inactivity Threshold")
 
-st.divider()
+    inactivity_threshold = st.number_input("Inactive after x days:", value=28, step=1)
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("Number of Seats", seat_data["total_seats"], border=True)
+    inactivity_date = datetime.now() - pd.Timedelta(days=inactivity_threshold)
 
-with col2:
-    number_of_engaged_users = 0
+    st.write("Users are considered inactive after:", inactivity_date.strftime("%-d %B %Y"))
 
-    for index, row in df_seat_data.iterrows():
-        if row.last_activity_at >= inactivity_date:
-            number_of_engaged_users += 1
+    st.divider()
 
-    st.metric("Number of Engaged Users", number_of_engaged_users, border=True)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Number of Seats", seat_data["total_seats"], border=True)
 
-with col3:
-    number_of_inactive_users = seat_data["total_seats"] - number_of_engaged_users
+    with col2:
+        number_of_engaged_users = 0
 
-    st.metric("Number of Inactive Users", number_of_inactive_users, border=True)
+        for index, row in df_seat_data.iterrows():
+            if row.last_activity_at >= inactivity_date:
+                number_of_engaged_users += 1
 
-col1, col2 = st.columns(2)
+        st.metric("Number of Engaged Users", number_of_engaged_users, border=True)
 
-with col1:
-    st.subheader("Active Users")
+    with col3:
+        number_of_inactive_users = seat_data["total_seats"] - number_of_engaged_users
 
-    # Dataframe showing only active users (this with a latest activity)
-    st.dataframe(
-        df_seat_data.loc[df_seat_data["last_activity_at"] >= inactivity_date][
-            ["assignee.login", "last_activity_at", "assignee.html_url"]
-        ],
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "assignee.login": st.column_config.Column("User"),
-            "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-            "assignee.html_url": st.column_config.LinkColumn(
-                "Github Profile",
-                help="A link to this user's profile",
-                display_text="Go to Profile",
-            ),
-        },
+        st.metric("Number of Inactive Users", number_of_inactive_users, border=True)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("Active Users")
+
+        # Dataframe showing only active users (this with a latest activity)
+        st.dataframe(
+            df_seat_data.loc[df_seat_data["last_activity_at"] >= inactivity_date][
+                ["assignee.login", "last_activity_at", "assignee.html_url"]
+            ],
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                "assignee.html_url": st.column_config.LinkColumn(
+                    "Github Profile",
+                    help="A link to this user's profile",
+                    display_text="Go to Profile",
+                ),
+            },
+        )
+
+    with col2:
+        st.subheader("Inactive Users")
+
+        # Dataframe showing only inactive users (those where last_activity_at is None)
+        st.dataframe(
+            df_seat_data.loc[(df_seat_data["last_activity_at"].isnull()) | (df_seat_data["last_activity_at"] < inactivity_date)][
+                ["assignee.login", "last_activity_at", "assignee.html_url"]
+            ],
+            hide_index=True,
+            use_container_width=True,
+            column_config={
+                "assignee.login": st.column_config.Column("User"),
+                "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
+                "assignee.html_url": st.column_config.LinkColumn(
+                    "Github Profile",
+                    help="A link to this user's profile",
+                    display_text="Go to Profile",
+                ),
+            },
+        )
+
+with historic_tab:
+    st.header(":blue-background[Historic Data]")
+
+    date_grouping = st.radio("Organise Dates By", ["Day", "Week", "Month", "Year"])
+
+    # Create an S3 client
+    s3 = session.client("s3")
+
+    # Get historic_usage_data.json from S3
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key=object_name)
+        historic_data = json.loads(response["Body"].read().decode("utf-8"))
+
+    except ClientError as e:
+        st.error(
+            f"An error occurred while trying to get the historic data from S3 ({object_name}). Please check the error message below."
+        )
+        st.error(e)
+        st.stop()
+
+    # Convert the historic data into a dataframe
+    df_historic_data = pd.json_normalize(historic_data)
+
+    # Convert date column from str to datetime
+    df_historic_data["date"] = df_historic_data["date"].apply(lambda x: datetime.strptime(x, "%Y-%m-%d"))
+
+    # Group the data by the date as selected by the user
+    if date_grouping == "Day":
+        # Format into a year-month-day format (i.e 2022-01-01)
+        df_historic_data["date"] = df_historic_data["date"].dt.strftime("%Y-%m-%d")
+    elif date_grouping == "Week":
+        # Format into a year-week format (i.e 2022-01)
+        df_historic_data["date"] = df_historic_data["date"].dt.strftime("%Y-%U")
+    elif date_grouping == "Month":
+        # Format into a year-month format (i.e 2022-01)
+        df_historic_data["date"] = df_historic_data["date"].dt.strftime("%Y-%m")
+    elif date_grouping == "Year":
+        # Format into a year format (i.e 2022)
+        df_historic_data["date"] = df_historic_data["date"].dt.strftime("%Y")
+
+    # Extract IDE chat data
+    df_chat = pd.json_normalize(
+        historic_data,
+        record_path=["copilot_ide_chat", "editors", "models"],
+        meta=["date"],
+        errors="ignore"
+    )
+    df_chat["date"] = pd.to_datetime(df_chat["date"]).dt.strftime(
+    "%Y-%m-%d" if date_grouping == "Day" else
+    "%Y-%U" if date_grouping == "Week" else
+    "%Y-%m" if date_grouping == "Month" else
+    "%Y"
     )
 
-with col2:
-    st.subheader("Inactive Users")
+    # Extract IDE completions data
+    df_ide = pd.json_normalize(
+        historic_data,
+        record_path=["copilot_ide_code_completions", "editors", "models", "languages"],
+        meta=["date"],
+        errors="ignore"
+    )
+    df_ide["date"] = pd.to_datetime(df_ide["date"]).dt.strftime(
+        "%Y-%m-%d" if date_grouping == "Day" else
+        "%Y-%U" if date_grouping == "Week" else
+        "%Y-%m" if date_grouping == "Month" else
+        "%Y"
+    )
 
-    # Dataframe showing only inactive users (those where last_activity_at is None)
-    st.dataframe(
-        df_seat_data.loc[(df_seat_data["last_activity_at"].isnull()) | (df_seat_data["last_activity_at"] < inactivity_date)][
-            ["assignee.login", "last_activity_at", "assignee.html_url"]
-        ],
-        hide_index=True,
-        use_container_width=True,
-        column_config={
-            "assignee.login": st.column_config.Column("User"),
-            "last_activity_at": st.column_config.DatetimeColumn("Last Activity At", format="YYYY-MM-DD HH:mm"),
-            "assignee.html_url": st.column_config.LinkColumn(
-                "Github Profile",
-                help="A link to this user's profile",
-                display_text="Go to Profile",
-            ),
-        },
+    # Aggregate chat totals
+    df_chat_totals = df_chat.groupby("date").agg({
+        "total_chats": "sum",
+        # "total_engaged_users": "sum",
+        "total_chat_copy_events": "sum",
+        "total_chat_insertion_events": "sum"
+    }).reset_index()
+
+    # Aggregate IDE totals
+    df_ide_totals = df_ide.groupby("date").agg({
+        "total_code_suggestions": "sum",
+        "total_code_acceptances": "sum",
+        "total_code_lines_suggested": "sum",
+        "total_code_lines_accepted": "sum"
+    }).reset_index()
+
+    # Merge chat and IDE totals on date
+    df_combined = pd.merge(df_chat_totals, df_ide_totals, on="date", how="outer")
+
+    # Merge in engaged users from df_historic_data
+    # Extract engaged users data
+    df_engaged_users = df_historic_data[["date", "total_engaged_users"]]
+
+    # Group df_engaged_users by date
+    df_engaged_users = df_engaged_users.groupby("date").agg({
+        "total_engaged_users": "sum"
+    }).reset_index()
+
+    # Merge
+    df_combined = pd.merge(df_combined, df_engaged_users, on="date", how="outer")
+
+    # Calculate acceptance rate
+    df_combined["acceptance_rate"] = round(
+        (df_combined["total_code_acceptances"] / df_combined["total_code_suggestions"]) * 100, 2
+    )
+
+    # Display overall metrics
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Suggestions", df_combined["total_code_suggestions"].sum())
+        st.metric(f"Avg Suggestions per {date_grouping}", round(df_combined["total_code_suggestions"].mean(), 2))
+
+    with col2:
+        st.metric("Total Accepts", df_combined["total_code_acceptances"].sum())
+        st.metric(f"Avg Accepts per {date_grouping}", round(df_combined["total_code_acceptances"].mean(), 2))
+
+    with col3:
+        st.metric("Total Lines Accepted", df_combined["total_code_lines_accepted"].sum())
+        st.metric("Acceptance Rate", f"{df_combined['acceptance_rate'].mean():.2f}%")
+
+    # Acceptance Graph
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig.add_trace(
+        go.Scatter(
+            mode="lines+markers+text",
+            x=df_combined["date"],
+            y=df_combined["acceptance_rate"],
+            name="Acceptance Rate (%)",
+            text=df_combined["acceptance_rate"],
+            textposition="top center",
+        ),
+        secondary_y=True,
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=df_combined["date"],
+            y=df_combined["total_code_acceptances"],
+            name="Total Acceptances",
+            hovertext=df_combined["total_code_acceptances"],
+        )
+    )
+
+    fig.update_layout(
+        title="Accepts and Acceptance Rate",
+        xaxis_title="Date",
+        yaxis_title="Acceptances",
+        legend_title="Legend",
+        hovermode="x unified",
+    )
+
+    fig.update_yaxes(title_text="Acceptance Rate (%)", secondary_y=True)
+    fig.update_xaxes(type="category")
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Engaged Users By Day
+
+    fig = make_subplots()
+
+    fig.add_trace(
+        go.Bar(
+            x=df_combined["date"],
+            y=df_combined["total_engaged_users"],
+            name="Engaged Users",
+            )
+        )
+
+    title = (
+        "Engaged Users By Day (All Editors)"
+        if date_grouping == "Day"
+        else f"Unique Daily User Instances By {date_grouping} (All Editors)"
+    )
+
+    fig.update_layout(
+        title=title,
+        xaxis_title="Day",
+        yaxis_title="Number of Users",
+        hovermode="x unified",
+    )
+
+    fig.update_xaxes(type="category")
+
+    st.plotly_chart(fig)
+
+    st.caption(
+        "**Note:** If grouping by day, the graph above will show the number of unique users per day. If grouping by week, month or year, the graph above will show the sum of those unique users for the period."
     )
