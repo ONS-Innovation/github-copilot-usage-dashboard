@@ -48,20 +48,22 @@ In order to build an MkDocs deployment or serve the documentation locally, we ne
 
 ## Updating MkDocs Deployment
 
+### GitHub Action to Deploy Documentation
+
+A GitHub Action is set up to automatically deploy the documentation to GitHub Pages whenever a commit is made to the `main` branch. This action is triggered by a push event to the `main` branch and runs the `mkdocs gh-deploy` command to build and deploy the documentation.
+
+### Manual Deployment
+
 If changes are made within `/docs`, the GitHub Pages deployment will need to be updated. Assuming you have already installed [MkDocs](https://www.mkdocs.org/getting-started/#installation) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/getting-started/#installation), do the following:
 
 1. Navigate to the projects root directory.
 
-2. Delete the existing `/mkdocs_deployment` directory.
+2. Deploy the documentation to GitHub Pages.
 
-3. Build the MkDocs deployment.
+    ```bash
+    mkdocs gh-deploy
+    ```
 
-```bash
-mkdocs build
-```
+3. This will build the documentation and deploy it to the `gh-pages` branch of your repository. The documentation will be available at `https://ONS-Innovation.github.io/<repository-name>/`.
 
-4. Rename the `/site` directory to `/mkdocs_deployment`. This allows git to track the build so GitHub Pages can redeploy it.
-
-5. Commit and Push changes.
-
-Once completed, a GitHub Action will redeploy the new build to GitHub Pages.
+**Please Note:** The `gh-deploy` command will overwrite the `gh-pages` branch and make the local changes available on GitHub Pages. Make sure that these changes are appropriate and have been reviewed before deployment.
