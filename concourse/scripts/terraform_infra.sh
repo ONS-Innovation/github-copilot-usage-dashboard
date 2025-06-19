@@ -42,6 +42,7 @@ terraform apply \
 -var "lambda_version=${tag}" \
 -var "lambda_name=$lambda_name" \
 -var "lambda_arch=$lambda_arch" \
+-var "lambda_timeout=$lambda_timeout" \
 -var "github_app_client_id=$github_app_client_id" \
 -var "github_org=$github_org" \
 -var "schedule=$schedule" \
