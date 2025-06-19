@@ -39,7 +39,7 @@ terraform apply \
 -var "aws_secret_access_key=$aws_secret_access_key" \
 -var "aws_secret_name=$aws_secret_name" \
 -var "env_name=$env_name" \
--var "container_ver=${tag}" \
+-var "lambda_version=${tag}" \
 -var "lambda_name=$lambda_name" \
 -var "lambda_arch=$lambda_arch" \
 -var "github_app_client_id=$github_app_client_id" \
