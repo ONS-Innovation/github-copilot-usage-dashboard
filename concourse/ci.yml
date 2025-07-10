@@ -8,22 +8,12 @@ resources:
     password: x-oauth-basic
     branch: ((branch))
 
-- name: release
-  type: github-release
-  icon: github
-  source:
-    owner: ONS-Innovation
-    username: ((github_access_token))
-    password: x-oauth-basic
-    repository: github-copilot-usage-dashboard
-
 jobs:
 - name:  build-and-push
   public: true
   plan:
   - get: resource-repo
     timeout: 5m
-  - get: release
     trigger: true
     timeout: 5m
   - task: build-image
@@ -36,18 +26,20 @@ jobs:
           repository: hashicorp/terraform
       inputs:
       - name: resource-repo
-      - name: release
       params:
         aws_account_id: ((aws_account_sdp_((env))))
         aws_role_arn: arn:aws:iam::((aws_account_sdp_((env)))):role/sdp-concourse-((env))
-        github_copilot_secrets: ((sdp_((env))_github_copilot_secrets))
+        secrets: ((sdp_((env))_github_copilot_secrets))
       run: # binary used to build the image
         path: sh
         args:
         - -cx
         - |
+          apk add --no-cache aws-cli podman jq iptables curl
+
           if [[ "((env))" == "prod" ]]; then
-            export tag=v$(cat release/version)
+            tag=$(curl "https://api.github.com/repos/ONS-Innovation/github-copilot-usage-dashboard/releases" | jq -r '.[0].tag_name')
+            export tag
           else
             export tag=((tag))
           fi
@@ -66,17 +58,19 @@ jobs:
         source: {repository: hashicorp/terraform}
       inputs:
       - name: resource-repo
-      - name: release
       params:
-        github_copilot_secrets: ((sdp_((env))_github_copilot_secrets))
+        secrets: ((sdp_((env))_github_copilot_secrets))
         github_access_token: ((github_access_token))
       run:
         path: sh
         args:
         - -cx
         - |
+          apk add --no-cache jq curl
+
           if [[ "((env))" == "prod" ]]; then
-            export tag=v$(cat release/version)
+            tag=$(curl "https://api.github.com/repos/ONS-Innovation/github-copilot-usage-dashboard/releases" | jq -r '.[0].tag_name')
+            export tag
           else 
             export tag=((tag))
           fi
