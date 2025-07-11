@@ -67,10 +67,10 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
             if usage_data.json():
                 copilot_teams.append(
                     {
-                        "name": team["name"],
-                        "slug": team["slug"],
-                        "description": team["description"],
-                        "url": team["html_url"],
+                        "name": team.get("name", ""),
+                        "slug": team.get("slug", ""),
+                        "description": team.get("description", ""),
+                        "url": team.get("html_url", ""),
                     }
                 )
         except Exception as error:
