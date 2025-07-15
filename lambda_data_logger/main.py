@@ -65,7 +65,14 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
         usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
         try:
             if usage_data.json():
-                copilot_teams.append(team["name"])
+                copilot_teams.append(
+                    {
+                        "name": team.get("name", ""),
+                        "slug": team.get("slug", ""),
+                        "description": team.get("description", ""),
+                        "url": team.get("html_url", ""),
+                    }
+                )
         except Exception as error:
             # If Exception, then the team does not have copilot usage data and can be skipped
             pass
