@@ -187,3 +187,36 @@ def handler(event, context):
             "no_copilot_teams": len(copilot_teams),
         },
     )
+
+    # Get teams history
+    team_history = []
+    
+    logger.info("Getting history of each team with CoPilot Data")
+    for team in copilot_teams:
+        single_team_history = get_team_history(gh, org, team)
+        if not single_team_history:
+            logger.info(f"No history found for team {team}")
+            continue
+
+        if single_team_history:
+            team_data = {
+                "team": team,
+                "data": single_team_history
+            }
+            team_history.append(team_data)
+
+    s3.put_object(
+        Bucket=bucket_name,
+        Key="teams_history.json",
+        Body=json.dumps(team_history, indent=4).encode("utf-8"),
+    )
+    
+    return "Github Data logging is now complete."
+
+def get_team_history(gh: github_api_toolkit.github_interface, org: str, team:str):
+    try:
+        response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params={"per_page": 28})
+        return response.json()
+    except Exception as e:
+        logger.error(f"Error getting history for team {team} due to {e} with Github API")
+        return None
