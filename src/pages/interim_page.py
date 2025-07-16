@@ -97,7 +97,7 @@ def generate_datasets(date_range: tuple):
     # Create a subset of data based on slider selection
     df_usage_data_subset = df_usage_data.loc[
         (df_usage_data["date"] >= date_range[0]) & (df_usage_data["date"] <= date_range[1])
-    ].reset_index(drop=True)
+    ].reset_index(drop=True).dropna()
 
     copilot_chat = pd.DataFrame()
     ide_completions = pd.DataFrame()
@@ -106,7 +106,6 @@ def generate_datasets(date_range: tuple):
 
         # Get copilot chat data
         editors_data = df_usage_data_subset.iloc[i]["copilot_ide_chat.editors"]
-
         for editor in editors_data:
             editor_name = editor.get("name", "")
             models_data = editor.get("models", [])
@@ -121,7 +120,6 @@ def generate_datasets(date_range: tuple):
                     "total_insertions": model.get("total_chat_insertion_events", 0),
                 }])
                 copilot_chat = pd.concat([copilot_chat, data], ignore_index=True)
-
 
         # Get IDE completions data
         editors_data = df_usage_data_subset.iloc[i]["copilot_ide_code_completions.editors"]
@@ -364,12 +362,24 @@ with historic_tab:
         # Format into a year format (i.e 2022)
         df_historic_data["date"] = df_historic_data["date"].dt.strftime("%Y")
 
+    # Remove any rows where the data is NAN
+    initial_historical_data = historic_data
+    indexes = []
+    for day in initial_historical_data:
+        try:
+            editor = day["copilot_ide_chat"]["editors"]
+        except KeyError:
+            indexes.append(initial_historical_data.index(day))
+
+    for index in indexes:
+        initial_historical_data.pop(index)
+
     # Extract IDE chat data
     df_chat = pd.json_normalize(
-        historic_data,
+        initial_historical_data,
         record_path=["copilot_ide_chat", "editors", "models"],
         meta=["date"],
-        errors="ignore"
+        errors="ignore" 
     )
     df_chat["date"] = pd.to_datetime(df_chat["date"]).dt.strftime(
     "%Y-%m-%d" if date_grouping == "Day" else
