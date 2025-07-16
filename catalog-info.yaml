@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: github-copilot-usage-dashboard
+  annotations:
+    github.com/project-slug: ONS-Innovation/github-copilot-usage-dashboard
+spec:
+  type: other
+  lifecycle: unknown
+  owner: keh-dev
