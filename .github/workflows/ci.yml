@@ -13,11 +13,10 @@ concurrency:
 
 jobs:
   lint-test:
-    permissions:
-      contents: read
-      pull-requests: write
     name: Lint and Test
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     strategy:
       matrix:
         python-version: ["3.12"]
