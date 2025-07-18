@@ -194,3 +194,54 @@ def handler(event, context):
             "no_copilot_teams": len(copilot_teams),
         },
     )
+
+    # Get teams history
+    team_history = []
+    
+    logger.info("Getting history of each teams identified previously")
+    for team in copilot_teams:
+        team_name = team.get("name", "")
+        if not team_name:
+            logger.warning("Skipping team with no name")
+            continue
+        else:
+            single_team_history = get_team_history(gh, org, team_name)
+            if not single_team_history:
+                logger.info(f"No history found for team {team}")
+                continue
+
+            if single_team_history:
+                team_data = {
+                    "team": team,
+                    "data": single_team_history
+                }
+                team_history.append(team_data)
+
+    s3.put_object(
+        Bucket=bucket_name,
+        Key="teams_history.json",
+        Body=json.dumps(team_history, indent=4).encode("utf-8"),
+    )
+    
+    return "Github Data logging is now complete."
+
+def get_team_history(gh: github_api_toolkit.github_interface, org: str, team:str):
+    """
+    Gets the team metrics CoPilot data through the API.
+    Note - This endpoint will only return results for a given day if the team had 
+    five or more members with active Copilot licenses on that day, 
+    as evaluated at the end of that day
+
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        team (str): Team name.
+
+    Returns:
+        json: A json of team's GitHub team metrics.
+    """
+    try:
+        response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params={"per_page": 28})
+        return response.json()
+    except Exception as e:
+        logger.error(f"Error getting history for team {team} due to {e} with Github API")
+        return None
