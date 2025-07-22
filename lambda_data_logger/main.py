@@ -208,7 +208,7 @@ def handler(event, context):
         logger.warning(f"Error retrieving existing team history: {e}")
         existing_team_history = []
 
-    logger.error(f"Existing team history has {len(existing_team_history)} entries")
+    logger.info(f"Existing team history has {len(existing_team_history)} entries")
 
     # Create a dictionary for quick lookup of existing team data using the `name` field
     existing_team_data_map = {single_team["team"]["name"]: single_team for single_team in existing_team_history}
@@ -227,7 +227,7 @@ def handler(event, context):
             if existing_dates:
                 last_known_date = max(existing_dates)  # Get the most recent date
 
-        # Fetch new team history using the `since` query parameter
+        # Assign the last know date to the `since` query parameter
         query_params = {}
         if last_known_date:
             query_params["since"] = last_known_date
@@ -277,7 +277,6 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
     """
     try:
         response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
-        logger.error(f"Response for team {team}: {response}")
         return response.json()
     except Exception as e:
         logger.error(f"Error getting history for team {team} due to {e} with Github API")
