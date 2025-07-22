@@ -1,6 +1,0 @@
-# For development environment
-# terraform init -backend-config="env/dev/backend-dev.tfbackend"
-bucket         = "sdp-dev-tf-state"
-key            = "sdp-dev-ecs-copilot-usage/terraform.tfstate"
-region         = "eu-west-2"
-dynamodb_table = "terraform-state-lock"
