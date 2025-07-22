@@ -273,7 +273,7 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
         query_params (dict): Additional query parameters for the API request.
 
     Returns:
-        json: A json of team's GitHub team metrics.
+        json: A json of team's GitHub team metrics or None if an error occurs.
     """
     try:
         response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
