@@ -23,3 +23,46 @@ A user within ONSDigital. Upon authentication, the app identifies the teams they
 
 #### Admin User
 An enhanced regular user with the ability to search for any team. This user belongs to a specific whitelisted team, enabling them to view metrics for any team that meets the CoPilot usage data requirements.
+
+## Metrics
+
+### Team History Metrics
+The team history metrics function retrieves historical usage data for each team identified with CoPilot usage. This data includes detailed metrics about the team's activity over time. New data for a team is fetched only from the last captured date in the file.
+
+#### Functionality
+- **Input**: The function in addition to the GitHub Client takes a team name, organisation and the optional "since" as a query parameter as input.
+- **Process**: 
+  - Fetches historical data for the specified team using the GitHub API.
+  - If the since query parameter exist then fetch data only after the specified date.
+  - Filters and organizes the data into a structured format.
+- **Output**: A JSON object containing the team's historical metrics, including:
+  - Team name
+  - Activity data
+  - CoPilot usage statistics
+
+#### Usage
+The historical metrics are stored in an S3 bucket as a json file (`teams_history.json`).
+
+#### Example
+For a team named `kehdev`, the historical metrics might include:
+```json
+{
+  "team": {
+    "name": "kehdev",
+    "slug": "kehdev",
+    "description": "Team responsible for CI/CD pipelines",
+    "url": "https://github.com/orgs/<organisation>/teams/kehdev"
+  },
+  "data": [
+    {
+      "date": "2025-07-01",
+      "active_members": 10,
+      "copilot_usage_hours": 50
+    },
+    {
+      "date": "2025-07-02",
+      "active_members": 12,
+      "copilot_usage_hours": 60
+    }
+  ]
+}
