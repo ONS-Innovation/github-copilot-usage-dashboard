@@ -194,3 +194,91 @@ def handler(event, context):
             "no_copilot_teams": len(copilot_teams),
         },
     )
+
+    # Get teams history
+    team_history = []
+    
+    logger.info("Getting history of each team identified previously")
+
+    # Retrieve existing team history from S3
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key="teams_history.json")
+        existing_team_history = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        logger.warning(f"Error retrieving existing team history: {e}")
+        existing_team_history = []
+
+    logger.info(f"Existing team history has {len(existing_team_history)} entries")
+
+    # Create a dictionary for quick lookup of existing team data using the `name` field
+    existing_team_data_map = {single_team["team"]["name"]: single_team for single_team in existing_team_history}
+
+    # Iterate through identified teams
+    for team in copilot_teams:
+        team_name = team.get("name", "")
+        if not team_name:
+            logger.warning("Skipping team with no name")
+            continue
+
+        # Determine the last known date for the team
+        last_known_date = None
+        if team_name in existing_team_data_map:
+            existing_dates = [entry["date"] for entry in existing_team_data_map[team_name]["data"]]
+            if existing_dates:
+                last_known_date = max(existing_dates)  # Get the most recent date
+
+        # Assign the last know date to the `since` query parameter
+        query_params = {}
+        if last_known_date:
+            query_params["since"] = last_known_date
+
+        single_team_history = get_team_history(gh, org, team_name, query_params)
+        if not single_team_history:
+            logger.info(f"No new history found for team {team_name}")
+            continue
+
+        # Append new data to the existing team history
+        new_team_data = single_team_history
+        if team_name in existing_team_data_map:
+            existing_team_data_map[team_name]["data"].extend(new_team_data)
+        else:
+            existing_team_data_map[team_name] = {"team": team, "data": new_team_data}
+
+    # Convert the updated team data map back to a list
+    updated_team_history = list(existing_team_data_map.values())
+
+    # Write updated team history to S3
+    s3.put_object(
+        Bucket=bucket_name,
+        Key="teams_history.json",
+        Body=json.dumps(updated_team_history, indent=4).encode("utf-8"),
+    )
+
+    logger.info("Uploaded updated teams_history.json to S3")
+
+    return "Github Data logging is now complete."
+
+
+def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: str, query_params: dict = None):
+    """
+    Gets the team metrics Copilot data through the API.
+    Note - This endpoint will only return results for a given day if the team had
+    five or more members with active Copilot licenses on that day,
+    as evaluated at the end of that day.
+
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        org (str): Organisation name.
+        team (str): Team name.
+        query_params (dict): Additional query parameters for the API request.
+
+    Returns:
+        json: A json of team's GitHub team metrics or None if an error occurs.
+    """
+    try:
+        response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
+        return response.json()
+    except Exception as e:
+        logger.error(f"Error getting history for team {team} due to {e} with Github API")
+        return None
+    
