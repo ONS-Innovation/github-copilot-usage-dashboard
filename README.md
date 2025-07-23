@@ -44,11 +44,16 @@ There is a guide to getting started on this repository's GitHub Pages site.
 
 # AWS Lambda Scripts
 
-This script is used to gather data from the /orgs/{org}/copilot/usage endpoint in the Github API.
+This script is used to gather data from the `/orgs/{org}/copilot/usage` endpoint in the Github API.
+
 The script then appends the collected data to the old data in an S3 bucket.
+
 This creates a record of historical copilot usage data which is used to show trends over time.
-The script also gets a list of GitHub Teams with CoPilot Usage Data. This is to reduce load times in the frontend.
-The API endpoint above only stores the last 28 days worth of data, meaning this script must run atleast every 28 days to avoid missing data.
+
+The script also gets a list of GitHub Teams with Copilot Usage Data. This is to reduce load times in the frontend.
+
+The API endpoint above only stores the last 28 days worth of data, meaning this script must run at least every 28 days to avoid missing data.
+
 This script is run as a containered lambda function in AWS which is executed periodically using EventBridge.
 
 ## Setup - Running in a container
@@ -129,9 +134,9 @@ When you make changes to the Lambda Script, a new container image must be pushed
 These instructions assume:
 
 1. You have a repository set up in your AWS account named copilot-usage-lambda-script.
-2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in ~/.aws/credentials and can be used by accessing --profile <aws-credentials-profile\>, if these are the only credentials in your file then the profile name is _default_
+2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is _default_
 
-You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace <aws-credentials-profile\>, <aws-account-id\> and <version\> accordingly):
+You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace `<aws-credentials-profile\>`, `<aws-account-id\>` and `<version\>` accordingly):
 
 1. Get an authentication token and authenticate your docker client for pushing images to ECR:
 
@@ -139,13 +144,13 @@ You can find the AWS repo push commands under your repository in ECR by selectin
     aws ecr --profile <aws-credentials-profile> get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com
     ```
 
-2. Tag your latest built docker image for ECR (assumes you have run _docker build -t sdp-repo-archive ._ locally first)
+2. Tag your latest built docker image for ECR (assumes you have run `docker build -t sdp-repo-archive .` locally first)
 
     ```bash
     docker tag copilot-usage-lambda-script:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
     ```
 
-    **Note:** To find the <version\> to build look at the latest tagged version in ECR and increment appropriately
+    **Note:** To find the `<version\>` to build, look at the latest tagged version in ECR and increment appropriately
 
 3. Push the version up to ECR
 
@@ -159,7 +164,7 @@ The deployment of the service is defined in Infrastructure as Code (IaC) using T
 
 ### Deployment Prerequisites
 
-When first deploying the service to AWS the following prerequisites are expected to be in place or added.
+When first deploying the service to AWS, the following prerequisites are expected to be in place or added.
 
 #### Underlying AWS Infrastructure
 
@@ -204,14 +209,14 @@ The following groups and permissions must be defined and applied to the above us
 - AmazonEventBridgeFullAccess
 - AWSLambda_FullAccess
 
-Further to the above an IAM Role must be defined to allow ECS tasks to be executed:
+Further to the above, an IAM Role must be defined to allow ECS tasks to be executed:
 
 - ecsTaskExecutionRole
   - See the [AWS guide to create the task execution role policy](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
 
 #### Bootstrap for Terraform
 
-To store the state and implement a state locking mechanism for the service resources a Terraform backend is deployed in AWS (an S3 object and DynamoDbTable).
+To store the state and implement a state locking mechanism for the service resources, a Terraform backend is deployed in AWS (an S3 object and DynamoDbTable).
 
 #### Running the Terraform
 
@@ -222,7 +227,7 @@ There are associated README files in each of the Terraform modules in this repos
 - terraform/data_logger/main.tf
   - This provisions the resources required to launch the Copilot Dashboard's data collection Lambda script (data logger).
 
-Depending upon which environment you are deploying to you will want to run your terraform by pointing at an appropriate environment tfvars file.  
+Depending upon which environment you are deploying to, you will want to run your terraform by pointing at an appropriate environment tfvars file.
 
 Example service tfvars file:
 [/env/sandbox/example_tfvars.txt](../terraform/dashboard/env/sandbox/example_tfvars.txt)
@@ -299,8 +304,9 @@ Delete the service resources by running the following ensuring your reference th
 
 #### Allowlisting your IP
 To setup the deployment pipeline with concourse, you must first allowlist your IP address on the Concourse
-server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day
-whenever the deployment pipeline needs to be used. Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > Concourse Login) to
+server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used. 
+
+Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > Concourse Login) to
 login. All our pipelines run on sdp-pipeline-prod, whereas sdp-pipeline-dev is the account used for
 changes to Concourse instance itself. Make sure to export all necessary environment variables from sdp-pipeline-prod (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN).
 
