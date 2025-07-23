@@ -1,8 +1,11 @@
 # GitHub Copilot Usage Lambda
 
-This repository contains the lambda for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. The dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot).
+This repository contains the Lambda for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. The dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot).
 
 ---
+
+## Table of Contents
+TODO
 
 ## Disclaimer
 
@@ -10,9 +13,24 @@ The Copilot dashboard has been migrated to the Digital Landscape and this reposi
 
 ## Prerequisites
 
-This project uses Poetry for package management.
+- A Docker Daemon (Colima is recommended)
+  - [Colima](https://github.com/abiosoft/colima)
+- Terraform (For deployment)
+  - [Terraform](https://www.terraform.io/)
+- Poetry (For package management)
+  - [Poetry](https://python-poetry.org/docs/)
+- Python >3.12
+  - [Python](https://www.python.org/)
+- Make
+  - [GNU make](https://www.gnu.org/software/make/manual/make.html#Overview)
 
-[Instructions to install Poetry](https://python-poetry.org/docs/)
+## Makefile
+
+This repository has a Makefile for executing common commands. To view all commands, execute `make all`.
+
+```bash
+make all
+```
 
 ## Documentation
 
