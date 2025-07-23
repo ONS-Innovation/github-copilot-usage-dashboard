@@ -73,11 +73,12 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
                         "url": team.get("html_url", ""),
                     }
                 )
-        except Exception as error:
+        except Exception:
             # If Exception, then the team does not have copilot usage data and can be skipped
             pass
 
     return copilot_teams
+
 
 def handler(event, context):
 
@@ -197,7 +198,7 @@ def handler(event, context):
 
     # Get teams history
     team_history = []
-    
+
     logger.info("Getting history of each team identified previously")
 
     # Retrieve existing team history from S3
@@ -260,8 +261,7 @@ def handler(event, context):
 
 
 def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: str, query_params: dict = None):
-    """
-    Gets the team metrics Copilot data through the API.
+    """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
     as evaluated at the end of that day.
@@ -281,4 +281,3 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
     except Exception as e:
         logger.error(f"Error getting history for team {team} due to {e} with Github API")
         return None
-    
