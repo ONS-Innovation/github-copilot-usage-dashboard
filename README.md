@@ -52,13 +52,19 @@ The API endpoint above only stores the last 28 days worth of data, meaning this 
 This script is run as a containered lambda function in AWS which is executed periodically using EventBridge.
 
 ## Setup - Running in a container
-1. Build a Docker Image
+1. Change directory to the lambda folder
+
+```bash
+cd src
+```
+
+2. Build a Docker Image
 
 ```bash
 docker build -t copilot-usage-lambda-script .
 ```
 
-2. Check the image exists
+3. Check the image exists
 
 ```bash
 docker images
@@ -71,7 +77,7 @@ REPOSITORY                                                      TAG         IMAG
 copilot-usage-lambda-script                                     latest      0bbe73d9256f   11 seconds ago   224MB
 ```
 
-3. Run the image locally mapping local host port (9000) to container port (8080) and passing in AWS credentials to download a .pem file from the AWS Secrets Manager to the running container. These credentials will also be used to upload and download `historic_usage_data.json` to and from S3.
+4. Run the image locally mapping local host port (9000) to container port (8080) and passing in AWS credentials to download a .pem file from the AWS Secrets Manager to the running container. These credentials will also be used to upload and download `historic_usage_data.json` to and from S3.
 
 The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager and upload and download files from AWS S3.
 
@@ -89,13 +95,13 @@ copilot-usage-lambda-script
 
 Once the container is running, a local endpoint is created at `localhost:9000/2015-03-31/functions/function/invocations`.
 
-4. Post to the endpoint to trigger the function
+5. Post to the endpoint to trigger the function
 
 ```bash
 curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
 ```
 
-5. Once testing is finished, stop the running container
+6. Once testing is finished, stop the running container
 
 To check the container is running
 
