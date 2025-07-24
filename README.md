@@ -224,7 +224,7 @@ There are associated README files in each of the Terraform modules in this repos
 
 - terraform/dashboard/main.tf
   - This provisions the resources required to launch the Copilot Usage Dashboard iteself.
-- terraform/data_logger/main.tf
+- terraform/main.tf
   - This provisions the resources required to launch the Copilot Dashboard's data collection Lambda script (data logger).
 
 Depending upon which environment you are deploying to, you will want to run your terraform by pointing at an appropriate environment tfvars file.
@@ -232,15 +232,15 @@ Depending upon which environment you are deploying to, you will want to run your
 Example service tfvars file:
 [/env/sandbox/example_tfvars.txt](../terraform/dashboard/env/sandbox/example_tfvars.txt)
 
-### Updating the running service using Terraform (data_logger)
+### Updating the running service using Terraform
 
 If the application has been modified then the following can be performed to update the running service:
 
 - Build a new version of the container image and upload to ECR as per the instructions earlier in this guide.
-- Change directory to the **terraform/data_logger**
+- Change directory to **terraform**
 
   ```bash
-  cd terraform/data_logger
+  cd terraform
   ```
 
 - In the appropriate environment variable file env/sandbox/sandbox.tfvars, env/dev/dev.tfvars or env/prod/prod.tfvars
@@ -291,7 +291,7 @@ If the application has been modified then the following can be performed to upda
 Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
 
   ```bash
-  cd terraform/data_logger
+  cd terraform
 
   terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
