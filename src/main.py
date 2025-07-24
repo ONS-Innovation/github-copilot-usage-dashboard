@@ -122,10 +122,7 @@ def handler(event, context):
     if isinstance(access_token, str):
         logger.error("Error getting access token: %s", access_token)
         return f"Error getting access token: {access_token}"
-    logger.info(
-        "Access token retrieved using AWS Secret",
-        extra={"secret_address": secret_name},
-    )
+    logger.info("Access token retrieved using AWS Secret")
 
     # Create an instance of the api_controller class
     gh = github_api_toolkit.github_interface(access_token[0])
