@@ -12,23 +12,23 @@ clean: ## Clean the temporary files.
 
 .PHONY: black-check
 black-check: ## Run black for code formatting, without fixing.
-	poetry run black src --check || true
+	poetry run black src --check
 
 .PHONY: black-apply
 black-apply: ## Run black and fix code formatting.
-	poetry run black src || true
+	poetry run black src
 
 .PHONY: ruff-check
 ruff-check: ## Run ruff for linting and code formatting, without fixing.
-	poetry run ruff check src || true
+	poetry run ruff check src
 
 .PHONY: ruff-apply
 ruff-apply: ## Run ruff and fix linting and code formatting.
-	poetry run ruff check --fix src || true
+	poetry run ruff check --fix src
 
 .PHONY: pylint
 pylint: ## Run pylint for code analysis.
-	poetry run pylint src || true
+	poetry run pylint src
 
 .PHONY: lint
 lint:  ## Run Python linters without fixing.
