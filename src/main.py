@@ -1,3 +1,10 @@
+"""GitHub Copilot Usage Lambda
+
+This module contains the AWS Lambda handler and supporting functions for
+gathering, storing, and updating GitHub Copilot usage metrics and team history
+for an organization. Data is retrieved from the GitHub API and stored in S3.
+"""
+
 import json
 import logging
 import os
@@ -112,14 +119,13 @@ def handler(event, context):
     # Get updated copilot usage data from GitHub API
     access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 
-    if type(access_token) == str:
-        logger.error(f"Error getting access token: {access_token}")
+    if isinstance(access_token, str):
+        logger.error("Error getting access token: %s", access_token)
         return f"Error getting access token: {access_token}"
-    else:
-        logger.info(
-            "Access token retrieved using AWS Secret",
-            extra={"secret_address": secret_name},
-        )
+    logger.info(
+        "Access token retrieved using AWS Secret",
+        extra={"secret_address": secret_name},
+    )
 
     # Create an instance of the api_controller class
     gh = github_api_toolkit.github_interface(access_token[0])
@@ -138,9 +144,9 @@ def handler(event, context):
         response = s3.get_object(Bucket=BUCKET_NAME, Key=OBJECT_NAME)
         historic_usage = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
-        logger.error(f"Error getting {OBJECT_NAME}: {e}")
+        logger.error("Error getting %s: %s", OBJECT_NAME, e)
 
-        logger.info(f"Using empty list for {OBJECT_NAME}")
+        logger.info("Using empty list for %s", OBJECT_NAME)
         historic_usage = []
 
     dates_added = []
@@ -153,7 +159,8 @@ def handler(event, context):
             dates_added.append(date["date"])
 
     logger.info(
-        f"New usage data added to {OBJECT_NAME}",
+        "New usage data added to %s",
+        OBJECT_NAME,
         extra={"no_days_added": len(dates_added), "dates_added": dates_added},
     )
 
@@ -164,7 +171,7 @@ def handler(event, context):
         Body=json.dumps(historic_usage, indent=4).encode("utf-8"),
     )
 
-    logger.info(f"Uploaded updated {OBJECT_NAME} to S3")
+    logger.info("Uploaded updated %s to S3", OBJECT_NAME)
 
     # GitHub Teams with Copilot Data
 
@@ -217,10 +224,10 @@ def handler(event, context):
         response = s3.get_object(Bucket=BUCKET_NAME, Key="teams_history.json")
         existing_team_history = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
-        logger.warning(f"Error retrieving existing team history: {e}")
+        logger.warning("Error retrieving existing team history: %s", e)
         existing_team_history = []
 
-    logger.info(f"Existing team history has {len(existing_team_history)} entries")
+    logger.info("Existing team history has %d entries", len(existing_team_history))
 
     # Create a dictionary for quick lookup of existing team data using the `name` field
     existing_team_data_map = {single_team["team"]["name"]: single_team for single_team in existing_team_history}
@@ -244,9 +251,9 @@ def handler(event, context):
         if last_known_date:
             query_params["since"] = last_known_date
 
-        single_team_history = get_team_history(gh, org, team_name, query_params)
+        single_team_history = get_team_history(gh, team_name, query_params)
         if not single_team_history:
-            logger.info(f"No new history found for team {team_name}")
+            logger.info("No new history found for team %s", team_name)
             continue
 
         # Append new data to the existing team history
@@ -271,7 +278,7 @@ def handler(event, context):
     return "Github Data logging is now complete."
 
 
-def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: str, query_params: dict = None):
+def get_team_history(gh: github_api_toolkit.github_interface, team: str, query_params: dict = None):
     """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
@@ -279,7 +286,6 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
 
     Args:
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
-        org (str): Organisation name.
         team (str): Team name.
         query_params (dict): Additional query parameters for the API request.
 
@@ -290,5 +296,5 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
         response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
         return response.json()
     except Exception as e:
-        logger.error(f"Error getting history for team {team} due to {e} with Github API")
+        logger.error("Error getting history for team %s due to %s with Github API", team, e)
         return None
