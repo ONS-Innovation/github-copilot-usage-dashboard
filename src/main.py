@@ -226,9 +226,13 @@ def handler(event, context):  # pylint: disable=unused-argument
     return "Github Data logging is now complete."
 
 
-def create_dictionary(gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list):
+def create_dictionary(
+    gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list
+):
     """Create a dictionary for quick lookup of existing team data using the `name` field."""
-    existing_team_data_map = {single_team["team"]["name"]: single_team for single_team in existing_team_history}
+    existing_team_data_map = {
+        single_team["team"]["name"]: single_team for single_team in existing_team_history
+    }
 
     # Iterate through identified teams
     for team in copilot_teams:
@@ -284,7 +288,9 @@ def update_s3_object(s3_client, bucket_name, object_name, data):
         logger.error("Failed to update %s in bucket %s: %s", object_name, bucket_name, e)
 
 
-def get_team_history(gh: github_api_toolkit.github_interface, team: str, query_params: Optional[dict] = None):
+def get_team_history(
+    gh: github_api_toolkit.github_interface, team: str, query_params: Optional[dict] = None
+):
     """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
