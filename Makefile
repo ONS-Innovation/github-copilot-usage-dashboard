@@ -10,22 +10,36 @@ clean: ## Clean the temporary files.
 	rm -rf .mypy_cache
 	rm -rf .ruff_cache
 
-.PHONY: black
-black: ## Run black.
-	poetry run black src --check || true
+.PHONY: black-check
+black-check: ## Run black for code formatting, without fixing.
+	poetry run black src --check
 
-.PHONY: ruff
-ruff: ## Run ruff without fixing.
-	poetry run ruff check src || true
+.PHONY: black-apply
+black-apply: ## Run black and fix code formatting.
+	poetry run black src
+
+.PHONY: ruff-check
+ruff-check: ## Run ruff for linting and code formatting, without fixing.
+	poetry run ruff check src
+
+.PHONY: ruff-apply
+ruff-apply: ## Run ruff and fix linting and code formatting.
+	poetry run ruff check --fix src
 
 .PHONY: pylint
-pylint: ## Run pylint.
-	poetry run pylint src || true
+pylint: ## Run pylint for code analysis.
+	poetry run pylint src
 
 .PHONY: lint
-lint:  ## Run Python linter
-	make black
-	make ruff
+lint:  ## Run Python linters without fixing.
+	make black-check
+	make ruff-check
+	make pylint
+
+.PHONY: lint-apply
+lint-apply: ## Run black and ruff with auto-fix.
+	make black-apply
+	make ruff-apply
 	make pylint
 
 .PHONY: mypy
@@ -39,9 +53,5 @@ install:  ## Install the dependencies excluding dev.
 .PHONY: install-dev
 install-dev:  ## Install the dependencies including dev.
 	poetry install --no-root
-
-.PHONY: run-local
-run-local:  ## Install the dependencies including dev.
-	poetry run streamlit run src/app.py --server.port 8502
 
 	

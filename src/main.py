@@ -1,9 +1,16 @@
+"""GitHub Copilot Usage Lambda.
+
+This module contains the AWS Lambda handler and supporting functions for
+gathering, storing, and updating GitHub Copilot usage metrics and team history
+for an organization. Data is retrieved from the GitHub API and stored in S3.
+"""
+
 import json
 import logging
 import os
+from typing import Optional
 
 import boto3
-import boto3.exceptions
 import github_api_toolkit
 from botocore.exceptions import ClientError
 
@@ -15,13 +22,13 @@ client_id = os.getenv("GITHUB_APP_CLIENT_ID")
 
 # AWS Secret Manager Secret Name for the .pem file
 secret_name = os.getenv("AWS_SECRET_NAME")
-secret_reigon = os.getenv("AWS_DEFAULT_REGION")
+secret_region = os.getenv("AWS_DEFAULT_REGION")
 
 account = os.getenv("AWS_ACCOUNT_NAME")
 
 # AWS Bucket Path
-bucket_name = f"{account}-copilot-usage-dashboard"
-object_name = "historic_usage_data.json"
+BUCKET_NAME = f"{account}-copilot-usage-dashboard"
+OBJECT_NAME = "historic_usage_data.json"
 
 logger = logging.getLogger()
 
@@ -48,14 +55,14 @@ logger = logging.getLogger()
 
 
 def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
-    """Gets a list of GitHub Teams with CoPilot Data for a given API page.
+    """Gets a list of GitHub Teams with Copilot Data for a given API page.
 
     Args:
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
         page (int): The page number of the API request.
 
     Returns:
-        list: A list of GitHub Teams with CoPilot Data.
+        list: A list of GitHub Teams with Copilot Data.
     """
     copilot_teams = []
 
@@ -73,14 +80,33 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
                         "url": team.get("html_url", ""),
                     }
                 )
-        except Exception as error:
+        except Exception as e:
             # If Exception, then the team does not have copilot usage data and can be skipped
-            pass
+            logger.error(
+                "Error getting copilot usage data for team: %s",
+                e,
+            )
 
     return copilot_teams
 
-def handler(event, context):
 
+def handler(event, context):  # pylint: disable=unused-argument
+    """AWS Lambda handler function for GitHub Copilot usage data aggregation.
+
+    This function:
+    - Retrieves Copilot usage data from the GitHub API.
+    - Appends new usage data to historical data stored in S3.
+    - Retrieves and stores GitHub teams with Copilot usage.
+    - Updates team history data in S3.
+    - Logs progress and errors.
+
+    Args:
+        event (dict): AWS Lambda event payload.
+        context (LambdaContext): AWS Lambda context object.
+
+    Returns:
+        str: Completion message.
+    """
     # Create an S3 client
     session = boto3.Session()
     s3 = session.client("s3")
@@ -88,7 +114,7 @@ def handler(event, context):
     logger.info("S3 client created")
 
     # Get the .pem file from AWS Secrets Manager
-    secret_manager = session.client("secretsmanager", region_name=secret_reigon)
+    secret_manager = session.client("secretsmanager", region_name=secret_region)
 
     logger.info("Secret Manager client created")
 
@@ -97,21 +123,17 @@ def handler(event, context):
     # Get updated copilot usage data from GitHub API
     access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
 
-    if type(access_token) == str:
-        logger.error(f"Error getting access token: {access_token}")
+    if isinstance(access_token, str):
+        logger.error("Error getting access token: %s", access_token)
         return f"Error getting access token: {access_token}"
-    else:
-        logger.info(
-            "Access token retrieved using AWS Secret",
-            extra={"secret_address": secret_name},
-        )
+    logger.info("Access token retrieved using AWS Secret")
 
     # Create an instance of the api_controller class
     gh = github_api_toolkit.github_interface(access_token[0])
 
     logger.info("API Controller created")
 
-    # CoPilot Usage Data (Historic)
+    # Copilot Usage Data (Historic)
 
     # Get the usage data
     usage_data = gh.get(f"/orgs/{org}/copilot/metrics")
@@ -120,12 +142,11 @@ def handler(event, context):
     logger.info("Usage data retrieved")
 
     try:
-        response = s3.get_object(Bucket=bucket_name, Key=object_name)
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=OBJECT_NAME)
         historic_usage = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
-        logger.error(f"Error getting {object_name}: {e}")
+        logger.error("Error getting %s: %s. Using empty list.", OBJECT_NAME, e)
 
-        logger.info(f"Using empty list for {object_name}")
         historic_usage = []
 
     dates_added = []
@@ -138,22 +159,17 @@ def handler(event, context):
             dates_added.append(date["date"])
 
     logger.info(
-        f"New usage data added to {object_name}",
+        "New usage data added to %s",
+        OBJECT_NAME,
         extra={"no_days_added": len(dates_added), "dates_added": dates_added},
     )
 
     # Write the updated historic_usage to historic_usage_data.json
-    s3.put_object(
-        Bucket=bucket_name,
-        Key=object_name,
-        Body=json.dumps(historic_usage, indent=4).encode("utf-8"),
-    )
+    update_s3_object(s3, BUCKET_NAME, OBJECT_NAME, historic_usage)
 
-    logger.info(f"Uploaded updated {object_name} to S3")
+    # GitHub Teams with Copilot Data
 
-    # GitHub Teams with CoPilot Data
-
-    logger.info("Getting GitHub Teams with CoPilot Data")
+    logger.info("Getting GitHub Teams with Copilot Data")
 
     copilot_teams = []
 
@@ -171,22 +187,16 @@ def handler(event, context):
         copilot_teams = copilot_teams + page_teams
 
     logger.info(
-        "Got GitHub Teams with CoPilot Data",
+        "Fetched GitHub Teams with Copilot Data",
         extra={"no_teams": len(copilot_teams)},
     )
 
-    s3.put_object(
-        Bucket=bucket_name,
-        Key="copilot_teams.json",
-        Body=json.dumps(copilot_teams, indent=4).encode("utf-8"),
-    )
-
-    logger.info("Uploaded updated copilot_teams.json to S3")
+    update_s3_object(s3, BUCKET_NAME, "copilot_teams.json", copilot_teams)
 
     logger.info(
         "Process complete",
         extra={
-            "bucket": bucket_name,
+            "bucket": BUCKET_NAME,
             "no_days_added": len(dates_added),
             "dates_added": dates_added,
             "no_dates_before": len(historic_usage) - len(dates_added),
@@ -195,23 +205,34 @@ def handler(event, context):
         },
     )
 
-    # Get teams history
-    team_history = []
-    
     logger.info("Getting history of each team identified previously")
 
     # Retrieve existing team history from S3
     try:
-        response = s3.get_object(Bucket=bucket_name, Key="teams_history.json")
+        response = s3.get_object(Bucket=BUCKET_NAME, Key="teams_history.json")
         existing_team_history = json.loads(response["Body"].read().decode("utf-8"))
     except ClientError as e:
-        logger.warning(f"Error retrieving existing team history: {e}")
+        logger.warning("Error retrieving existing team history: %s", e)
         existing_team_history = []
 
-    logger.info(f"Existing team history has {len(existing_team_history)} entries")
+    logger.info("Existing team history has %d entries", len(existing_team_history))
 
-    # Create a dictionary for quick lookup of existing team data using the `name` field
-    existing_team_data_map = {single_team["team"]["name"]: single_team for single_team in existing_team_history}
+    # Convert to dictionary for quick lookup
+    updated_team_history = create_dictionary(gh, copilot_teams, existing_team_history)
+
+    # Write updated team history to S3
+    update_s3_object(s3, BUCKET_NAME, "teams_history.json", updated_team_history)
+
+    return "Github Data logging is now complete."
+
+
+def create_dictionary(
+    gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list
+):
+    """Create a dictionary for quick lookup of existing team data using the `name` field."""
+    existing_team_data_map = {
+        single_team["team"]["name"]: single_team for single_team in existing_team_history
+    }
 
     # Iterate through identified teams
     for team in copilot_teams:
@@ -232,9 +253,9 @@ def handler(event, context):
         if last_known_date:
             query_params["since"] = last_known_date
 
-        single_team_history = get_team_history(gh, org, team_name, query_params)
+        single_team_history = get_team_history(gh, team_name, query_params)
         if not single_team_history:
-            logger.info(f"No new history found for team {team_name}")
+            logger.info("No new history found for team %s", team_name)
             continue
 
         # Append new data to the existing team history
@@ -244,31 +265,39 @@ def handler(event, context):
         else:
             existing_team_data_map[team_name] = {"team": team, "data": new_team_data}
 
-    # Convert the updated team data map back to a list
-    updated_team_history = list(existing_team_data_map.values())
-
-    # Write updated team history to S3
-    s3.put_object(
-        Bucket=bucket_name,
-        Key="teams_history.json",
-        Body=json.dumps(updated_team_history, indent=4).encode("utf-8"),
-    )
-
-    logger.info("Uploaded updated teams_history.json to S3")
-
-    return "Github Data logging is now complete."
+    return list(existing_team_data_map.values())
 
 
-def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: str, query_params: dict = None):
+def update_s3_object(s3_client, bucket_name, object_name, data):
+    """Update an S3 object with new data.
+
+    Args:
+        s3_client (boto3.client): The S3 client.
+        bucket_name (str): The name of the S3 bucket.
+        object_name (str): The name of the S3 object.
+        data (dict): The data to be written to the S3 object.
     """
-    Gets the team metrics Copilot data through the API.
+    try:
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=object_name,
+            Body=json.dumps(data, indent=4).encode("utf-8"),
+        )
+        logger.info("Successfully updated %s in bucket %s", object_name, bucket_name)
+    except ClientError as e:
+        logger.error("Failed to update %s in bucket %s: %s", object_name, bucket_name, e)
+
+
+def get_team_history(
+    gh: github_api_toolkit.github_interface, team: str, query_params: Optional[dict] = None
+):
+    """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
     as evaluated at the end of that day.
 
     Args:
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
-        org (str): Organisation name.
         team (str): Team name.
         query_params (dict): Additional query parameters for the API request.
 
@@ -279,6 +308,5 @@ def get_team_history(gh: github_api_toolkit.github_interface, org: str, team: st
         response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
         return response.json()
     except Exception as e:
-        logger.error(f"Error getting history for team {team} due to {e} with Github API")
+        logger.error("Error getting history for team %s due to %s with Github API", team, e)
         return None
-    
