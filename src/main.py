@@ -55,38 +55,6 @@ logger = logging.getLogger()
 # }
 
 
-def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
-    """Gets a list of GitHub Teams with Copilot Data for a given API page.
-
-    Args:
-        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
-        page (int): The page number of the API request.
-
-    Returns:
-        list: A list of GitHub Teams with Copilot Data.
-    """
-    copilot_teams = []
-
-    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
-    teams = response.json()
-    for team in teams:
-        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
-
-        if not isinstance(usage_data, Response):
-            logger.error("Unexpected response type: %s", type(usage_data))
-            continue
-        copilot_teams.append(
-            {
-                "name": team.get("name", ""),
-                "slug": team.get("slug", ""),
-                "description": team.get("description", ""),
-                "url": team.get("html_url", ""),
-            }
-        )
-
-    return copilot_teams
-
-
 def handler(event, context):  # pylint: disable=unused-argument
     """AWS Lambda handler function for GitHub Copilot usage data aggregation.
 
@@ -131,64 +99,10 @@ def handler(event, context):  # pylint: disable=unused-argument
     logger.info("API Controller created")
 
     # Copilot Usage Data (Historic)
-
-    # Get the usage data
-    usage_data = gh.get(f"/orgs/{org}/copilot/metrics")
-    usage_data = usage_data.json()
-
-    logger.info("Usage data retrieved")
-
-    try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key=OBJECT_NAME)
-        historic_usage = json.loads(response["Body"].read().decode("utf-8"))
-    except ClientError as e:
-        logger.error("Error getting %s: %s. Using empty list.", OBJECT_NAME, e)
-
-        historic_usage = []
-
-    dates_added = []
-
-    # Append the new usage data to the historic_usage_data.json
-    for date in usage_data:
-        if not any(d["date"] == date["date"] for d in historic_usage):
-            historic_usage.append(date)
-
-            dates_added.append(date["date"])
-
-    logger.info(
-        "New usage data added to %s",
-        OBJECT_NAME,
-        extra={"no_days_added": len(dates_added), "dates_added": dates_added},
-    )
-
-    # Write the updated historic_usage to historic_usage_data.json
-    update_s3_object(s3, BUCKET_NAME, OBJECT_NAME, historic_usage)
+    historic_usage, dates_added = get_and_update_historic_usage(s3, gh)
 
     # GitHub Teams with Copilot Data
-
-    logger.info("Getting GitHub Teams with Copilot Data")
-
-    copilot_teams = []
-
-    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100})
-
-    # Get the last page of teams
-    try:
-        last_page = int(response.links["last"]["url"].split("=")[-1])
-    except KeyError:
-        last_page = 1
-
-    for page in range(1, last_page + 1):
-        page_teams = get_copilot_team_date(gh, page)
-
-        copilot_teams = copilot_teams + page_teams
-
-    logger.info(
-        "Fetched GitHub Teams with Copilot Data",
-        extra={"no_teams": len(copilot_teams)},
-    )
-
-    update_s3_object(s3, BUCKET_NAME, "copilot_teams.json", copilot_teams)
+    copilot_teams = get_and_update_copilot_teams(s3, gh)
 
     logger.info(
         "Process complete",
@@ -221,6 +135,104 @@ def handler(event, context):  # pylint: disable=unused-argument
     update_s3_object(s3, BUCKET_NAME, "teams_history.json", updated_team_history)
 
     return "Github Data logging is now complete."
+
+
+def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
+    """Gets a list of GitHub Teams with Copilot Data for a given API page.
+
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        page (int): The page number of the API request.
+
+    Returns:
+        list: A list of GitHub Teams with Copilot Data.
+    """
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100, "page": page})
+    teams = response.json()
+    for team in teams:
+        usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
+
+        if not isinstance(usage_data, Response):
+            logger.error("Unexpected response type: %s", type(usage_data))
+            continue
+        copilot_teams.append(
+            {
+                "name": team.get("name", ""),
+                "slug": team.get("slug", ""),
+                "description": team.get("description", ""),
+                "url": team.get("html_url", ""),
+            }
+        )
+
+    return copilot_teams
+
+
+def get_and_update_historic_usage(s3, gh):
+    """Get and update historic usage data from GitHub Copilot."""
+    # Get the usage data
+    usage_data = gh.get(f"/orgs/{org}/copilot/metrics")
+    usage_data = usage_data.json()
+
+    logger.info("Usage data retrieved")
+
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key=OBJECT_NAME)
+        historic_usage = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        logger.error("Error getting %s: %s. Using empty list.", OBJECT_NAME, e)
+
+        historic_usage = []
+
+    dates_added = []
+
+    # Append the new usage data to the historic_usage_data.json
+    for date in usage_data:
+        if not any(d["date"] == date["date"] for d in historic_usage):
+            historic_usage.append(date)
+
+            dates_added.append(date["date"])
+
+    logger.info(
+        "New usage data added to %s",
+        OBJECT_NAME,
+        extra={"no_days_added": len(dates_added), "dates_added": dates_added},
+    )
+
+    # Write the updated historic_usage to historic_usage_data.json
+    update_s3_object(s3, BUCKET_NAME, OBJECT_NAME, historic_usage)
+
+    return historic_usage, dates_added
+
+
+def get_and_update_copilot_teams(s3, gh):
+    """Get and update GitHub Teams with Copilot Data."""
+    logger.info("Getting GitHub Teams with Copilot Data")
+
+    copilot_teams = []
+
+    response = gh.get(f"/orgs/{org}/teams", params={"per_page": 100})
+
+    # Get the last page of teams
+    try:
+        last_page = int(response.links["last"]["url"].split("=")[-1])
+    except KeyError:
+        last_page = 1
+
+    for page in range(1, last_page + 1):
+        page_teams = get_copilot_team_date(gh, page)
+
+        copilot_teams = copilot_teams + page_teams
+
+    logger.info(
+        "Fetched GitHub Teams with Copilot Data",
+        extra={"no_teams": len(copilot_teams)},
+    )
+
+    update_s3_object(s3, BUCKET_NAME, "copilot_teams.json", copilot_teams)
+
+    return copilot_teams
 
 
 def create_dictionary(
