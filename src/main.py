@@ -13,6 +13,7 @@ from typing import Optional
 import boto3
 import github_api_toolkit
 from botocore.exceptions import ClientError
+from requests import Response
 
 # GitHub Organisation
 org = os.getenv("GITHUB_ORG")
@@ -70,22 +71,18 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
     teams = response.json()
     for team in teams:
         usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
-        try:
-            if usage_data.json():
-                copilot_teams.append(
-                    {
-                        "name": team.get("name", ""),
-                        "slug": team.get("slug", ""),
-                        "description": team.get("description", ""),
-                        "url": team.get("html_url", ""),
-                    }
-                )
-        except Exception as e:
-            # If Exception, then the team does not have copilot usage data and can be skipped
-            logger.error(
-                "Error getting copilot usage data for team: %s",
-                e,
-            )
+
+        if not isinstance(usage_data, Response):
+            logger.error("Unexpected response type: %s", type(usage_data))
+            continue
+        copilot_teams.append(
+            {
+                "name": team.get("name", ""),
+                "slug": team.get("slug", ""),
+                "description": team.get("description", ""),
+                "url": team.get("html_url", ""),
+            }
+        )
 
     return copilot_teams
 
@@ -304,9 +301,9 @@ def get_team_history(
     Returns:
         json: A json of team's GitHub team metrics or None if an error occurs.
     """
-    try:
-        response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
-        return response.json()
-    except Exception as e:
-        logger.error("Error getting history for team %s due to %s with Github API", team, e)
+    response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
+
+    if not isinstance(response, Response):
+        logger.error("Unexpected response type: %s", type(response))
         return None
+    return response.json()
