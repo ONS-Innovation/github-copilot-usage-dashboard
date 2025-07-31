@@ -5,7 +5,27 @@ This repository contains the Lambda for updating the GitHub Copilot dashboard's 
 ---
 
 ## Table of Contents
-TODO
+- [Disclaimer](#disclaimer)
+- [Prerequisites](#prerequisites)
+- [Makefile](#makefile)
+- [Documentation](#documentation)
+- [Testing](#testing)
+- [Linting](#linting)
+- [AWS Lambda Scripts](#aws-lambda-scripts)
+  - [Setup - Running in a container](#setup---running-in-a-container)
+  - [Storing the container on AWS Elastic Container Registry (ECR)](#storing-the-container-on-aws-elastic-container-registry-ecr)
+  - [Deployment to AWS](#deployment-to-aws)
+    - [Deployment Prerequisites](#deployment-prerequisites)
+      - [Underlying AWS Infrastructure](#underlying-aws-infrastructure)
+      - [Bootstrap IAM User Groups, Users and an ECSTaskExecutionRole](#bootstrap-iam-user-groups-users-and-an-ecstaskexecutionrole)
+      - [Bootstrap for Terraform](#bootstrap-for-terraform)
+      - [Running the Terraform](#running-the-terraform)
+    - [Updating the running service using Terraform](#updating-the-running-service-using-terraform)
+    - [Destroy the Main Service Resources](#destroy-the-main-service-resources)
+- [Deployments with Concourse](#deployments-with-concourse)
+  - [Allowlisting your IP](#allowlisting-your-ip)
+  - [Setting up a pipeline](#setting-up-a-pipeline)
+  - [Triggering a pipeline](#triggering-a-pipeline)
 
 ## Disclaimer
 
@@ -41,6 +61,33 @@ For more information about MkDocs, see the below documentation.
 [Getting Started with MkDocs](https://www.mkdocs.org/getting-started/)
 
 There is a guide to getting started on this repository's GitHub Pages site.
+
+## Testing
+This project uses Pytest for testing. The tests can be found in the `tests` folder.
+
+To run all tests, use `make test`.
+
+## Linting
+This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in both `src` and `tests`.
+
+The following Makefile commands can be used to run linting and optionally apply fixes or run a specific linter:
+```bash
+black-check ## Run black for code formatting, without fixing.
+
+black-apply ## Run black and fix code formatting.
+
+ruff-check ## Run ruff for linting and code formatting, without fixing.
+
+ruff-apply ## Run ruff and fix linting and code formatting.
+
+pylint ## Run pylint for code analysis.
+
+lint  ## Run Python linters without fixing.
+
+lint-apply ## Run black and ruff with auto-fix, and Pylint.
+```
+
+On pull request or push to the `master` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes.
 
 # AWS Lambda Scripts
 
@@ -300,9 +347,9 @@ Delete the service resources by running the following ensuring your reference th
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
 
-### Deployments with Concourse
+# Deployments with Concourse
 
-#### Allowlisting your IP
+## Allowlisting your IP
 To setup the deployment pipeline with concourse, you must first allowlist your IP address on the Concourse
 server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used. 
 
@@ -310,7 +357,7 @@ Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > C
 login. All our pipelines run on sdp-pipeline-prod, whereas sdp-pipeline-dev is the account used for
 changes to Concourse instance itself. Make sure to export all necessary environment variables from sdp-pipeline-prod (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN).
 
-#### Setting up a pipeline
+## Setting up a pipeline
 When setting up our pipelines, we use ecs-infra-user on sdp-dev to be able to interact with our infrastructure on AWS. The credentials for this are stored on
 AWS Secrets Manager so you do not need to set up anything yourself.
 
@@ -330,7 +377,7 @@ If you wish to set a pipeline for another branch without checking out, you can r
 
 If the branch you are deploying is "main" or "master", it will trigger a deployment to the sdp-prod environment. To set the ECR image tag, you must draft a Github release pointing to the latest release of the main/master branch that has a tag in the form of vX.Y.Z. Drafting up a release will automatically deploy the latest version of the main/master branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
 
-#### Triggering a pipeline
+## Triggering a pipeline
 Once the pipeline has been set, you can manually trigger a build on the Concourse UI, or run the following command:
 ```bash
 fly -t aws-sdp trigger-job -j github-copilot-usage-lambda-<branch-name>/build-and-push
