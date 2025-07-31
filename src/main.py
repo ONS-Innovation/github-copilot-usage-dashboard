@@ -257,7 +257,7 @@ def create_dictionary(
             if existing_dates:
                 last_known_date = max(existing_dates)  # Get the most recent date
 
-        # Assign the last know date to the `since` query parameter
+        # Assign the last known date to the `since` query parameter
         query_params = {}
         if last_known_date:
             query_params["since"] = last_known_date
