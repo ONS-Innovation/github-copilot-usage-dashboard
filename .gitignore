@@ -61,3 +61,6 @@ terraform/dashboard/highest_alb_listener_priority.txt
 
 # Ignore the .DS_Store file created by macOS
 .DS_Store
+
+# Pytest Coverage Reports
+.coverage

@@ -58,6 +58,5 @@ install-dev:  ## Install the dependencies including dev.
 
 .PHONY: test
 test: ## Run the lambda tests.
-	poetry run pytest
-
+	poetry run pytest -n auto --cov=src --cov-report term-missing --cov-fail-under=95
 	

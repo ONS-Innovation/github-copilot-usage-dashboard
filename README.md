@@ -5,12 +5,14 @@ This repository contains the Lambda for updating the GitHub Copilot dashboard's 
 ---
 
 ## Table of Contents
-- [Disclaimer](#disclaimer)
-- [Prerequisites](#prerequisites)
-- [Makefile](#makefile)
-- [Documentation](#documentation)
-- [Testing](#testing)
-- [Linting](#linting)
+- [GitHub Copilot Usage Lambda](#github-copilot-usage-lambda)
+  - [Table of Contents](#table-of-contents)
+  - [Disclaimer](#disclaimer)
+  - [Prerequisites](#prerequisites)
+  - [Makefile](#makefile)
+  - [Documentation](#documentation)
+  - [Testing](#testing)
+  - [Linting](#linting)
 - [AWS Lambda Scripts](#aws-lambda-scripts)
   - [Setup - Running in a container](#setup---running-in-a-container)
   - [Storing the container on AWS Elastic Container Registry (ECR)](#storing-the-container-on-aws-elastic-container-registry-ecr)

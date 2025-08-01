@@ -2,7 +2,6 @@ import pytest
 from unittest.mock import patch
 
 from src.main import (
-    get_access_token,
     handler,
 )
 
