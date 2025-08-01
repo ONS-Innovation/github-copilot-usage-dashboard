@@ -11,26 +11,27 @@ clean: ## Clean the temporary files.
 	rm -rf .ruff_cache
 	rm -rf .pytest_cache
 	rm -rf tests/__pycache__
+	rm -rf .coverage
 
 .PHONY: black-check
 black-check: ## Run black for code formatting, without fixing.
-	poetry run black src tests --check
+	poetry run black src --check
 
 .PHONY: black-apply
 black-apply: ## Run black and fix code formatting.
-	poetry run black src tests
+	poetry run black src
 
 .PHONY: ruff-check
 ruff-check: ## Run ruff for linting and code formatting, without fixing.
-	poetry run ruff check src tests
+	poetry run ruff check src
 
 .PHONY: ruff-apply
 ruff-apply: ## Run ruff and fix linting and code formatting.
-	poetry run ruff check --fix src tests
+	poetry run ruff check --fix src
 
 .PHONY: pylint
 pylint: ## Run pylint for code analysis.
-	poetry run pylint src tests
+	poetry run pylint src
 
 .PHONY: lint
 lint:  ## Run Python linters without fixing.
