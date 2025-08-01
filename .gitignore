@@ -64,3 +64,6 @@ terraform/dashboard/highest_alb_listener_priority.txt
 
 # Pytest Coverage Reports
 .coverage
+
+# VS Code settings
+.vscode/
