@@ -1,14 +1,14 @@
-# CoPilot Team Usage
+# Copilot Team Usage
 
 ## Overview
 This section of the project leverages GitHub OAuth2 for user authentication, granting access to essential data.
 
 The tech stack and UI is the same as the Organization Usage.
 
-### Requirements for Team CoPilot Usage
+### Requirements for Team Copilot Usage
 To retrieve data, a team must meet the following criteria:
 
-- At least 5 members with active CoPilot licenses.
+- At least 5 members with active Copilot licenses.
 - These 5 users must be active for a minimum of 1 day.
 
 ## Access
@@ -22,12 +22,12 @@ The session is saved to streamlit's `session_state`. For security, the session r
 A user within ONSDigital. Upon authentication, the app identifies the teams they belong to and populates the selection box accordingly. If the user is part of a qualifying team, they can view the data. Users not associated with any team cannot select teams.
 
 #### Admin User
-An enhanced regular user with the ability to search for any team. This user belongs to a specific whitelisted team, enabling them to view metrics for any team that meets the CoPilot usage data requirements.
+An enhanced regular user with the ability to search for any team. This user belongs to a specific whitelisted team, enabling them to view metrics for any team that meets the Copilot usage data requirements.
 
 ## Metrics
 
 ### Team History Metrics
-The team history metrics function retrieves historical usage data for each team identified with CoPilot usage. This data includes detailed metrics about the team's activity over time. New data for a team is fetched only from the last captured date in the file.
+The team history metrics function retrieves historical usage data for each team identified with Copilot usage. This data includes detailed metrics about the team's activity over time. New data for a team is fetched only from the last captured date in the file.
 
 #### Functionality
 - **Input**: The function in addition to the GitHub Client takes a team name, organisation and the optional "since" as a query parameter as input.
@@ -38,7 +38,7 @@ The team history metrics function retrieves historical usage data for each team 
 - **Output**: A JSON object containing the team's historical metrics, including:
   - Team name
   - Activity data
-  - CoPilot usage statistics
+  - Copilot usage statistics
 
 #### Usage
 The historical metrics are stored in an S3 bucket as a json file (`teams_history.json`).
