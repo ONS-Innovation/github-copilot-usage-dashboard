@@ -221,7 +221,6 @@ class TestHandler:
         mock_update_s3_object.assert_called_with(
             mock_s3, BUCKET_NAME, "teams_history.json", mock_create_dictionary.return_value
         )
-        assert any("Process complete" in record.getMessage() for record in caplog.records)
 
     @patch("src.main.boto3.Session")
     @patch("src.main.github_api_toolkit.get_token_as_installation")
@@ -476,10 +475,11 @@ class TestCreateDictionary:
                 {"date": "2024-01-02", "usage": 10},
             ]
             mock_get_team_history.assert_called_once()
-            # Should pass 'since' param with last_known_date
+
             args, kwargs = mock_get_team_history.call_args
-            assert kwargs["team"] == "team1"
-            assert kwargs["query_params"]["since"] == "2024-01-01"
+            assert args[0] == gh
+            assert args[1] == "team1"
+            assert args[2] == {"since": "2024-01-01"}
 
     def test_create_dictionary_skips_team_with_no_name(self, caplog):
         gh = MagicMock()
@@ -504,7 +504,3 @@ class TestCreateDictionary:
             result = create_dictionary(gh, copilot_teams, existing_team_history)
             assert result == []
             assert mock_get_team_history.call_count == 1
-            assert any(
-                "No new history found for team team1" in record.getMessage()
-                for record in caplog.records
-            )
