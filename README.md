@@ -69,6 +69,8 @@ This project uses Pytest for testing. The tests can be found in the `tests` fold
 
 To run all tests, use `make test`.
 
+On pull request or push to the `master` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%.
+
 ## Linting
 This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in both `src` and `tests`.
 
