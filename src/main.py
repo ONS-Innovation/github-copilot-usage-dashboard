@@ -319,3 +319,7 @@ def get_team_history(
         logger.error("Unexpected response type: %s", type(response))
         return None
     return response.json()
+
+
+# if __name__ == "__main__":
+#     handler(None, None)

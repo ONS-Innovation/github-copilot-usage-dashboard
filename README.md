@@ -15,6 +15,7 @@ This repository contains the Lambda for updating the GitHub Copilot dashboard's 
   - [Linting](#linting)
 - [AWS Lambda Scripts](#aws-lambda-scripts)
   - [Setup - Running in a container](#setup---running-in-a-container)
+  - [Setup - running outside of a Container (Development only)](#setup---running-outside-of-a-container-development-only)
   - [Storing the container on AWS Elastic Container Registry (ECR)](#storing-the-container-on-aws-elastic-container-registry-ecr)
   - [Deployment to AWS](#deployment-to-aws)
     - [Deployment Prerequisites](#deployment-prerequisites)
@@ -172,6 +173,39 @@ Once the container is running, a local endpoint is created at `localhost:9000/20
   ```bash
   docker stop 3f7d64676b1a
   ```
+
+## Setup - running outside of a Container (Development only)
+
+To run the Lambda function outside of a container, we need to execute the `handler()` function.
+
+1. Uncomment the following at the bottom of `main.py`.
+
+    ```python
+    ...
+    # if __name__ == "__main__":
+    #     handler(None, None)
+    ...
+    ```
+
+    **Please Note:** If uncommenting the above in `main.py`, make sure you re-comment the code *before* pushing back to GitHub.
+
+2. Export the required environment variables:
+
+    ```bash
+    export AWS_ACCESS_KEY_ID=<access_key_id>
+    export AWS_SECRET_ACCESS_KEY=<secret_access_key>
+    export AWS_DEFAULT_REGION=eu-west-2
+    export AWS_SECRET_NAME=<secret_name>
+    export S3_BUCKET_NAME=<bucket_name>
+    export GITHUB_ORG=<org>
+    export GITHUB_APP_CLIENT_ID=<client_id>
+    ```
+
+3. Run the script.
+
+    ```bash
+    python3 src/main.py
+    ```
 
 ## Storing the container on AWS Elastic Container Registry (ECR)
 
