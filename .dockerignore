@@ -1,0 +1,10 @@
+# Virtual Environment
+venv/
+
+# __pycache__
+__pycache__/
+
+concourse/
+docs/
+terraform/
+tests/

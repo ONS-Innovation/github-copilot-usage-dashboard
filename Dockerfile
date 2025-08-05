@@ -4,14 +4,18 @@ FROM public.ecr.aws/lambda/python:3.12
 # For python 3.12, dnf replaces yum for package management
 RUN dnf install git -y
 
-# Copy requirements.txt
-COPY requirements.txt ${LAMBDA_TASK_ROOT}
+# Copy required files into the container
+COPY pyproject.toml poetry.lock ./
 
-# Install the specified packages
-RUN pip install -r requirements.txt
+# Install Poetry
+RUN pip install poetry
 
-# Copy function code
-COPY main.py ${LAMBDA_TASK_ROOT}
+# Install dependencies using Poetry
+RUN poetry config virtualenvs.create false && \
+    poetry install --only main --no-root
+
+# Copy the source code into the container
+COPY src/ src/
 
 # Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
-CMD [ "main.handler" ]
+CMD [ "src.main.handler" ]
