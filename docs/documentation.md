@@ -35,7 +35,7 @@ In order to build an MkDocs deployment or serve the documentation locally, we ne
 2. Install MkDocs and its dependencies.
 
     ```bash
-    poetry install --with docs
+    poetry install --only docs
     ```
 
 3. You can now use MkDocs. To see a list of commands run the following:

@@ -55,88 +55,6 @@ logger = logging.getLogger()
 # }
 
 
-def handler(event, context):  # pylint: disable=unused-argument
-    """AWS Lambda handler function for GitHub Copilot usage data aggregation.
-
-    This function:
-    - Retrieves Copilot usage data from the GitHub API.
-    - Appends new usage data to historical data stored in S3.
-    - Retrieves and stores GitHub teams with Copilot usage.
-    - Updates team history data in S3.
-    - Logs progress and errors.
-
-    Args:
-        event (dict): AWS Lambda event payload.
-        context (LambdaContext): AWS Lambda context object.
-
-    Returns:
-        str: Completion message.
-    """
-    # Create an S3 client
-    session = boto3.Session()
-    s3 = session.client("s3")
-
-    logger.info("S3 client created")
-
-    # Get the .pem file from AWS Secrets Manager
-    secret_manager = session.client("secretsmanager", region_name=secret_region)
-
-    logger.info("Secret Manager client created")
-
-    secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
-
-    # Get updated copilot usage data from GitHub API
-    access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
-
-    if isinstance(access_token, str):
-        logger.error("Error getting access token: %s", access_token)
-        return f"Error getting access token: {access_token}"
-    logger.info("Access token retrieved using AWS Secret")
-
-    # Create an instance of the api_controller class
-    gh = github_api_toolkit.github_interface(access_token[0])
-
-    logger.info("API Controller created")
-
-    # Copilot Usage Data (Historic)
-    historic_usage, dates_added = get_and_update_historic_usage(s3, gh)
-
-    # GitHub Teams with Copilot Data
-    copilot_teams = get_and_update_copilot_teams(s3, gh)
-
-    logger.info(
-        "Process complete",
-        extra={
-            "bucket": BUCKET_NAME,
-            "no_days_added": len(dates_added),
-            "dates_added": dates_added,
-            "no_dates_before": len(historic_usage) - len(dates_added),
-            "no_dates_after": len(historic_usage),
-            "no_copilot_teams": len(copilot_teams),
-        },
-    )
-
-    logger.info("Getting history of each team identified previously")
-
-    # Retrieve existing team history from S3
-    try:
-        response = s3.get_object(Bucket=BUCKET_NAME, Key="teams_history.json")
-        existing_team_history = json.loads(response["Body"].read().decode("utf-8"))
-    except ClientError as e:
-        logger.warning("Error retrieving existing team history: %s", e)
-        existing_team_history = []
-
-    logger.info("Existing team history has %d entries", len(existing_team_history))
-
-    # Convert to dictionary for quick lookup
-    updated_team_history = create_dictionary(gh, copilot_teams, existing_team_history)
-
-    # Write updated team history to S3
-    update_s3_object(s3, BUCKET_NAME, "teams_history.json", updated_team_history)
-
-    return "Github Data logging is now complete."
-
-
 def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) -> list:
     """Gets a list of GitHub Teams with Copilot Data for a given API page.
 
@@ -349,6 +267,88 @@ def get_team_history(
         logger.error("Unexpected response type: %s", type(response))
         return None
     return response.json()
+
+
+def handler(event, context):  # pylint: disable=unused-argument
+    """AWS Lambda handler function for GitHub Copilot usage data aggregation.
+
+    This function:
+    - Retrieves Copilot usage data from the GitHub API.
+    - Appends new usage data to historical data stored in S3.
+    - Retrieves and stores GitHub teams with Copilot usage.
+    - Updates team history data in S3.
+    - Logs progress and errors.
+
+    Args:
+        event (dict): AWS Lambda event payload.
+        context (LambdaContext): AWS Lambda context object.
+
+    Returns:
+        str: Completion message.
+    """
+    # Create an S3 client
+    session = boto3.Session()
+    s3 = session.client("s3")
+
+    logger.info("S3 client created")
+
+    # Get the .pem file from AWS Secrets Manager
+    secret_manager = session.client("secretsmanager", region_name=secret_region)
+
+    logger.info("Secret Manager client created")
+
+    secret = secret_manager.get_secret_value(SecretId=secret_name)["SecretString"]
+
+    # Get updated copilot usage data from GitHub API
+    access_token = github_api_toolkit.get_token_as_installation(org, secret, client_id)
+
+    if isinstance(access_token, str):
+        logger.error("Error getting access token: %s", access_token)
+        return f"Error getting access token: {access_token}"
+    logger.info("Access token retrieved using AWS Secret")
+
+    # Create an instance of the api_controller class
+    gh = github_api_toolkit.github_interface(access_token[0])
+
+    logger.info("API Controller created")
+
+    # Copilot Usage Data (Historic)
+    historic_usage, dates_added = get_and_update_historic_usage(s3, gh)
+
+    # GitHub Teams with Copilot Data
+    copilot_teams = get_and_update_copilot_teams(s3, gh)
+
+    logger.info(
+        "Process complete",
+        extra={
+            "bucket": BUCKET_NAME,
+            "no_days_added": len(dates_added),
+            "dates_added": dates_added,
+            "no_dates_before": len(historic_usage) - len(dates_added),
+            "no_dates_after": len(historic_usage),
+            "no_copilot_teams": len(copilot_teams),
+        },
+    )
+
+    logger.info("Getting history of each team identified previously")
+
+    # Retrieve existing team history from S3
+    try:
+        response = s3.get_object(Bucket=BUCKET_NAME, Key="teams_history.json")
+        existing_team_history = json.loads(response["Body"].read().decode("utf-8"))
+    except ClientError as e:
+        logger.warning("Error retrieving existing team history: %s", e)
+        existing_team_history = []
+
+    logger.info("Existing team history has %d entries", len(existing_team_history))
+
+    # Convert to dictionary for quick lookup
+    updated_team_history = create_dictionary(gh, copilot_teams, existing_team_history)
+
+    # Write updated team history to S3
+    update_s3_object(s3, BUCKET_NAME, "teams_history.json", updated_team_history)
+
+    return "Github Data logging is now complete."
 
 
 # # Dev Only
