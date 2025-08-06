@@ -1,13 +1,14 @@
 # GitHub Copilot Usage Lambda
 
-This repository contains the Lambda for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. The dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot).
+This repository contains the Lambda for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. 
+
+The Copilot dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot). Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ---
 
 ## Table of Contents
 - [GitHub Copilot Usage Lambda](#github-copilot-usage-lambda)
   - [Table of Contents](#table-of-contents)
-  - [Disclaimer](#disclaimer)
   - [Prerequisites](#prerequisites)
   - [Makefile](#makefile)
   - [Documentation](#documentation)
@@ -29,10 +30,6 @@ This repository contains the Lambda for updating the GitHub Copilot dashboard's 
   - [Allowlisting your IP](#allowlisting-your-ip)
   - [Setting up a pipeline](#setting-up-a-pipeline)
   - [Triggering a pipeline](#triggering-a-pipeline)
-
-## Disclaimer
-
-The Copilot dashboard has been migrated to the Digital Landscape and this repository has been updated to only contain the lambda. The repository for the new dashboard can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ## Prerequisites
 
