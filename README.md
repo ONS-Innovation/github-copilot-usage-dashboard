@@ -142,7 +142,7 @@ This script is run as a containered lambda function in AWS which is executed per
   -e AWS_SECRET_NAME=<aws_secret_name> \
   -e GITHUB_ORG=ONSDigital \
   -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
-  -e AWS_ACCOUNT_NAME=sdp-sandbox \
+  -e AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod> \
   copilot-usage-lambda-script
   ```
 
@@ -199,7 +199,7 @@ To run the Lambda function outside of a container, we need to execute the `handl
     export AWS_SECRET_NAME=<aws_secret_name>
     export GITHUB_ORG=ONSDigital
     export GITHUB_APP_CLIENT_ID=<github_app_client_id>
-    export AWS_ACCOUNT_NAME=sdp-sandbox
+    export AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod>
     ```
 
 3. Run the script.
@@ -311,7 +311,7 @@ There are associated README files in each of the Terraform modules in this repos
 Depending upon which environment you are deploying to, you will want to run your terraform by pointing at an appropriate environment tfvars file.
 
 Example service tfvars file:
-[/env/sandbox/example_tfvars.txt](../terraform/dashboard/env/sandbox/example_tfvars.txt)
+[/env/dev/example_tfvars.txt](/terraform/env/dev/example_tfvars.txt)
 
 ### Updating the running service using Terraform
 
@@ -324,7 +324,7 @@ If the application has been modified then the following can be performed to upda
   cd terraform
   ```
 
-- In the appropriate environment variable file env/sandbox/sandbox.tfvars, env/dev/dev.tfvars or env/prod/prod.tfvars
+- In the appropriate environment variable file env/dev/dev.tfvars or env/prod/prod.tfvars
   - Fill out the appropriate variables
 
 - Initialise terraform for the appropriate environment config file _backend-dev.tfbackend_ or _backend-prod.tfbackend_ run:

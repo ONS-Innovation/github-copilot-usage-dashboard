@@ -30,7 +30,7 @@ validate_semver() {
 
 # Check if a profile name is passed as an argument
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] ; then
-  echo "Usage: $0 <aws profile e.g ons_sdp_sandbox> <AWS account ID e.g 123456789> <env e.g sdp-sandbox> <container-ver e.g 1.0.0>"
+  echo "Usage: $0 <aws profile e.g ons_sdp_dev> <AWS account ID e.g 123456789> <env e.g sdp-dev> <container-ver e.g 1.0.0>"
   exit 1
 fi
 
@@ -41,8 +41,8 @@ VER=$4
 IMAGE_NAME=copilot-usage
 
 # Check if the environment matches expected values
-if [ "$3" != "sdp-sandbox" ] && [ "$3" != "sdp-dev" ] && [ "$3" != "sdp-prod" ]; then
-  echo "Usage: $0 env must be one of sdp-sandbox or sdp-dev or sdp-prod"
+if [ "$3" != "sdp-dev" ] && [ "$3" != "sdp-prod" ]; then
+  echo "Usage: $0 env must be one of sdp-dev or sdp-prod"
   exit 1
 else
     ENV=$3

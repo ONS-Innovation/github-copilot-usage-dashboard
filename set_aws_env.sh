@@ -9,17 +9,12 @@
 # [ecr_account]
 # aws_access_key_id = EXAMPLEACCESSKEY-ECR
 # aws_secret_access_key = EXAMPLESECRETACCESSKEY-ECR
-# # organisation aws account
-# [ons_sdp_sandbox]
-# aws_access_key_id = EXAMPLEACCESSKEY-SANDBOX
-# aws_secret_access_key = EXAMPLESECRETACCESSKEY-SANDBOX
-
 
 #!/bin/bash
 
 # Check if a profile name is passed as an argument
 if [ -z "$1" ] || [ -z "$2" ]; then
-  echo "Usage: $0 <profile-name e.g ons_sdp_sandbox> <env e.g sdp-sandbox>"
+  echo "Usage: $0 <profile-name e.g ons_sdp_dev> <env e.g sdp-dev>"
   exit 1
 fi
 
@@ -27,8 +22,8 @@ PROFILE=$1
 CREDENTIALS_FILE="$HOME/.aws/credentials"
 
 # Check if the environment matches expected values
-if [ "$2" != "sdp-sandbox" ] && [ "$2" != "sdp-dev" ]; then
-  echo "Usage: $0 env must be one of sdp-sandbox or sdp-dev"
+if [ "$2" != "sdp-dev" ]; then
+  echo "Usage: $0 env must be sdp-dev"
   exit 1
 else
     ENV=$2
