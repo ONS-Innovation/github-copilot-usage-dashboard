@@ -70,10 +70,12 @@ This project uses Pytest for testing. The tests can be found in the `tests` fold
 
 To run all tests, use `make test`.
 
-On pull request or push to the `master` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%.
+On pull request or push to the `master` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%. 
+
+The related workflow can be found in `.github/workflows/ci.yml`.
 
 ## Linting
-This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in both `src` and `tests`.
+This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in `src`.
 
 The following Makefile commands can be used to run linting and optionally apply fixes or run a specific linter:
 ```bash
@@ -92,7 +94,9 @@ lint  ## Run Python linters without fixing.
 lint-apply ## Run black and ruff with auto-fix, and Pylint.
 ```
 
-On pull request or push to the `master` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes.
+On pull request or push to the `master` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
+
+The related workflow can be found in `.github/workflows/ci.yml`.
 
 # AWS Lambda Scripts
 
@@ -192,13 +196,13 @@ To run the Lambda function outside of a container, we need to execute the `handl
 2. Export the required environment variables:
 
     ```bash
-    export AWS_ACCESS_KEY_ID=<access_key_id>
-    export AWS_SECRET_ACCESS_KEY=<secret_access_key>
+    export AWS_ACCESS_KEY_ID=<aws_access_key_id>
+    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
     export AWS_DEFAULT_REGION=eu-west-2
-    export AWS_SECRET_NAME=<secret_name>
-    export S3_BUCKET_NAME=<bucket_name>
-    export GITHUB_ORG=<org>
-    export GITHUB_APP_CLIENT_ID=<client_id>
+    export AWS_SECRET_NAME=<aws_secret_name>
+    export GITHUB_ORG=ONSDigital
+    export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+    export AWS_ACCOUNT_NAME=sdp-sandbox
     ```
 
 3. Run the script.

@@ -170,7 +170,14 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
 
 
 def get_and_update_historic_usage(s3, gh):
-    """Get and update historic usage data from GitHub Copilot."""
+    """
+    Get and update historic usage data from GitHub Copilot.
+    Args:
+        s3 (boto3.client): An S3 client.
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+    Returns:
+        tuple: A tuple containing the updated historic usage data and a list of dates added.
+    """
     # Get the usage data
     usage_data = gh.get(f"/orgs/{org}/copilot/metrics")
     usage_data = usage_data.json()
@@ -207,7 +214,14 @@ def get_and_update_historic_usage(s3, gh):
 
 
 def get_and_update_copilot_teams(s3, gh):
-    """Get and update GitHub Teams with Copilot Data."""
+    """
+    Get and update GitHub Teams with Copilot Data.
+    Args:
+        s3 (boto3.client): An S3 client.
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+    Returns:
+        list: A list of GitHub Teams with Copilot Data.
+    """
     logger.info("Getting GitHub Teams with Copilot Data")
 
     copilot_teams = []
@@ -238,7 +252,15 @@ def get_and_update_copilot_teams(s3, gh):
 def create_dictionary(
     gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list
 ):
-    """Create a dictionary for quick lookup of existing team data using the `name` field."""
+    """
+    Create a dictionary for quick lookup of existing team data using the `name` field.
+    Args:
+        gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+        copilot_teams (list): List of teams with Copilot data.
+        existing_team_history (list): List of existing team history data.
+    Returns:
+        list: A list of dictionaries containing team data and their history.
+    """
     existing_team_data_map = {
         single_team["team"]["name"]: single_team for single_team in existing_team_history
     }
@@ -285,6 +307,9 @@ def update_s3_object(s3_client, bucket_name, object_name, data):
         bucket_name (str): The name of the S3 bucket.
         object_name (str): The name of the S3 object.
         data (dict): The data to be written to the S3 object.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
     """
     try:
         s3_client.put_object(
@@ -293,8 +318,10 @@ def update_s3_object(s3_client, bucket_name, object_name, data):
             Body=json.dumps(data, indent=4).encode("utf-8"),
         )
         logger.info("Successfully updated %s in bucket %s", object_name, bucket_name)
+        return True
     except ClientError as e:
         logger.error("Failed to update %s in bucket %s: %s", object_name, bucket_name, e)
+        return False
 
 
 def get_team_history(
@@ -321,5 +348,7 @@ def get_team_history(
     return response.json()
 
 
+# # Dev Only
+# # Uncomment the following line to run the script locally
 # if __name__ == "__main__":
 #     handler(None, None)
