@@ -264,16 +264,16 @@ That infrastructure is defined in the repository [sdp-infrastructure](https://gi
 
 The following users must be provisioned in AWS IAM:
 
-- ecr-user
+- `ecr-user`
   - Used for interaction with the Elastic Container Registry from AWS cli
-- terraform-user
+- `terraform-user`
   - Used for terraform staging of the resources required to deploy the service
 
 The following groups and permissions must be defined and applied to the above users:
 
-- ecr-user-group
+- `ecr-user-group`
   - EC2 Container Registry Access
-- terraform-user-group
+- `terraform-user-group`
   - Dynamo DB Access
   - EC2 Access
   - ECS Access
@@ -286,13 +286,13 @@ The following groups and permissions must be defined and applied to the above us
 
 **The Lambda Script Terraform requires some additional permissions to those above:**
 
-- AmazonEC2ContainerRegistryFullAccess
-- AmazonEventBridgeFullAccess
-- AWSLambda_FullAccess
+- `AmazonEC2ContainerRegistryFullAccess`
+- `AmazonEventBridgeFullAccess`
+- `AWSLambda_FullAccess`
 
 Further to the above, an IAM Role must be defined to allow ECS tasks to be executed:
 
-- ecsTaskExecutionRole
+- `ecsTaskExecutionRole`
   - See the [AWS guide to create the task execution role policy](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
 
 #### Bootstrap for Terraform
@@ -301,33 +301,29 @@ To store the state and implement a state locking mechanism for the service resou
 
 #### Running the Terraform
 
-There are associated README files in each of the Terraform modules in this repository.  
-
-- terraform/dashboard/main.tf
-  - This provisions the resources required to launch the Copilot Usage Dashboard iteself.
-- terraform/main.tf
+- `terraform/main.tf`
   - This provisions the resources required to launch the Copilot Dashboard's data collection Lambda script (data logger).
 
-Depending upon which environment you are deploying to, you will want to run your terraform by pointing at an appropriate environment tfvars file.
+Depending upon which environment you are deploying to, you will want to run your Terraform by pointing at an appropriate environment `tfvars` file.
 
 Example service tfvars file:
 [/env/dev/example_tfvars.txt](/terraform/env/dev/example_tfvars.txt)
 
 ### Updating the running service using Terraform
 
-If the application has been modified then the following can be performed to update the running service:
+If the application has been modified, the following can be performed to update the running service:
 
 - Build a new version of the container image and upload to ECR as per the instructions earlier in this guide.
-- Change directory to **terraform**
+- Change directory to `terraform`
 
   ```bash
   cd terraform
   ```
 
-- In the appropriate environment variable file env/dev/dev.tfvars or env/prod/prod.tfvars
+- In the appropriate environment variable file `env/dev/dev.tfvars` or `env/prod/prod.tfvars`
   - Fill out the appropriate variables
 
-- Initialise terraform for the appropriate environment config file _backend-dev.tfbackend_ or _backend-prod.tfbackend_ run:
+- Initialise Terraform for the appropriate environment config file `backend-dev.tfbackend` or `backend-prod.tfbackend` run:
 
   ```bash
   terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
@@ -365,7 +361,7 @@ If the application has been modified then the following can be performed to upda
   terraform apply -var-file=env/dev/dev.tfvars
   ```
 
-- When the terraform has applied successfully the Lambda and EventBridge Schedule will be created.
+- When the Terraform has applied successfully, the Lambda and EventBridge Schedule will be created.
 
 ### Destroy the Main Service Resources
 
@@ -388,12 +384,11 @@ To setup the deployment pipeline with concourse, you must first allowlist your I
 server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used. 
 
 Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > Concourse Login) to
-login. All our pipelines run on sdp-pipeline-prod, whereas sdp-pipeline-dev is the account used for
-changes to Concourse instance itself. Make sure to export all necessary environment variables from sdp-pipeline-prod (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN).
+login. All our pipelines run on `sdp-pipeline-prod`, whereas `sdp-pipeline-dev` is the account used for
+changes to Concourse instance itself. Make sure to export all necessary environment variables from `sdp-pipeline-prod` (**AWS_ACCESS_KEY_ID**, **AWS_SECRET_ACCESS_KEY**, **AWS_SESSION_TOKEN**).
 
 ## Setting up a pipeline
-When setting up our pipelines, we use ecs-infra-user on sdp-dev to be able to interact with our infrastructure on AWS. The credentials for this are stored on
-AWS Secrets Manager so you do not need to set up anything yourself.
+When setting up our pipelines, we use `ecs-infra-user` on `sdp-dev` to be able to interact with our infrastructure on AWS. The credentials for this are stored on AWS Secrets Manager so you do not need to set up anything yourself.
 
 To set the pipeline, run the following script:
 ```bash
@@ -409,7 +404,7 @@ If you wish to set a pipeline for another branch without checking out, you can r
 ./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda <branch_name>
 ```
 
-If the branch you are deploying is "main" or "master", it will trigger a deployment to the sdp-prod environment. To set the ECR image tag, you must draft a Github release pointing to the latest release of the main/master branch that has a tag in the form of vX.Y.Z. Drafting up a release will automatically deploy the latest version of the main/master branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
+If the branch you are deploying is `main` or `master`, it will trigger a deployment to the `sdp-prod` environment. To set the ECR image tag, you must draft a GitHub release pointing to the latest release of the `main/master` branch that has a tag in the form of `vX.Y.Z.` Drafting up a release will automatically deploy the latest version of the `main/master` branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
 
 ## Triggering a pipeline
 Once the pipeline has been set, you can manually trigger a build on the Concourse UI, or run the following command:
