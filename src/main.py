@@ -170,11 +170,12 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
 
 
 def get_and_update_historic_usage(s3, gh):
-    """
-    Get and update historic usage data from GitHub Copilot.
+    """Get and update historic usage data from GitHub Copilot.
+
     Args:
         s3 (boto3.client): An S3 client.
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+
     Returns:
         tuple: A tuple containing the updated historic usage data and a list of dates added.
     """
@@ -214,11 +215,12 @@ def get_and_update_historic_usage(s3, gh):
 
 
 def get_and_update_copilot_teams(s3, gh):
-    """
-    Get and update GitHub Teams with Copilot Data.
+    """Get and update GitHub Teams with Copilot Data.
+
     Args:
         s3 (boto3.client): An S3 client.
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
+
     Returns:
         list: A list of GitHub Teams with Copilot Data.
     """
@@ -252,12 +254,13 @@ def get_and_update_copilot_teams(s3, gh):
 def create_dictionary(
     gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list
 ):
-    """
-    Create a dictionary for quick lookup of existing team data using the `name` field.
+    """Create a dictionary for quick lookup of existing team data using the `name` field.
+
     Args:
         gh (github_api_toolkit.github_interface): An instance of the github_interface class.
         copilot_teams (list): List of teams with Copilot data.
         existing_team_history (list): List of existing team history data.
+
     Returns:
         list: A list of dictionaries containing team data and their history.
     """
