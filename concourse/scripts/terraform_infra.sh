@@ -27,7 +27,7 @@ if [[ ${env} != "prod" ]]; then
     env="dev"
 fi
 
-cd resource-repo/terraform/data_logger/
+cd resource-repo/terraform
 
 terraform init -backend-config=env/${env}/backend-${env}.tfbackend -reconfigure
 

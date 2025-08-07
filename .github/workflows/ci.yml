@@ -38,8 +38,11 @@ jobs:
       - name: Install dependencies
         run: make install-dev
 
-      - name: Lint Python
+      - name: Lint Python (check only)
         run: make lint
+
+      - name: Run tests
+        run: make test
       
       - name: Cleanup residue file
         run: make clean

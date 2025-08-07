@@ -1,21 +1,21 @@
-# Get a base image with a slim version of Python 3.10
-FROM python:3.12-slim
+FROM public.ecr.aws/lambda/python:3.12
 
-# run a pip install for poetry 1.5.0
-RUN pip install poetry==1.5.0
+# Install git using dnf (https://docs.aws.amazon.com/lambda/latest/dg/python-image.html#python-image-base)
+# For python 3.12, dnf replaces yum for package management
+RUN dnf install git -y
 
-# Set the working directory
-WORKDIR /app
+# Copy required files into the container
+COPY pyproject.toml poetry.lock ./
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Install Poetry
+RUN pip install poetry
 
-# Run poetry install --without dev
-RUN poetry install --only main --no-root 
+# Install dependencies using Poetry
+RUN poetry config virtualenvs.create false && \
+    poetry install --only main --no-root
 
-# Expose the port the app runs on
-EXPOSE 8501
+# Copy the source code into the container
+COPY src/ src/
 
-# Run the dashboard
-# Note: ENTRYPOINT cannot be overriden by docker run command
-ENTRYPOINT ["poetry", "run", "streamlit", "run", "src/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
+CMD [ "src.main.handler" ]

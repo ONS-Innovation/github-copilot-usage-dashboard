@@ -21,7 +21,7 @@ variable "aws_secret_name" {
 variable "env_name" {
   description = "AWS environment"
   type        = string
-  default     = "sdp-sandbox"
+  default     = "sdp-dev"
 }
 
 variable "lambda_name" {

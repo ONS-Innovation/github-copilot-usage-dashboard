@@ -1,12 +1,11 @@
-.github/*
-docs/*
-lambda_data_logger/*
-mkdocs_deployment/*
-terraform/*
-.gitignore
-CODEOWNERS
-Makefile
-mkdocs_requirements.txt
-mkdocs.yml
-README.md
-venv/*
+# Virtual Environment
+venv/
+
+# __pycache__
+__pycache__/
+
+.github/
+concourse/
+docs/
+terraform/
+tests/
