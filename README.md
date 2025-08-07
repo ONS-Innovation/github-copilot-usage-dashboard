@@ -97,17 +97,12 @@ The related workflow can be found in `.github/workflows/ci.yml`.
 
 # AWS Lambda Scripts
 
-This script is used to gather data from the `/orgs/{org}/copilot/usage` endpoint in the Github API.
+This script:
+1. Collects Copilot usage data from the GitHub API and appends it to the old data in S3, creating a record of historical data to show trends over time
+2. Collects a list of GitHub Teams with Copilot usage data, to reduce load times in the frontend
+3. Is triggered weekly via AWS EventBridge
 
-The script then appends the collected data to the old data in an S3 bucket.
-
-This creates a record of historical copilot usage data which is used to show trends over time.
-
-The script also gets a list of GitHub Teams with Copilot Usage Data. This is to reduce load times in the frontend.
-
-The API endpoint above only stores the last 28 days worth of data, meaning this script must run at least every 28 days to avoid missing data.
-
-This script is run as a containered lambda function in AWS which is executed periodically using EventBridge.
+Further information can be found in the [documentation](/docs/index.md).
 
 ## Setup - Running in a container
 

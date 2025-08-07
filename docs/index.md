@@ -31,7 +31,7 @@ The Copilot usage data endpoint can be found [here](https://docs.github.com/en/r
 
 ### Historic Data
 
-This section gathers data from AWS S3. The Copilot usage endpoints have a limitation where they only return the last 28 days worth of information. To get around this, the project has an AWS Lambda function which periodically stores data within an S3 bucket.
+This section gathers data from AWS S3. The Copilot usage endpoints have a limitation where they only return the last 28 days worth of information. To get around this, the project has an AWS Lambda function which runs weekly and stores data within an S3 bucket.
 
 ## Getting Started
 
