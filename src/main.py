@@ -87,7 +87,9 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
     return copilot_teams
 
 
-def get_and_update_historic_usage(s3, gh):
+def get_and_update_historic_usage(
+    s3: boto3.client, gh: github_api_toolkit.github_interface
+) -> tuple:
     """Get and update historic usage data from GitHub Copilot.
 
     Args:
@@ -132,7 +134,7 @@ def get_and_update_historic_usage(s3, gh):
     return historic_usage, dates_added
 
 
-def get_and_update_copilot_teams(s3, gh):
+def get_and_update_copilot_teams(s3: boto3.client, gh: github_api_toolkit.github_interface) -> list:
     """Get and update GitHub Teams with Copilot Data.
 
     Args:
@@ -171,7 +173,7 @@ def get_and_update_copilot_teams(s3, gh):
 
 def create_dictionary(
     gh: github_api_toolkit.github_interface, copilot_teams: list, existing_team_history: list
-):
+) -> list:
     """Create a dictionary for quick lookup of existing team data using the `name` field.
 
     Args:
@@ -220,7 +222,9 @@ def create_dictionary(
     return list(existing_team_data_map.values())
 
 
-def update_s3_object(s3_client, bucket_name, object_name, data):
+def update_s3_object(
+    s3_client: boto3.client, bucket_name: str, object_name: str, data: dict
+) -> bool:
     """Update an S3 object with new data.
 
     Args:
@@ -247,7 +251,7 @@ def update_s3_object(s3_client, bucket_name, object_name, data):
 
 def get_team_history(
     gh: github_api_toolkit.github_interface, team: str, query_params: Optional[dict] = None
-):
+) -> json:
     """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
@@ -269,7 +273,7 @@ def get_team_history(
     return response.json()
 
 
-def handler(event, context):  # pylint: disable=unused-argument
+def handler(event: dict, context) -> str:  # pylint: disable=unused-argument
     """AWS Lambda handler function for GitHub Copilot usage data aggregation.
 
     This function:
