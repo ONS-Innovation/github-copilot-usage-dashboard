@@ -251,7 +251,7 @@ def update_s3_object(
 
 def get_team_history(
     gh: github_api_toolkit.github_interface, team: str, query_params: Optional[dict] = None
-) -> json:
+) -> list[dict]:
     """Gets the team metrics Copilot data through the API.
     Note - This endpoint will only return results for a given day if the team had
     five or more members with active Copilot licenses on that day,
@@ -263,7 +263,7 @@ def get_team_history(
         query_params (dict): Additional query parameters for the API request.
 
     Returns:
-        json: A json of team's GitHub team metrics or None if an error occurs.
+        list[dict]: A team's GitHub Copilot metrics or None if an error occurs.
     """
     response = gh.get(f"/orgs/{org}/team/{team}/copilot/metrics", params=query_params)
 
