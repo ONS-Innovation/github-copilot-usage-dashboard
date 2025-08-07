@@ -1,53 +1,56 @@
-# GitHub Copilot Usage Dashboard
+# GitHub Copilot Usage Lambda
 
-A Streamlit dashboard to display information from the Github Copilot Usage API endpoints.
+This repository contains the AWS Lambda Function for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. 
 
----
-
-## Important Notice
-
-This repository is currently using depreciated endpoints to collect CoPilot Usage information and will not be able to show information past the 1st of February 2025.
-
-We are working on refactoring the dashboard and its lambda to make use of the new endpoints and its data structure.
-
-| Documentation | Link |
-| ------------- | ---- |
-| Old Endpoint  | https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28 |
-| New Endpoint  | https://docs.github.com/en/rest/copilot/copilot-metrics?apiVersion=2022-11-28 |
+The Copilot dashboard can be found on the Copilot tab within the Digital Landscape. Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ---
 
-## Interim Solution
-
-While we work on refactoring the CoPilot Dashboard, this repository will contain a temporary solution.
-
-This solution will display high-level information from the new API endpoints.
-
-The old dashboard pages (Organisation Usage & Team Usage) have been toggled to use example data in order to still see them.
-
-The data on these pages is completely synthetic.
-
----
-
-## Disclaimer
-
-### Early Stage & Accessibility Disclaimer
-
-Please note that the code available in this repository for creating a Dashboard to track GitHub Copilot usage within your organisation is in its **early stages of development**. It may **not** fully comply with all Civil Service / ONS best practices for software development. Currently, it is being used by a **limited number of individuals** within ONS. Additionally, due to the limited number of users, this project has **not** been tested for WACG 2.1 compliance nor accessibility. Please consider this when using the project.
-
-### Purpose of Early Sharing
-
-We are sharing this piece of code at this stage to enable other Civil Service entities to utilise it as soon as possible.
-
-### Collaboration and Contribution
-
-Feel free to **fork this repository** and use it as you see fit. If you wish to contribute to this work, please make a pull request, and we will consider adding you as an external collaborator.
+## Table of Contents
+- [GitHub Copilot Usage Lambda](#github-copilot-usage-lambda)
+  - [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Makefile](#makefile)
+  - [Documentation](#documentation)
+  - [Testing](#testing)
+  - [Linting](#linting)
+- [AWS Lambda Scripts](#aws-lambda-scripts)
+  - [Setup - Running in a container](#setup---running-in-a-container)
+  - [Setup - running outside of a Container (Development only)](#setup---running-outside-of-a-container-development-only)
+  - [Storing the container on AWS Elastic Container Registry (ECR)](#storing-the-container-on-aws-elastic-container-registry-ecr)
+  - [Deployment to AWS](#deployment-to-aws)
+    - [Deployment Prerequisites](#deployment-prerequisites)
+      - [Underlying AWS Infrastructure](#underlying-aws-infrastructure)
+      - [Bootstrap IAM User Groups, Users and an ECSTaskExecutionRole](#bootstrap-iam-user-groups-users-and-an-ecstaskexecutionrole)
+      - [Bootstrap for Terraform](#bootstrap-for-terraform)
+      - [Running the Terraform](#running-the-terraform)
+    - [Updating the running service using Terraform](#updating-the-running-service-using-terraform)
+    - [Destroy the Main Service Resources](#destroy-the-main-service-resources)
+- [Deployments with Concourse](#deployments-with-concourse)
+  - [Allowlisting your IP](#allowlisting-your-ip)
+  - [Setting up a pipeline](#setting-up-a-pipeline)
+  - [Triggering a pipeline](#triggering-a-pipeline)
 
 ## Prerequisites
 
-This project uses poetry for package management.
+- A Docker Daemon (Colima is recommended)
+  - [Colima](https://github.com/abiosoft/colima)
+- Terraform (For deployment)
+  - [Terraform](https://www.terraform.io/)
+- Poetry (For package management)
+  - [Poetry](https://python-poetry.org/docs/)
+- Python >3.12
+  - [Python](https://www.python.org/)
+- Make
+  - [GNU make](https://www.gnu.org/software/make/manual/make.html#Overview)
 
-[Instructions to install Poetry](https://python-poetry.org/docs/)
+## Makefile
+
+This repository has a Makefile for executing common commands. To view all commands, execute `make all`.
+
+```bash
+make all
+```
 
 ## Documentation
 
@@ -59,165 +62,158 @@ For more information about MkDocs, see the below documentation.
 
 There is a guide to getting started on this repository's GitHub Pages site.
 
-## Setup - Run outside of Docker
+## Testing
+This project uses Pytest for testing. The tests can be found in the `tests` folder.
 
-Prior to running outside of Docker ensure you have the necessary environment variables setup locally where you are running the application. E.g in linux or OSX you can run the following, providing appropriate values for the variables:
+To run all tests, use `make test`.
 
+On pull request or push to the `master` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%. 
+
+The related workflow can be found in `.github/workflows/ci.yml`.
+
+## Linting
+This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in `src`.
+
+The following Makefile commands can be used to run linting and optionally apply fixes or run a specific linter:
 ```bash
-export AWS_ACCESS_KEY_ID=<aws_access_key_id> 
-export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> 
-export AWS_DEFAULT_REGION=eu-west-2 
-export AWS_SECRET_NAME=<aws_secret_name> 
-export GITHUB_ORG=ONSDigital 
-export GITHUB_APP_CLIENT_ID=<github_app_client_id>
-export GITHUB_APP_CLIENT_SECRET=<github_app_client_secret>
-export AWS_ACCOUNT_NAME=sdp-sandbox
-export APP_URL=http://localhost:8501
+black-check ## Run black for code formatting, without fixing.
+
+black-apply ## Run black and fix code formatting.
+
+ruff-check ## Run ruff for linting and code formatting, without fixing.
+
+ruff-apply ## Run ruff and fix linting and code formatting.
+
+pylint ## Run pylint for code analysis.
+
+lint  ## Run Python linters without fixing.
+
+lint-apply ## Run black and ruff with auto-fix, and Pylint.
 ```
 
-**Please Note:**
+On pull request or push to the `master` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
 
-- APP_URL should point to the url which the app is running at. For example, if running locally you'd use localhost:8501 and on AWS the appropriate domain url.
-- The GITHUB_APP_CLIENT_ID and GITHUB_APP_CLIENT_SECRET can be found from the GitHub App in developer settings.
+The related workflow can be found in `.github/workflows/ci.yml`.
 
-1. Navigate into the project's folder and create a virtual environment using `python3 -m venv venv`
-2. Activate the virtual environment using `source venv/bin/activate`
-3. Install all project dependancies using `make install`
-4. When running the project locally, you need to edit `app.py`.
+# AWS Lambda Scripts
 
-    When creating an instance of `boto3.Session()`, you must pass which AWS credential profile to use, as found in `~/.aws/credentials`.
+This script:
+1. Collects Copilot usage data from the GitHub API and appends it to the old data in S3, creating a record of historical data to show trends over time
+2. Collects a list of GitHub Teams with Copilot usage data, to reduce load times in the frontend
+3. Is triggered weekly via AWS EventBridge
 
-    When running locally:
-
-    ```python
-    session = boto3.Session(profile_name="<profile_name>")
-    ```
-
-    When running from a container:
-
-    ```python
-    session = boto3.Session()
-    ```
-
-5. Run the project using `streamlit run src/app.py`
+Further information can be found in the [documentation](/docs/index.md).
 
 ## Setup - Running in a container
 
 1. Build a Docker Image
 
-    ```bash
-    docker build -t copilot-usage-dashboard .
-    ```
+  ```bash
+  docker build -t copilot-usage-lambda-script .
+  ```
 
 2. Check the image exists
 
-    ```bash
-    docker images
+  ```bash
+  docker images
+  ```
+
+  Example Output:
+
+  ```bash
+  REPOSITORY                                                      TAG         IMAGE ID       CREATED          SIZE
+  copilot-usage-lambda-script                                     latest      0bbe73d9256f   11 seconds ago   224MB
+  ```
+
+3. Run the image locally mapping local host port (9000) to container port (8080) and passing in AWS credentials to download a .pem file from the AWS Secrets Manager to the running container. These credentials will also be used to upload and download `historic_usage_data.json` to and from S3.
+
+  The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager and upload and download files from AWS S3.
+
+  ```bash
+  docker run --platform linux/amd64 -p 9000:8080 \
+  -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
+  -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
+  -e AWS_DEFAULT_REGION=eu-west-2 \
+  -e AWS_SECRET_NAME=<aws_secret_name> \
+  -e GITHUB_ORG=ONSDigital \
+  -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
+  -e AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod> \
+  copilot-usage-lambda-script
+  ```
+
+Once the container is running, a local endpoint is created at `localhost:9000/2015-03-31/functions/function/invocations`.
+
+4. Post to the endpoint to trigger the function
+
+  ```bash
+  curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+  ```
+  This should return a message if successful.
+
+5. Once testing is finished, stop the running container
+
+  To check the container is running
+
+  ```bash
+  docker ps
+  ```
+
+  Example output
+
+  ```bash
+  CONTAINER ID   IMAGE                         COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+  3f7d64676b1a   copilot-usage-lambda-script   "/lambda-entrypoint.…"   44 seconds ago   Up 44 seconds   0.0.0.0:9000->8080/tcp, :::9000->8080/tcp   nice_ritchie
+  ```
+
+  Stop the container
+
+  ```bash
+  docker stop 3f7d64676b1a
+  ```
+
+## Setup - running outside of a Container (Development only)
+
+To run the Lambda function outside of a container, we need to execute the `handler()` function.
+
+1. Uncomment the following at the bottom of `main.py`.
+
+    ```python
+    ...
+    # if __name__ == "__main__":
+    #     handler(None, None)
+    ...
     ```
 
-    Example Output:
+    **Please Note:** If uncommenting the above in `main.py`, make sure you re-comment the code *before* pushing back to GitHub.
+
+2. Export the required environment variables:
 
     ```bash
-    REPOSITORY                                                      TAG         IMAGE ID       CREATED          SIZE
-    copilot-usage-dashboard                                         latest      afa0494f35a5   7 minutes ago    1.02GB
+    export AWS_ACCESS_KEY_ID=<aws_access_key_id>
+    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
+    export AWS_DEFAULT_REGION=eu-west-2
+    export AWS_SECRET_NAME=<aws_secret_name>
+    export GITHUB_ORG=ONSDigital
+    export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+    export AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod>
     ```
 
-3. Run the image locally mapping local port 5801 to container port 5801 and passing in AWS credentials to download a .pem file from AWS Secrets Manager to the running container.
-These credentials should also allow access to S3 for historic reporting.
+3. Run the script.
 
     ```bash
-    docker run -p 8501:8501 \
-    -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
-    -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
-    -e AWS_DEFAULT_REGION=eu-west-2 \
-    -e AWS_SECRET_NAME=<aws_secret_name> \
-    -e GITHUB_ORG=ONSDigital \
-    -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
-    -e GITHUB_APP_CLIENT_SECRET=<github_app_client_secret> \
-    -e AWS_ACCOUNT_NAME=sdp-sandbox \
-    -e APP_URL=http://localhost:8501
-    copilot-usage-dashboard
-    ```
-
-4. Check the container is running
-
-    ```bash
-    docker ps
-    ```
-
-    Example Output:
-
-    ```bash
-    CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS         PORTS                                       NAMES
-    ae4aaf1daee6   copilot-usage-dashboard   "/app/start_dashboar…"   7 seconds ago   Up 6 seconds   0.0.0.0:8501->8501/tcp, :::8501->8501/tcp   quirky_faraday
-    ```
-
-5. To view the running in a browser app navigate to
-
-    ```bash
-    You can now view your Streamlit app in your browser.
-
-    URL: http://0.0.0.0:8501
-    ```
-
-6. To stop the container, use the container ID
-
-    ```bash
-    docker stop ae4aaf1daee6
+    python3 src/main.py
     ```
 
 ## Storing the container on AWS Elastic Container Registry (ECR)
 
-When you make changes to the application a new container image must be pushed to ECR.
-
-### Scripted Push to ECR
-
-This script assumes you have a ~/.aws/credentials file set up with profiles of the credentials for pushing to ECR and that a suitably named repository (environmentname-toolname) is already created in the ECR.  In the credential file you should use the profile that matches the IAM user associated with permissions to push to the ECR.
-
-Setup the environment for the correct credentials. Ensure the script is executable:
-
-```bash
-chmod a+x set_aws_env.sh
-```
-
-Run the script:
-
-```bash
-./set_aws_env.sh <aws-profile e.g ons_sdp_dev_ecr> <environment  e.g sdp-dev> 
-```
-
-Verify the output is as expected:
-
-```bash
-Environment variables are set as:
-export AWS_ACCESS_KEY_ID=MYACCESSKEY
-export AWS_SECRET_ACCESS_KEY=MYSECRETACCESSKEY
-export AWS_DEFAULT_REGION=eu-west-2
-export APP_NAME=sdp-dev-copilot-usage
-```
-
-Ensure the script to build and push the image is executable:
-
-```bash
-chmod a+x publish_container.sh
-```
-
-Check the version of the image you want to build (verify the next available release by looking in ECR)
-
-Run the script, which will build an image locally, connect to ECR, push the image and then check the image is uploaded correctly.
-
-```bash
-./publish_container.sh <AWS Profile - e.g ons_sdp_dev_ecr> <AWS_ACCOUNT_NUMBER> <AWS Env - e.g sdp-dev> <image version - e.g v0.0.1>
-```
-
-### Manual Push to ECR
+When you make changes to the Lambda Script, a new container image must be pushed to ECR.
 
 These instructions assume:
 
-1. You have a repository set up in your AWS account named copilot-usage-dashboard.
-2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in ~/.aws/credentials and can be used by accessing --profile <aws-credentials-profile\>, if these are the only credentials in your file then the profile name is _default_
+1. You have a repository set up in your AWS account named copilot-usage-lambda-script.
+2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is _default_
 
-You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace <aws-credentials-profile\>, <aws-account-id\> and <version\> accordingly):
+You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace `<aws-credentials-profile\>`, `<aws-account-id\>` and `<version\>` accordingly):
 
 1. Get an authentication token and authenticate your docker client for pushing images to ECR:
 
@@ -225,75 +221,19 @@ You can find the AWS repo push commands under your repository in ECR by selectin
     aws ecr --profile <aws-credentials-profile> get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com
     ```
 
-2. Tag your latest built docker image for ECR (assumes you have run _docker build -t sdp-repo-archive ._ locally first)
+2. Tag your latest built docker image for ECR (assumes you have run `docker build -t sdp-repo-archive .` locally first)
 
     ```bash
-    docker tag copilot-usage-dashboard:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-dashboard:<version>
+    docker tag copilot-usage-lambda-script:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
     ```
 
-    **Note:** To find the <version\> to build look at the latest tagged version in ECR and increment appropriately
+    **Note:** To find the `<version\>` to build, look at the latest tagged version in ECR and increment appropriately
 
 3. Push the version up to ECR
 
     ```bash
-    docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-dashboard:<version>
+    docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
     ```
-
-## Data
-
-When running the dashboard, you can toggle between using Live and Example Data.
-
-To use real data from the Github API, the project must be supplied with a copilot-usage-dashboard.pem file in AWS Secret Manager (as mentioned [here](./readme.md/#bootstrap-for-secrets-manager)).
-
-This project also supports historic reporting outside of the 28 days which the API supplies. For more information on setup, please see this [README.md](../aws_lambda_scripts/README.md).
-
-## Team Usage Page
-
-This page shows CoPilot Usage at a team level.
-
-The user will be prompted to login to GitHub on the page.
-
-Logged in users will only be able to see teams that they are a member of.
-
-If the logged in user is apart of an admin team, they can search for and view any team's metrics. See [Updating Admin Teams](#updating-admin-teams) for more information.
-
-**Please Note:**
-
-- The team must have a **minimum of 5 users with active copilot licenses** to have any data.
-- The team must be in the organisation the tool is running in.
-
-### Updating Admin Teams
-
-Currently, there are 2 admin teams `keh-dev` and `sdp-dev`.
-
-These teams are defined in `admin_teams.json` in the `copilot-usage-dashboard` bucket.
-
-To add another admin team, simply add the team name to `admin_teams.json`.
-
-
-`admin_teams.json` is in the following format and must be created manually on a fresh deployment:
-
-```json
-["team-A", "team-B"]
-```
-
-### Permissions
-
-A .pem file is used to allow the project to make authorised Github API requests through the means of Github App authentication.
-The project uses authentication as a Github App installation ([documentation](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation)).
-
-In order to get a .pem file, a Github App must be created an installed into the organisation of which the app will be managing.
-This app should have **Read and Write Administration** organisation permission and **Read-only GitHub Copilot Business** organisation permission.
-
-This file should be uploaded to AWS Secret Manager as below.
-
-### Callback URLs
-
-It is vital that a callback URL is added to allow a login through GitHub when using the `/team_usage` page.
-
-To do this, add `<app_url>/team_usage` as a callback url within your GitHub App's settings.
-
-If you receive an error about an **invalid callback uri**, this callback url either doesn't exist or is incorrect.
 
 ## Deployment to AWS
 
@@ -301,7 +241,7 @@ The deployment of the service is defined in Infrastructure as Code (IaC) using T
 
 ### Deployment Prerequisites
 
-When first deploying the service to AWS the following prerequisites are expected to be in place or added.
+When first deploying the service to AWS, the following prerequisites are expected to be in place or added.
 
 #### Underlying AWS Infrastructure
 
@@ -320,16 +260,16 @@ That infrastructure is defined in the repository [sdp-infrastructure](https://gi
 
 The following users must be provisioned in AWS IAM:
 
-- ecr-user
+- `ecr-user`
   - Used for interaction with the Elastic Container Registry from AWS cli
-- ecs-app-user
+- `terraform-user`
   - Used for terraform staging of the resources required to deploy the service
 
 The following groups and permissions must be defined and applied to the above users:
 
-- ecr-user-group
+- `ecr-user-group`
   - EC2 Container Registry Access
-- ecs-application-user-group
+- `terraform-user-group`
   - Dynamo DB Access
   - EC2 Access
   - ECS Access
@@ -340,52 +280,46 @@ The following groups and permissions must be defined and applied to the above us
   - IAM Access
   - Secrets Manager Access
 
-Further to the above an IAM Role must be defined to allow ECS tasks to be executed:
+**The Lambda Script Terraform requires some additional permissions to those above:**
 
-- ecsTaskExecutionRole
+- `AmazonEC2ContainerRegistryFullAccess`
+- `AmazonEventBridgeFullAccess`
+- `AWSLambda_FullAccess`
+
+Further to the above, an IAM Role must be defined to allow ECS tasks to be executed:
+
+- `ecsTaskExecutionRole`
   - See the [AWS guide to create the task execution role policy](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
 
 #### Bootstrap for Terraform
 
-To store the state and implement a state locking mechanism for the service resources a Terraform backend is deployed in AWS (an S3 object and DynamoDbTable).
-
-#### Bootstrap for Secrets Manager
-
-The service requires access to an associated Github App secret, this secret is created when the Github App is installed in the appropriate Github Organisation.  The contents of the generated pem file is stored in the AWS Secret Manager and retrieved by this service to interact with Github securely.
-
-AWS Secret Manager must be set up with a secret:
-
-- /sdp/tools/copilot-usage/copilot-usage-dashboard.pem
-  - A plaintext secret, containing the contents of the .pem file created when a Github App was installed.
+To store the state and implement a state locking mechanism for the service resources, a Terraform backend is deployed in AWS (an S3 object and DynamoDbTable).
 
 #### Running the Terraform
 
-There are associated README files in each of the Terraform modules in this repository.  
+- `terraform/main.tf`
+  - This provisions the resources required to launch the Copilot Dashboard's data collection Lambda script (data logger).
 
-- terraform/service/main.tf
-  - This provisions the resources required to launch the service.
-
-Depending upon which environment you are deploying to you will want to run your terraform by pointing at an appropriate environment tfvars file.  
+Depending upon which environment you are deploying to, you will want to run your Terraform by pointing at an appropriate environment `tfvars` file.
 
 Example service tfvars file:
-[dashboard/env/sandbox/example_tfvars.txt](./terraform/dashboard/env/sandbox/example_tfvars.txt)
+[/env/dev/example_tfvars.txt](/terraform/env/dev/example_tfvars.txt)
 
 ### Updating the running service using Terraform
 
-If the application has been modified then the following can be performed to update the running service:
+If the application has been modified, the following can be performed to update the running service:
 
 - Build a new version of the container image and upload to ECR as per the instructions earlier in this guide.
-- Change directory to the **dashboard terraform**
+- Change directory to `terraform`
 
   ```bash
-  cd terraform/dashboard
+  cd terraform
   ```
 
-- In the appropriate environment variable file env/sandbox/sandbox.tfvars, env/dev/dev.tfvars or env/prod/prod.tfvars
-  - Change the _container_ver_ variable to the new version of your container.
-  - Change the _force_deployment_ variable to _true_.
+- In the appropriate environment variable file `env/dev/dev.tfvars` or `env/prod/prod.tfvars`
+  - Fill out the appropriate variables
 
-- Initialise terraform for the appropriate environment config file _backend-dev.tfbackend_ or _backend-prod.tfbackend_ run:
+- Initialise Terraform for the appropriate environment config file `backend-dev.tfbackend` or `backend-prod.tfbackend` run:
 
   ```bash
   terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
@@ -423,14 +357,14 @@ If the application has been modified then the following can be performed to upda
   terraform apply -var-file=env/dev/dev.tfvars
   ```
 
-- When the terraform has applied successfully the running task will have been replaced by a task running the container version you specified in the tfvars file
+- When the Terraform has applied successfully, the Lambda and EventBridge Schedule will be created.
 
 ### Destroy the Main Service Resources
 
 Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
 
   ```bash
-  cd terraform/dashboard
+  cd terraform
 
   terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
@@ -439,54 +373,37 @@ Delete the service resources by running the following ensuring your reference th
   terraform destroy -var-file=env/dev/dev.tfvars
   ```
 
-## Linting and Formatting
+# Deployments with Concourse
 
-To view all commands
+## Allowlisting your IP
+To setup the deployment pipeline with concourse, you must first allowlist your IP address on the Concourse
+server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used. 
 
+Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > Concourse Login) to
+login. All our pipelines run on `sdp-pipeline-prod`, whereas `sdp-pipeline-dev` is the account used for
+changes to Concourse instance itself. Make sure to export all necessary environment variables from `sdp-pipeline-prod` (**AWS_ACCESS_KEY_ID**, **AWS_SECRET_ACCESS_KEY**, **AWS_SESSION_TOKEN**).
+
+## Setting up a pipeline
+When setting up our pipelines, we use `ecs-infra-user` on `sdp-dev` to be able to interact with our infrastructure on AWS. The credentials for this are stored on AWS Secrets Manager so you do not need to set up anything yourself.
+
+To set the pipeline, run the following script:
 ```bash
-make all
+chmod u+x ./concourse/scripts/set_pipeline.sh
+./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda
+```
+Note that you only have to run chmod the first time running the script in order to give permissions.
+This script will set the branch and pipeline name to whatever branch you are currently on. It will also set the image tag on ECR to the current commit hash at the time of setting the pipeline.
+
+The pipeline name itself will usually follow a pattern as follows: `<repo-name>-<branch-name>`
+If you wish to set a pipeline for another branch without checking out, you can run the following:
+```bash
+./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda <branch_name>
 ```
 
-Linting tools must first be installed before they can be used
+If the branch you are deploying is `main` or `master`, it will trigger a deployment to the `sdp-prod` environment. To set the ECR image tag, you must draft a GitHub release pointing to the latest release of the `main/master` branch that has a tag in the form of `vX.Y.Z.` Drafting up a release will automatically deploy the latest version of the `main/master` branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
 
+## Triggering a pipeline
+Once the pipeline has been set, you can manually trigger a build on the Concourse UI, or run the following command:
 ```bash
-make install-dev
-```
-
-To clean residue files
-
-```bash
-make clean
-```
-
-To format your code
-
-```bash
-make format
-```
-
-To run all linting tools
-
-```bash
-make lint
-```
-
-To run a specific linter (black, ruff, pylint)
-
-```bash
-make black
-make ruff
-make pylint
-```
-
-To run mypy (static type checking)
-
-```bash
-make mypy
-```
-
-To run the application locally
-
-```bash
-make run-local
+fly -t aws-sdp trigger-job -j github-copilot-usage-lambda-<branch-name>/build-and-push
 ```

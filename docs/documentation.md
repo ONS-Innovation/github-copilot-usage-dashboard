@@ -35,7 +35,7 @@ In order to build an MkDocs deployment or serve the documentation locally, we ne
 2. Install MkDocs and its dependencies.
 
     ```bash
-    pip install -r mkdocs_requirements.txt
+    poetry install --only docs
     ```
 
 3. You can now use MkDocs. To see a list of commands run the following:
@@ -43,8 +43,6 @@ In order to build an MkDocs deployment or serve the documentation locally, we ne
     ```bash
     mkdocs --help
     ```
-
-**Please Note:** Python's package manager, PIP, is required to install MkDocs. Please make sure you have Python installed beforehand.
 
 ## Updating MkDocs Deployment
 
@@ -56,7 +54,7 @@ A GitHub Action is set up to automatically deploy the documentation to GitHub Pa
 
 If changes are made within `/docs`, the GitHub Pages deployment will need to be updated. Assuming you have already installed [MkDocs](https://www.mkdocs.org/getting-started/#installation) and [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/getting-started/#installation), do the following:
 
-1. Navigate to the projects root directory.
+1. Navigate to the project's root directory.
 
 2. Deploy the documentation to GitHub Pages.
 
