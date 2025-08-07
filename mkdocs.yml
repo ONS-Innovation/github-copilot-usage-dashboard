@@ -1,7 +1,7 @@
-site_name: GitHub Copilot Usage Dashboard
+site_name: GitHub Copilot Usage Lambda
 
-repo_url: https://github.com/ONS-Innovation/github-copilot-usage-dashboard
-repo_name: GitHub Copilot Usage Dashboard
+repo_url: https://github.com/ONS-Innovation/github-copilot-usage-lambda
+repo_name: GitHub Copilot Usage Lambda
 
 nav:
   - Home: 'index.md'
