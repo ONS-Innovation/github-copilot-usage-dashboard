@@ -318,18 +318,6 @@ def handler(event, context):  # pylint: disable=unused-argument
     # GitHub Teams with Copilot Data
     copilot_teams = get_and_update_copilot_teams(s3, gh)
 
-    logger.info(
-        "Process complete",
-        extra={
-            "bucket": BUCKET_NAME,
-            "no_days_added": len(dates_added),
-            "dates_added": dates_added,
-            "no_dates_before": len(historic_usage) - len(dates_added),
-            "no_dates_after": len(historic_usage),
-            "no_copilot_teams": len(copilot_teams),
-        },
-    )
-
     logger.info("Getting history of each team identified previously")
 
     # Retrieve existing team history from S3
@@ -347,6 +335,18 @@ def handler(event, context):  # pylint: disable=unused-argument
 
     # Write updated team history to S3
     update_s3_object(s3, BUCKET_NAME, "teams_history.json", updated_team_history)
+
+    logger.info(
+        "Process complete",
+        extra={
+            "bucket": BUCKET_NAME,
+            "no_days_added": len(dates_added),
+            "dates_added": dates_added,
+            "no_dates_before": len(historic_usage) - len(dates_added),
+            "no_dates_after": len(historic_usage),
+            "no_copilot_teams": len(copilot_teams),
+        },
+    )
 
     return "Github Data logging is now complete."
 

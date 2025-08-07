@@ -2,7 +2,7 @@
 
 This repository contains the AWS Lambda Function for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. 
 
-The Copilot dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot). Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
+The Copilot dashboard can be found on the Copilot tab within the Digital Landscape. Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ---
 
@@ -153,6 +153,7 @@ Once the container is running, a local endpoint is created at `localhost:9000/20
   ```bash
   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
   ```
+  This should return a message if successful.
 
 5. Once testing is finished, stop the running container
 

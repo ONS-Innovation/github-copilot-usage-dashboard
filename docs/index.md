@@ -4,7 +4,7 @@
 
 This project contains an AWS Lambda Function which updates the GitHub Copilot dashboard's historic information, stored within an S3 bucket.
 
-The Copilot dashboard can be found on the [Copilot tab within the Digital Landscape](digital-landscape.sdp-prod.aws.onsdigital.uk/copilot). Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
+The Copilot dashboard can be found on the Copilot tab within the Digital Landscape. Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ## Techstack Overview
 ## Architecture Overview
