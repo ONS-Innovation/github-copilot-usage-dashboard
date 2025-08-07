@@ -67,7 +67,7 @@ This project uses Pytest for testing. The tests can be found in the `tests` fold
 
 To run all tests, use `make test`.
 
-On pull request or push to the `master` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%. 
+On pull request or push to the `main` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%. 
 
 The related workflow can be found in `.github/workflows/ci.yml`.
 
@@ -91,7 +91,7 @@ lint  ## Run Python linters without fixing.
 lint-apply ## Run black and ruff with auto-fix, and Pylint.
 ```
 
-On pull request or push to the `master` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
+On pull request or push to the `main` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
 
 The related workflow can be found in `.github/workflows/ci.yml`.
 
@@ -400,7 +400,7 @@ If you wish to set a pipeline for another branch without checking out, you can r
 ./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda <branch_name>
 ```
 
-If the branch you are deploying is `main` or `master`, it will trigger a deployment to the `sdp-prod` environment. To set the ECR image tag, you must draft a GitHub release pointing to the latest release of the `main/master` branch that has a tag in the form of `vX.Y.Z.` Drafting up a release will automatically deploy the latest version of the `main/master` branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
+If the branch you are deploying is `main`, it will trigger a deployment to the `sdp-prod` environment. To set the ECR image tag, you must draft a GitHub release pointing to the latest release of the `main` branch that has a tag in the form of `vX.Y.Z.` Drafting up a release will automatically deploy the latest version of the `main` branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
 
 ## Triggering a pipeline
 Once the pipeline has been set, you can manually trigger a build on the Concourse UI, or run the following command:
