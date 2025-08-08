@@ -35,4 +35,4 @@ This section gathers data from AWS S3. The Copilot usage endpoints have a limita
 
 ## Getting Started
 
-To setup and use the project, please refer to the [README](https://github.com/ONS-Innovation/github-copilot-usage-dashboard/blob/master/README.md).
+To setup and use the project, please refer to the [README](https://github.com/ONS-Innovation/github-copilot-usage-lambda/blob/main/README.md).

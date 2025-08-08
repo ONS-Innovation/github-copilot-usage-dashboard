@@ -1,12 +1,12 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: github-copilot-usage-dashboard
+  name: github-copilot-usage-lambda
   annotations:
-    github.com/project-slug: ONS-Innovation/github-copilot-usage-dashboard
+    github.com/project-slug: ONS-Innovation/github-copilot-usage-lambda
   links:
-    - url: https://ons-innovation.github.io/github-copilot-usage-dashboard
-      title: Copilot Usage Dashboard Documentation  
+    - url: https://ons-innovation.github.io/github-copilot-usage-lambda
+      title: Copilot Usage Lambda Documentation  
 spec:
   type: service
   lifecycle: production
