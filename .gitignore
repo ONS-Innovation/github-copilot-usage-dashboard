@@ -53,10 +53,6 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# Ignore the terraform/service prority calc
-terraform/dashboard/highest_priority.txt
-terraform/dashboard/highest_alb_listener_priority.txt
-
 .env
 
 # Ignore the .DS_Store file created by macOS
