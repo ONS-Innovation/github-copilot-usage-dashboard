@@ -379,7 +379,7 @@ def handler(event: dict, context) -> str:  # pylint: disable=unused-argument
     return "Github Data logging is now complete."
 
 
-# Dev Only
-# Uncomment the following line to run the script locally
-if __name__ == "__main__":
-    handler(None, None)
+# # Dev Only
+# # Uncomment the following line to run the script locally
+# if __name__ == "__main__":
+#     handler(None, None)
