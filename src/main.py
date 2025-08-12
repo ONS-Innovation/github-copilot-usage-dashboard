@@ -74,9 +74,10 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
 
         if not isinstance(usage_data, Response):
 
-            # If the response is not a Response object, no copilot data is available for this team
+            # If the response is not a Response object, no copilot data is available for this team
             # We can then skip this team
-            # We don't log this as an error, as it is expected that some teams may not have Copilot data and it'd be too noisy
+
+            # We don't log this as an error, as it is expected and it'd be too noisy within logs
 
             continue
 
@@ -96,7 +97,7 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
                     "team_slug": team_slug,
                     "team_description": team_description,
                     "team_html_url": team_html_url,
-                }
+                },
             )
 
             copilot_teams.append(
