@@ -73,16 +73,41 @@ def get_copilot_team_date(gh: github_api_toolkit.github_interface, page: int) ->
         usage_data = gh.get(f"/orgs/{org}/team/{team['name']}/copilot/metrics")
 
         if not isinstance(usage_data, Response):
-            logger.error("Unexpected response type: %s", type(usage_data))
+
+            # If the response is not a Response object, no copilot data is available for this team
+            # We can then skip this team
+
+            # We don't log this as an error, as it is expected and it'd be too noisy within logs
+
             continue
-        copilot_teams.append(
-            {
-                "name": team.get("name", ""),
-                "slug": team.get("slug", ""),
-                "description": team.get("description", ""),
-                "url": team.get("html_url", ""),
-            }
-        )
+
+        # If the response has data, append the team to the list
+        # If there is no data, .json() will return an empty list
+        if usage_data.json():
+
+            team_name = team.get("name", "")
+            team_slug = team.get("slug", "")
+            team_description = team.get("description", "")
+            team_html_url = team.get("html_url", "")
+
+            logger.info(
+                "Team %s has Copilot data",
+                extra={
+                    "team_name": team_name,
+                    "team_slug": team_slug,
+                    "team_description": team_description,
+                    "team_html_url": team_html_url,
+                },
+            )
+
+            copilot_teams.append(
+                {
+                    "name": team_name,
+                    "slug": team_slug,
+                    "description": team_description,
+                    "url": team_html_url,
+                }
+            )
 
     return copilot_teams
 

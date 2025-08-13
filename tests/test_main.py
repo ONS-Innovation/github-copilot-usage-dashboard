@@ -331,9 +331,6 @@ class TestGetCopilotTeamDate:
         with caplog.at_level("ERROR"):
             result = get_copilot_team_date(gh, 1)
             assert result == []
-            assert any(
-                "Unexpected response type" in record.getMessage() for record in caplog.records
-            )
 
     @patch("src.main.org", "test-org")
     def test_get_copilot_team_date_empty_teams(self):
