@@ -33,17 +33,29 @@ ruff-apply: ## Run ruff and fix linting and code formatting.
 pylint: ## Run pylint for code analysis.
 	poetry run pylint src
 
-.PHONY: lint
-lint:  ## Run Python linters without fixing.
+.PHONY: markdown-check
+markdown-check: ## Run markdown linting using Markdownlint, without fixing.
+	@echo "Running Markdownlint...";
+	sh ./shell_scripts/md_lint.sh
+
+.PHONY: markdown-apply
+markdown-apply: ## Run markdown linting with Markdownlint and fix issues.
+	@echo "Running Markdownlint fix...";
+	sh ./shell_scripts/md_fix.sh
+
+.PHONY: lint-check
+lint-check:  ## Run Python linters and markdown linting without fixing.
 	make black-check
 	make ruff-check
 	make pylint
+	make markdown-check
 
 .PHONY: lint-apply
-lint-apply: ## Run black and ruff with auto-fix, and Pylint.
+lint-apply: ## Run Python linters and markdown linting.
 	make black-apply
 	make ruff-apply
 	make pylint
+	make markdown-apply
 
 .PHONY: mypy
 mypy:  ## Run mypy.
