@@ -1,12 +1,13 @@
 # GitHub Copilot Usage Lambda
 
-This repository contains the AWS Lambda Function for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket. 
+This repository contains the AWS Lambda Function for updating the GitHub Copilot dashboard's historic information, stored within an S3 bucket.
 
 The Copilot dashboard can be found on the Copilot tab within the Digital Landscape. Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ---
 
 ## Table of Contents
+
 - [GitHub Copilot Usage Lambda](#github-copilot-usage-lambda)
   - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
@@ -63,18 +64,21 @@ For more information about MkDocs, see the below documentation.
 There is a guide to getting started on this repository's GitHub Pages site.
 
 ## Testing
+
 This project uses Pytest for testing. The tests can be found in the `tests` folder.
 
 To run all tests, use `make test`.
 
-On pull request or push to the `main` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%. 
+On pull request or push to the `main` branch, the tests will automatically run. The workflow will fail if any tests fail, or if test coverage is below 95%.
 
 The related workflow can be found in `.github/workflows/ci.yml`.
 
 ## Linting
+
 This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in `src`.
 
 The following Makefile commands can be used to run linting and optionally apply fixes or run a specific linter:
+
 ```bash
 black-check ## Run black for code formatting, without fixing.
 
@@ -91,13 +95,14 @@ lint  ## Run Python linters without fixing.
 lint-apply ## Run black and ruff with auto-fix, and Pylint.
 ```
 
-On pull request or push to the `main` branch, `make lint-check` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
+On pull request or push to the `main` branch, `make lint-check` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes.
 
 The related workflow can be found in `.github/workflows/ci.yml`.
 
 # AWS Lambda Scripts
 
 This script:
+
 1. Collects Copilot usage data from the GitHub API and appends it to the old data in S3, creating a record of historical data to show trends over time
 2. Collects a list of GitHub Teams with Copilot usage data, to reduce load times in the frontend
 3. Is triggered weekly via AWS EventBridge
@@ -148,6 +153,7 @@ Once the container is running, a local endpoint is created at `localhost:9000/20
   ```bash
   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
   ```
+
   This should return a message if successful.
 
 5. Once testing is finished, stop the running container
@@ -211,7 +217,7 @@ When you make changes to the Lambda Script, a new container image must be pushed
 These instructions assume:
 
 1. You have a repository set up in your AWS account named copilot-usage-lambda-script.
-2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is _default_
+2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is *default*
 
 You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace `<aws-credentials-profile\>`, `<aws-account-id\>` and `<version\>` accordingly):
 
@@ -327,7 +333,7 @@ If the application has been modified, the following can be performed to update t
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
 
-  **_Please Note:_** This step requires an **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** to be loaded into the environment if not already in place.
+  ***Please Note:*** This step requires an **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** to be loaded into the environment if not already in place.
   This can be done using:
 
   ```bash
@@ -376,26 +382,31 @@ Delete the service resources by running the following ensuring your reference th
 # Deployments with Concourse
 
 ## Allowlisting your IP
+
 To setup the deployment pipeline with concourse, you must first allowlist your IP address on the Concourse
-server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used. 
+server. IP addresses are flushed everyday at 00:00 so this must be done at the beginning of every working day whenever the deployment pipeline needs to be used.
 
 Follow the instructions on the Confluence page (SDP Homepage > SDP Concourse > Concourse Login) to
 login. All our pipelines run on `sdp-pipeline-prod`, whereas `sdp-pipeline-dev` is the account used for
 changes to Concourse instance itself. Make sure to export all necessary environment variables from `sdp-pipeline-prod` (**AWS_ACCESS_KEY_ID**, **AWS_SECRET_ACCESS_KEY**, **AWS_SESSION_TOKEN**).
 
 ## Setting up a pipeline
+
 When setting up our pipelines, we use `ecs-infra-user` on `sdp-dev` to be able to interact with our infrastructure on AWS. The credentials for this are stored on AWS Secrets Manager so you do not need to set up anything yourself.
 
 To set the pipeline, run the following script:
+
 ```bash
 chmod u+x ./concourse/scripts/set_pipeline.sh
 ./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda
 ```
+
 Note that you only have to run chmod the first time running the script in order to give permissions.
 This script will set the branch and pipeline name to whatever branch you are currently on. It will also set the image tag on ECR to the current commit hash at the time of setting the pipeline.
 
 The pipeline name itself will usually follow a pattern as follows: `<repo-name>-<branch-name>`
 If you wish to set a pipeline for another branch without checking out, you can run the following:
+
 ```bash
 ./concourse/scripts/set_pipeline.sh github-copilot-usage-lambda <branch_name>
 ```
@@ -403,7 +414,9 @@ If you wish to set a pipeline for another branch without checking out, you can r
 If the branch you are deploying is `main`, it will trigger a deployment to the `sdp-prod` environment. To set the ECR image tag, you must draft a GitHub release pointing to the latest release of the `main` branch that has a tag in the form of `vX.Y.Z.` Drafting up a release will automatically deploy the latest version of the `main` branch with the associated release tag, but you can also manually trigger a build through the Concourse UI or the terminal prompt.
 
 ## Triggering a pipeline
+
 Once the pipeline has been set, you can manually trigger a build on the Concourse UI, or run the following command:
+
 ```bash
 fly -t aws-sdp trigger-job -j github-copilot-usage-lambda-<branch-name>/build-and-push
 ```
