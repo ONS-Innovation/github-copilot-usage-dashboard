@@ -91,7 +91,7 @@ lint  ## Run Python linters without fixing.
 lint-apply ## Run black and ruff with auto-fix, and Pylint.
 ```
 
-On pull request or push to the `main` branch, `make lint` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
+On pull request or push to the `main` branch, `make lint-check` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes. 
 
 The related workflow can be found in `.github/workflows/ci.yml`.
 
