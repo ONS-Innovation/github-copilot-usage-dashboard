@@ -17,6 +17,13 @@ The Copilot dashboard can be found on the Copilot tab within the Digital Landsca
   - [Documentation](#documentation)
   - [Testing](#testing)
   - [Linting](#linting)
+    - [Python](#python)
+    - [Markdown](#markdown)
+      - [Markdown Configuration](#markdown-configuration)
+      - [Markdown GitHub Action](#markdown-github-action)
+    - [Megalinter](#megalinter)
+      - [Megalinter Configuration](#megalinter-configuration)
+      - [Megalinter GitHub Action](#megalinter-github-action)
   - [AWS Lambda Scripts](#aws-lambda-scripts)
     - [Setup - Running in a container](#setup---running-in-a-container)
     - [Setup - running outside of a Container (Development only)](#setup---running-outside-of-a-container-development-only)
@@ -77,7 +84,9 @@ The related workflow can be found in `.github/workflows/ci.yml`.
 
 ## Linting
 
-This project uses Black, Ruff, and Pylint for linting and code formatting. Configurations for each are located in `pyproject.toml`. The linters are set to run on Python files in `src`.
+### Python
+
+This project uses Black, Ruff, and Pylint for linting and code formatting on Python files in `src`. Configurations for each are located in `pyproject.toml`.
 
 The following Makefile commands can be used to run linting and optionally apply fixes or run a specific linter:
 
@@ -100,6 +109,57 @@ lint-apply ## Run black and ruff with auto-fix, and Pylint.
 On pull request or push to the `main` branch, `make lint-check` will automatically run to check code quality, failing if there are any issues. It is up to the developer to apply fixes.
 
 The related workflow can be found in `.github/workflows/ci.yml`.
+
+### Markdown
+
+To lint all markdown files, run the following command:
+
+```bash
+make md-check
+```
+
+To fix all markdown files, run the following command:
+
+```bash
+make md-apply
+```
+
+#### Markdown Configuration
+
+The `.markdownlint.json` file in the root of the repository contains the configuration for markdownlint. This file is used to set the rules and settings for linting markdown files.
+
+Currently, MD013 (line length) is disabled. This is because the default line length of 80 characters is too restrictive.
+
+For a full list of rules, see [Markdownlint Rules / Aliases](https://github.com/DavidAnson/markdownlint?tab=readme-ov-file#rules--aliases)
+
+The `.markdownlintignore` file in the root of the repository is also used to prevent markdownlint running on unnecessary files such as `venv`.
+
+#### Markdown GitHub Action
+
+On pull request or push to the `main` branch, `make md-check` will automatically run to check for linting errors, failing if there are any issues. It is up to the developer to apply fixes.
+
+The related workflow can be found in `.github/workflows/ci.yml`.
+
+### Megalinter
+
+In addition to Python and Markdown-specific linting, this project uses Megalinter to catch all other types of linting errors across the project.
+
+To lint with Megalinter, run:
+```bash
+make megalint
+```
+
+After running, Megalinter will create a folder named `megalinter-reports` containing detailed logs on linting.
+
+#### Megalinter Configuration
+
+The configuration file for Megalinter can be found in the root of the repository, named `.mega-linter.yml`.
+
+#### Megalinter GitHub Action
+
+On pull request or push to the `main` branch, Megalinter will automatically run to check project-wide linting, failing if there are any issues.
+
+The related workflow can be found in `.github/workflows/megalinter.yml`.
 
 ## AWS Lambda Scripts
 
