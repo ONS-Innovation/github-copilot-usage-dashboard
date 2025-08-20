@@ -145,6 +145,7 @@ The related workflow can be found in `.github/workflows/ci.yml`.
 In addition to Python and Markdown-specific linting, this project uses Megalinter to catch all other types of linting errors across the project.
 
 To lint with Megalinter, run:
+
 ```bash
 make megalint
 ```
