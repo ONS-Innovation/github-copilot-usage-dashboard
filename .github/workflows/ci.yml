@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12"]
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
@@ -31,7 +31,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: poetry
-        
+
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
@@ -43,6 +43,6 @@ jobs:
 
       - name: Run tests
         run: make test
-      
+
       - name: Cleanup residue files
         run: make clean

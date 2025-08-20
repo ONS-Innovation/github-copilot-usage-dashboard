@@ -21,7 +21,7 @@ Please write a brief description of why test coverage is not necessary here.
 
 ### Documentation
 
-Has any new documentation been written as part of this issue? We should try to keep documentation up to date 
+Has any new documentation been written as part of this issue? We should try to keep documentation up to date
 as new code is added, rather than leaving it for the future.
 
 - [ ] Yes
