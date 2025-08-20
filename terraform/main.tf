@@ -1,19 +1,19 @@
 terraform {
   backend "s3" {
-    
+
   }
 }
 
 resource "aws_security_group" "lambda_sg" {
-  name = "${var.lambda_name}_security_group"
+  name        = "${var.lambda_name}_security_group"
   description = "Security group for ${var.lambda_name} Lambda function"
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/16"] // Allow HTTPS traffic within VPC
-  }  
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -32,19 +32,19 @@ resource "aws_lambda_function" "lambda_function" {
     log_format = "JSON" // JSON or Text
   }
   vpc_config {
-    subnet_ids          = data.terraform_remote_state.vpc.outputs.private_subnets
-    security_group_ids  = [aws_security_group.lambda_sg.id] // Dedicated security group for Lambda function
+    subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnets
+    security_group_ids = [aws_security_group.lambda_sg.id] // Dedicated security group for Lambda function
   }
 
   role = aws_iam_role.lambda_function_role.arn
 
   environment {
     variables = {
-      ENVIRONMENT = var.env_name
-      GITHUB_ORG = var.github_org
+      ENVIRONMENT          = var.env_name
+      GITHUB_ORG           = var.github_org
       GITHUB_APP_CLIENT_ID = var.github_app_client_id
-      AWS_SECRET_NAME = var.aws_secret_name
-      AWS_ACCOUNT_NAME = var.env_name
+      AWS_SECRET_NAME      = var.aws_secret_name
+      AWS_ACCOUNT_NAME     = var.env_name
     }
   }
 }
