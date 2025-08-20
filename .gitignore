@@ -63,3 +63,6 @@ terraform.rc
 
 # VS Code settings
 .vscode/
+
+# Ignore MegaLinter reports
+megalinter-reports/
