@@ -112,6 +112,8 @@ The related workflow can be found in `.github/workflows/ci.yml`.
 
 ### Markdown
 
+Markdown linting runs in a docker image, so docker must be running before attempting to lint.
+
 To lint all markdown files, run the following command:
 
 ```bash
@@ -143,6 +145,8 @@ The related workflow can be found in `.github/workflows/ci.yml`.
 ### Megalinter
 
 In addition to Python and Markdown-specific linting, this project uses Megalinter to catch all other types of linting errors across the project.
+
+Megalinter runs in a docker image, so docker must be running before attempting to lint.
 
 To lint with Megalinter, run:
 
