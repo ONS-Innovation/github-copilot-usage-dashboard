@@ -1,5 +1,5 @@
 module "eventbridge" {
-  source = "terraform-aws-modules/eventbridge/aws"
+  source  = "terraform-aws-modules/eventbridge/aws"
   version = "4.1.0"
 
   role_name = "${var.lambda_name}-eventbridge-role"
