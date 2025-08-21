@@ -16,7 +16,7 @@ Have any new tests been added as part of this issue? If not, try to explain why 
 
 - [ ] Yes
 - [ ] No
-Please write a brief description of why test coverage is not necessary here.
+      Please write a brief description of why test coverage is not necessary here.
 - [ ] Not as part of this ticket. (Could be done at a later point)
 
 ## Documentation
@@ -26,7 +26,7 @@ as new code is added, rather than leaving it for the future.
 
 - [ ] Yes
 - [ ] No
-Please write a brief description of why documentation is not necessary here.
+      Please write a brief description of why documentation is not necessary here.
 - [ ] Not as part of this ticket. (Could be done at a later point)
 
 ## Related issues

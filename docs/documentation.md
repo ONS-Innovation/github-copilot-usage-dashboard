@@ -34,15 +34,15 @@ In order to build an MkDocs deployment or serve the documentation locally, we ne
 
 2. Install MkDocs and its dependencies.
 
-    ```bash
-    poetry install --only docs
-    ```
+   ```bash
+   poetry install --only docs
+   ```
 
 3. You can now use MkDocs. To see a list of commands run the following:
 
-    ```bash
-    mkdocs --help
-    ```
+   ```bash
+   mkdocs --help
+   ```
 
 ## Updating MkDocs Deployment
 
@@ -58,9 +58,9 @@ If changes are made within `/docs`, the GitHub Pages deployment will need to be 
 
 2. Deploy the documentation to GitHub Pages.
 
-    ```bash
-    mkdocs gh-deploy
-    ```
+   ```bash
+   mkdocs gh-deploy
+   ```
 
 3. This will build the documentation and deploy it to the `gh-pages` branch of your repository. The documentation will be available at `https://ONS-Innovation.github.io/<repository-name>/`.
 
