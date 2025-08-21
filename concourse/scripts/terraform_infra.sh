@@ -1,5 +1,9 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC3040,SC2154,SC2148
 set -euo pipefail
 
+# shellcheck disable=SC2154
 aws_account_id=$(echo "$secrets" | jq -r .aws_account_id)
 aws_access_key_id=$(echo "$secrets" | jq -r .aws_access_key_id)
 
@@ -21,6 +25,7 @@ lambda_timeout=$(echo "$secrets" | jq -r .lambda_timeout)
 export AWS_ACCESS_KEY_ID=$aws_access_key_id
 export AWS_SECRET_ACCESS_KEY=$aws_secret_access_key
 
+# shellcheck disable=SC2086
 git config --global url."https://x-access-token:$github_access_token@github.com/".insteadOf "https://github.com/"
 
 if [[ ${env} != "prod" ]]; then
@@ -31,6 +36,7 @@ cd resource-repo/terraform
 
 terraform init -backend-config=env/${env}/backend-${env}.tfbackend -reconfigure
 
+# shellcheck disable=SC2154
 terraform apply \
 	-var "aws_account_id=$aws_account_id" \
 	-var "aws_access_key_id=$aws_access_key_id" \
