@@ -1,0 +1,19 @@
+skip-check:
+  # IAM Resourcing using wildcards
+  - CKV_AWS_356
+  - CKV_AWS_111
+
+  # Lambda Encryption and Dead Letter Queue
+  - CKV_AWS_173
+  - CKV_AWS_116
+
+  # Cloudwatch Logs KMS Encryption and Retention
+  - CKV_AWS_158
+  - CKV_AWS_338
+
+  # Pin module sources to a commit hash (false positive)
+  - CKV_TF_1
+
+  # These ignores are TEMPORARY. They will be resolved in the future.
+  - CKV_AWS_108
+  - CKV_AWS_272
