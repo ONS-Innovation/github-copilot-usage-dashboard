@@ -30,7 +30,7 @@ DISABLE_LINTERS:
 
   # Conflicting with Prettier
   - MARKDOWN_MARKDOWN_TABLE_FORMATTER
-  
+
   # Disabled due to false positives
   - MARKDOWN_MARKDOWN_LINK_CHECK
 
