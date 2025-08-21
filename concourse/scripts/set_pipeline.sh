@@ -27,4 +27,4 @@ else
 	tag=$(git tag | tail -n 1)
 fi
 
-fly -t aws-sdp set-pipeline -c concourse/ci.yml -p ${repo_name}-${branch} -v branch=${branch} -v tag=${tag} -v env=${env}
+fly -t aws-sdp set-pipeline -c concourse/ci.yml -p "${repo_name}"-"${branch}" -v branch="${branch}" -v tag="${tag}" -v env="${env}"
