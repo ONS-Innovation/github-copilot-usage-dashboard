@@ -28,6 +28,9 @@ DISABLE_LINTERS:
   - REPOSITORY_TRUFFLEHOG
   - REPOSITORY_GIT_DIFF
 
+  # Conflicting with Prettier
+  - MARKDOWN_MARKDOWN_TABLE_FORMATTER
+  
   # Disabled due to false positives
   - MARKDOWN_MARKDOWN_LINK_CHECK
 
