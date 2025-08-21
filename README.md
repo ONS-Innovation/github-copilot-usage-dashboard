@@ -180,67 +180,67 @@ Further information can be found in [this project's documentation](/docs/index.m
 
 1. Build a Docker Image
 
-    ```bash
-    docker build -t copilot-usage-lambda-script .
-    ```
+   ```bash
+   docker build -t copilot-usage-lambda-script .
+   ```
 
 2. Check the image exists
 
-    ```bash
-    docker images
-    ```
+   ```bash
+   docker images
+   ```
 
-    **Example Output:**
+   **Example Output:**
 
-    | REPOSITORY                  | TAG    | IMAGE ID     | CREATED        | SIZE  |
-    |-----------------------------|--------|--------------|----------------|-------|
-    | copilot-usage-lambda-script | latest | 0bbe73d9256f | 11 seconds ago | 224MB |
+   | REPOSITORY                  | TAG    | IMAGE ID     | CREATED        | SIZE  |
+   | --------------------------- | ------ | ------------ | -------------- | ----- |
+   | copilot-usage-lambda-script | latest | 0bbe73d9256f | 11 seconds ago | 224MB |
 
 3. Run the image locally mapping local host port (9000) to container port (8080) and passing in AWS credentials to download a .pem file from the AWS Secrets Manager to the running container. These credentials will also be used to upload and download `historic_usage_data.json` to and from S3.
 
-    The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager and upload and download files from AWS S3.
+   The credentials used in the below command are for a user in AWS that has permissions to retrieve secrets from AWS Secrets Manager and upload and download files from AWS S3.
 
-    ```bash
-    docker run --platform linux/amd64 -p 9000:8080 \
-    -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
-    -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
-    -e AWS_DEFAULT_REGION=eu-west-2 \
-    -e AWS_SECRET_NAME=<aws_secret_name> \
-    -e GITHUB_ORG=ONSDigital \
-    -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
-    -e AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod> \
-    copilot-usage-lambda-script
-    ```
+   ```bash
+   docker run --platform linux/amd64 -p 9000:8080 \
+   -e AWS_ACCESS_KEY_ID=<aws_access_key_id> \
+   -e AWS_SECRET_ACCESS_KEY=<aws_secret_access_key_id> \
+   -e AWS_DEFAULT_REGION=eu-west-2 \
+   -e AWS_SECRET_NAME=<aws_secret_name> \
+   -e GITHUB_ORG=ONSDigital \
+   -e GITHUB_APP_CLIENT_ID=<github_app_client_id> \
+   -e AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod> \
+   copilot-usage-lambda-script
+   ```
 
-    Once the container is running, a local endpoint is created at `localhost:9000/2015-03-31/functions/function/invocations`.
+   Once the container is running, a local endpoint is created at `localhost:9000/2015-03-31/functions/function/invocations`.
 
 4. Post to the endpoint to trigger the function
 
-    ```bash
-    curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
-    ```
+   ```bash
+   curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+   ```
 
-    This should return a message if successful.
+   This should return a message if successful.
 
 5. Once testing is finished, stop the running container
 
-    To check the container is running
+   To check the container is running
 
-    ```bash
-    docker ps
-    ```
+   ```bash
+   docker ps
+   ```
 
-    **Example output:**
+   **Example output:**
 
-    | CONTAINER ID | IMAGE                       | COMMAND                | CREATED        | STATUS        | PORTS                                     | NAMES        |
-    |--------------|-----------------------------|------------------------|----------------|---------------|-------------------------------------------|--------------|
-    | 3f7d64676b1a | copilot-usage-lambda-script | "/lambda-entrypoint.…" | 44 seconds ago | Up 44 seconds | 0.0.0.0:9000->8080/tcp, :::9000->8080/tcp | nice_ritchie |
+   | CONTAINER ID | IMAGE                       | COMMAND                | CREATED        | STATUS        | PORTS                                     | NAMES        |
+   | ------------ | --------------------------- | ---------------------- | -------------- | ------------- | ----------------------------------------- | ------------ |
+   | 3f7d64676b1a | copilot-usage-lambda-script | "/lambda-entrypoint.…" | 44 seconds ago | Up 44 seconds | 0.0.0.0:9000->8080/tcp, :::9000->8080/tcp | nice_ritchie |
 
-    Stop the container
+   Stop the container
 
-    ```bash
-    docker stop 3f7d64676b1a
-    ```
+   ```bash
+   docker stop 3f7d64676b1a
+   ```
 
 ### Setup - running outside of a Container (Development only)
 
@@ -248,32 +248,32 @@ To run the Lambda function outside of a container, we need to execute the `handl
 
 1. Uncomment the following at the bottom of `main.py`.
 
-    ```python
-    ...
-    # if __name__ == "__main__":
-    #     handler(None, None)
-    ...
-    ```
+   ```python
+   ...
+   # if __name__ == "__main__":
+   #     handler(None, None)
+   ...
+   ```
 
-    **Please Note:** If uncommenting the above in `main.py`, make sure you re-comment the code *before* pushing back to GitHub.
+   **Please Note:** If uncommenting the above in `main.py`, make sure you re-comment the code _before_ pushing back to GitHub.
 
 2. Export the required environment variables:
 
-    ```bash
-    export AWS_ACCESS_KEY_ID=<aws_access_key_id>
-    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
-    export AWS_DEFAULT_REGION=eu-west-2
-    export AWS_SECRET_NAME=<aws_secret_name>
-    export GITHUB_ORG=ONSDigital
-    export GITHUB_APP_CLIENT_ID=<github_app_client_id>
-    export AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod>
-    ```
+   ```bash
+   export AWS_ACCESS_KEY_ID=<aws_access_key_id>
+   export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
+   export AWS_DEFAULT_REGION=eu-west-2
+   export AWS_SECRET_NAME=<aws_secret_name>
+   export GITHUB_ORG=ONSDigital
+   export GITHUB_APP_CLIENT_ID=<github_app_client_id>
+   export AWS_ACCOUNT_NAME=<sdp-dev/sdp-prod>
+   ```
 
 3. Run the script.
 
-    ```bash
-    python3 src/main.py
-    ```
+   ```bash
+   python3 src/main.py
+   ```
 
 ### Storing the container on AWS Elastic Container Registry (ECR)
 
@@ -282,33 +282,33 @@ When you make changes to the Lambda Script, a new container image must be pushed
 These instructions assume:
 
 1. You have a repository set up in your AWS account named copilot-usage-lambda-script.
-2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user.  The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is *default*
+2. You have created an AWS IAM user with permissions to read/write to ECR (e.g AmazonEC2ContainerRegistryFullAccess policy) and that you have created the necessary access keys for this user. The credentials for this user are stored in `~/.aws/credentials` and can be used by accessing `--profile <aws-credentials-profile\>`. If these are the only credentials in your file, the profile name is _default_
 
-You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button.  This will display a guide to the following (replace `<aws-credentials-profile\>`, `<aws-account-id\>` and `<version\>` accordingly):
+You can find the AWS repo push commands under your repository in ECR by selecting the "View Push Commands" button. This will display a guide to the following (replace `<aws-credentials-profile\>`, `<aws-account-id\>` and `<version\>` accordingly):
 
 1. Get an authentication token and authenticate your docker client for pushing images to ECR:
 
-    ```bash
-    aws ecr --profile <aws-credentials-profile> get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com
-    ```
+   ```bash
+   aws ecr --profile <aws-credentials-profile> get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com
+   ```
 
 2. Tag your latest built docker image for ECR (assumes you have run `docker build -t sdp-repo-archive .` locally first)
 
-    ```bash
-    docker tag copilot-usage-lambda-script:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
-    ```
+   ```bash
+   docker tag copilot-usage-lambda-script:latest <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
+   ```
 
-    **Note:** To find the `<version\>` to build, look at the latest tagged version in ECR and increment appropriately
+   **Note:** To find the `<version\>` to build, look at the latest tagged version in ECR and increment appropriately
 
 3. Push the version up to ECR
 
-    ```bash
-    docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
-    ```
+   ```bash
+   docker push <aws-account-id>.dkr.ecr.eu-west-2.amazonaws.com/copilot-usage-lambda-script:<version>
+   ```
 
 ### Deployment to AWS
 
-The deployment of the service is defined in Infrastructure as Code (IaC) using Terraform.  The service is deployed as a container on an AWS Fargate Service Cluster.
+The deployment of the service is defined in Infrastructure as Code (IaC) using Terraform. The service is deployed as a container on an AWS Fargate Service Cluster.
 
 #### Deployment Prerequisites
 
@@ -398,7 +398,7 @@ If the application has been modified, the following can be performed to update t
 
   The reconfigure options ensures that the backend state is reconfigured to point to the appropriate S3 bucket.
 
-  ***Please Note:*** This step requires an **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** to be loaded into the environment if not already in place.
+  **_Please Note:_** This step requires an **AWS_ACCESS_KEY_ID** and **AWS_SECRET_ACCESS_KEY** to be loaded into the environment if not already in place.
   This can be done using:
 
   ```bash
@@ -434,15 +434,15 @@ If the application has been modified, the following can be performed to update t
 
 Delete the service resources by running the following ensuring your reference the correct environment files for the backend-config and var files:
 
-  ```bash
-  cd terraform
+```bash
+cd terraform
 
-  terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
+terraform init -backend-config=env/dev/backend-dev.tfbackend -reconfigure
 
-  terraform refresh -var-file=env/dev/dev.tfvars
+terraform refresh -var-file=env/dev/dev.tfvars
 
-  terraform destroy -var-file=env/dev/dev.tfvars
-  ```
+terraform destroy -var-file=env/dev/dev.tfvars
+```
 
 ## Deployments with Concourse
 

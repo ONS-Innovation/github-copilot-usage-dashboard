@@ -31,7 +31,7 @@ This component is an imported library which is shared across multiple GitHub too
 
 ### Endpoint
 
- [View docs for the Copilot usage data endpoint](https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28#get-a-summary-of-copilot-usage-for-organization-members).
+[View docs for the Copilot usage data endpoint](https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28#get-a-summary-of-copilot-usage-for-organization-members).
 
 ### Historic Data
 

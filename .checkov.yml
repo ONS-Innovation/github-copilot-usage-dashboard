@@ -1,7 +1,6 @@
 # Checkov configuration file
 # This file is used to configure Checkov, a static code analysis tool for infrastructure as code.
 ---
-
 skip-check:
   # IAM Resourcing using wildcards
   - CKV_AWS_356
