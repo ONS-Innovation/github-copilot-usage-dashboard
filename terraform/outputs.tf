@@ -1,19 +1,24 @@
 output "lambda_name" {
-  value = aws_lambda_function.lambda_function.function_name
+  description = "Name of the Lambda function"
+  value       = aws_lambda_function.lambda_function.function_name
 }
 
 output "lambda_image" {
-  value = aws_lambda_function.lambda_function.image_uri
+  description = "URI of the Lambda function container image in ECR"
+  value       = aws_lambda_function.lambda_function.image_uri
 }
 
 output "lambda_role" {
-  value = aws_lambda_function.lambda_function.role
+  description = "ARN of the IAM role attached to the Lambda function"
+  value       = aws_lambda_function.lambda_function.role
 }
 
 output "repo_name" {
-  value = local.lambda_repo
+  description = "Name of the ECR repository"
+  value       = local.lambda_repo
 }
 
 output "rule_arn" {
-  value = module.eventbridge.eventbridge_rules["${var.lambda_name}-crons"]["arn"]
+  description = "ARN of the EventBridge rule"
+  value       = module.eventbridge.eventbridge_rules["${var.lambda_name}-crons"]["arn"]
 }
