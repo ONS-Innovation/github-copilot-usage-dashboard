@@ -9,12 +9,14 @@ resource "aws_security_group" "lambda_sg" {
   description = "Security group for ${var.lambda_name} Lambda function"
   vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
   ingress {
+    description = "Allow inbound HTTPS traffic from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/16"] // Allow HTTPS traffic within VPC
   }
   egress {
+    description = "Allow all outbound HTTPS traffic to any destination"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -35,6 +37,12 @@ resource "aws_lambda_function" "lambda_function" {
     subnet_ids         = data.terraform_remote_state.vpc.outputs.private_subnets
     security_group_ids = [aws_security_group.lambda_sg.id] // Dedicated security group for Lambda function
   }
+
+  tracing_config {
+    mode = "Active"
+  }
+
+  reserved_concurrent_executions = 100
 
   role = aws_iam_role.lambda_function_role.arn
 
