@@ -4,9 +4,12 @@
 
 This project contains an AWS Lambda Function which updates the GitHub Copilot dashboard's historic information, stored within an S3 bucket.
 
-The Copilot dashboard can be found on the Copilot tab within the Digital Landscape. Its repository can be found [here](https://github.com/ONS-Innovation/keh-digital-landscape).
+The Copilot dashboard can be found on the Copilot tab within the Digital Landscape.
+
+[View the Digital Landscape's repository](https://github.com/ONS-Innovation/keh-digital-landscape).
 
 ## Techstack Overview
+
 ## Architecture Overview
 
 ![Architecture Diagram](./diagrams/architecture.png)
@@ -25,9 +28,10 @@ This component updates the dashboard's historic information, stored within an S3
 This component is an imported library which is shared across multiple GitHub tools. The toolkit allows applications to make authenticated requests to the GitHub API. It is imported and used by both the dashboard and lambda function.
 
 ## High Level Data Overview
+
 ### Endpoint
 
-The Copilot usage data endpoint can be found [here](https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28#get-a-summary-of-copilot-usage-for-organization-members).
+[View docs for the Copilot usage data endpoint](https://docs.github.com/en/rest/copilot/copilot-usage?apiVersion=2022-11-28#get-a-summary-of-copilot-usage-for-organization-members).
 
 ### Historic Data
 

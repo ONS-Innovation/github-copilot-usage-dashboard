@@ -33,17 +33,36 @@ ruff-apply: ## Run ruff and fix linting and code formatting.
 pylint: ## Run pylint for code analysis.
 	poetry run pylint src
 
-.PHONY: lint
-lint:  ## Run Python linters without fixing.
+.PHONY: md-check
+md-check: ## Run markdown linting using Markdownlint, without fixing.
+	@echo "Running Markdownlint...";
+	sh ./shell_scripts/md_lint.sh
+
+.PHONY: md-apply
+md-apply: ## Run markdown linting with Markdownlint and fix issues.
+	@echo "Running Markdownlint fix...";
+	sh ./shell_scripts/md_fix.sh
+
+.PHONY: lint-check
+lint-check:  ## Run Python linters and markdown linting without fixing.
 	make black-check
 	make ruff-check
 	make pylint
+	make md-check
 
 .PHONY: lint-apply
-lint-apply: ## Run black and ruff with auto-fix, and Pylint.
+lint-apply: ## Run Python linters and markdown linting.
 	make black-apply
 	make ruff-apply
 	make pylint
+	make md-apply
+
+.PHONY: megalint
+megalint:  ## Run the mega-linter.
+	docker run --platform linux/amd64 --rm \
+		-v /var/run/docker.sock:/var/run/docker.sock:rw \
+		-v $(shell pwd):/tmp/lint:rw \
+		oxsecurity/megalinter:v7
 
 .PHONY: mypy
 mypy:  ## Run mypy.

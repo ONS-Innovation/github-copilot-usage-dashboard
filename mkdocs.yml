@@ -1,12 +1,13 @@
+---
 site_name: GitHub Copilot Usage Lambda
 
 repo_url: https://github.com/ONS-Innovation/github-copilot-usage-lambda
 repo_name: GitHub Copilot Usage Lambda
 
 nav:
-  - Home: 'index.md'
-  - Documentation: 'documentation.md'
-  - Team Usage: 'team_usage.md'
+  - Home: "index.md"
+  - Documentation: "documentation.md"
+  - Team Usage: "team_usage.md"
 theme:
   name: material
   language: en
@@ -41,8 +42,6 @@ theme:
 
     - header.autohide
     - content.code.copy
-
-  
 
   logo: assets/logo.png
   favicon: assets/favicon.ico
