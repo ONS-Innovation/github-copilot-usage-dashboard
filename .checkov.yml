@@ -21,6 +21,7 @@ skip-check:
   # SPP use the same pattern so it's not a concern for us
   - CKV_AWS_382
 
-  # These ignores are TEMPORARY. They will be resolved in the future.
-  - CKV_AWS_108
+  # Ignore adding code-signing to Lambda.
+  # It is not needed here since our Lambda functions use container
+  # images over uploading .zip files for layers.
   - CKV_AWS_272
