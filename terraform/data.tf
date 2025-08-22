@@ -39,7 +39,9 @@ data "aws_iam_policy_document" "lambda_logging" {
       "logs:PutLogEvents",
     ]
 
-    resources = ["arn:aws:logs:*:*:*"] #trivy:ignore:AVD-AWS-0057
+    resources = [
+      "${aws_cloudwatch_log_group.loggroup.arn}:*"
+    ]
   }
 }
 
@@ -70,7 +72,7 @@ data "aws_iam_policy_document" "lambda_secret_manager_policy" {
     ]
 
     resources = [
-      "*"
+      "arn:aws:secretsmanager:*:*:secret:${var.aws_secret_name}*"
     ]
   }
 }
