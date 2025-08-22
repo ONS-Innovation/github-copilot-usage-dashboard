@@ -7,6 +7,8 @@ on: # yamllint disable-line rule:truthy
   pull_request:
     branches: [main]
 
+permissions: read-all
+
 concurrency:
   group: "${{ github.head_ref || github.ref }}-${{ github.workflow }}"
   cancel-in-progress: true
@@ -15,12 +17,10 @@ jobs:
   lint-test:
     name: Lint and Test
     runs-on: ubuntu-22.04
-    permissions:
-      contents: read
     strategy:
       matrix:
         python-version: ["3.12"]
-    
+
     steps:
       - uses: actions/checkout@v4
       - name: Install Poetry
@@ -31,18 +31,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: poetry
-        
+
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
       - name: Install dependencies
         run: make install-dev
 
-      - name: Lint Python (check only)
-        run: make lint
+      - name: Lint Python and Markdown (check only)
+        run: make lint-check
 
       - name: Run tests
         run: make test
-      
-      - name: Cleanup residue file
+
+      - name: Cleanup residue files
         run: make clean

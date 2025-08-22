@@ -1,3 +1,4 @@
+---
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
@@ -6,7 +7,7 @@ metadata:
     github.com/project-slug: ONS-Innovation/github-copilot-usage-lambda
   links:
     - url: https://ons-innovation.github.io/github-copilot-usage-lambda
-      title: Copilot Usage Lambda Documentation  
+      title: Copilot Usage Lambda Documentation
 spec:
   type: service
   lifecycle: production
