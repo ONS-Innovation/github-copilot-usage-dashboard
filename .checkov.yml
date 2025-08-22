@@ -17,6 +17,10 @@ skip-check:
   # Pin module sources to a commit hash (false positive)
   - CKV_TF_1
 
+  # Ignore unrestricted egress to any IP address
+  # SPP use the same pattern so it's not a concern for us
+  - CKV_AWS_382
+
   # These ignores are TEMPORARY. They will be resolved in the future.
   - CKV_AWS_108
   - CKV_AWS_272
